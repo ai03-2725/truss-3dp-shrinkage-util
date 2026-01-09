@@ -8,7 +8,7 @@ Extremely rapid filament shrinkage calibration for 3D printer filaments
 
 ## About
 The Truss shrinkage calibrator is a utility designed to calibrate shrinkage ratios for untested 3D printer filaments as quickly and efficiently as possible.  
-Care has been taken to minimize filament waste, print time, and manual burden - calibration can be as short as a 10 minute print, under 2.5 grams of filament, and only two manual measurements after the first use.
+Care has been taken to minimize filament waste, print time, and manual burden - calibration can be as short as a 10 minute print, under 3 grams of filament, and only two manual measurements after the first use.
 
 ## Implementation
 The Truss calibrator achieves the above using the following:
@@ -27,7 +27,7 @@ Averaging the four measurements will yield an accurate shrinkage ratio; however,
 Therefore, if all four dimensions are measured once and the printer's skew does not change, the ratio can be used to extrapolate what all 4 dimensions (and their average) would be from a single axis measurement - allowing for predicting a more accurate shrinkage ratio from a single-dimension print.  
 
 The truss calibrator uses this characteristic to allow subsequent calibrations after the first to be done using a single-beam design, extrapolating the remaining dimensions based on past results.  
-This allows for an simulated 4-dimension calibration to be done from a single 10-minute 2.5g print.
+This allows for an simulated 4-dimension calibration to be done from a very quick single-dimension print.
 
 The webapp will be designed to store the known values as well as allowing for export and import of such values for backup and restore.  
 
