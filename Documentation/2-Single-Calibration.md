@@ -12,16 +12,16 @@
     I personally recommend using Orca's built-in "YOLO single-pass" for this calibration.  
     If using Bambu Studio's built-in flow rate calibration, make sure to select the *higher value* if torn between two chips on the first pass - the second pass only tests values under the first.  
 
-1. Download the Single STL file from [here](/Truss%20Calibration%20Beam%20Single.stl).
+2. Download the Single STL file from [here](/Truss%20Calibration%20Beam%20Single.stl).
     ![Single design](./Images/truss-single.png)
-1. Load it into a modern slicer of your preference, and slice it as described in the [Quad guide](./1-Quad-Calibration.md).
+3. Load it into a modern slicer of your preference, and slice it as described in the [Quad guide](./1-Quad-Calibration.md).
     Make sure that no seams exist on the measurement faces.  
     ![Single beam sliced](./Images/sliced-single.png)
-1. Print the file.
+4. Print the file.
     ![Printing](./Images/printing-single.png)
-1. Once printed, **do not force the print off the build plate** - this may warp the print and render measurements meaningless.  
+5. Once printed, **do not force the print off the build plate** - this may warp the print and render measurements meaningless.  
   Wait for the print to fully cool, then remove it from the build plate; do not measure the print while it is attached to a build plate.  
-1. Measure the X dimensions.  
+6. Measure the X dimensions.  
   
     Before measuring, please note the following two warnings:
     1. **Do not apply excess force to the print with your calipers.**  
@@ -62,15 +62,12 @@
 
     Note these two values down - on a text editor or whatnot if manually calibrating, into the webapp once it goes live in the future.  
 
-1. If calibrating manually, do the following:
+7. If calibrating manually, do the following:
     1. Take an average of the inner and outer values - add them up, divide by 2.  
-    1. **If your printer has non-zero skew or its skew cannot be calibrated (Bambus and similar):**
-        1. Multiply this value by the X to 4-axis extrapolation factor you calculated at the end of Quad calibration.  
-          The resulting value is the predicted/extrapolated average of a quad-beam print.  
-        1. Divide the average value (either the extrapolated value ) by 140. The resulting value (say somewhere in the 0.95~0.99 range) is the shrinkage value of the filament.  
-    1. **If your printer has zero skew:**
-        1. Simply take the average of the inner/outer values of the single beam calculated in the first step above, and divide it by 140. The resulting value (say somewhere in the 0.95~0.99 range) is the shrinkage value of the filament.  
-    1. Use this value to adjust the filament's X/Y shrinkage compensation.  
+    2. Multiply this value by the 4-axis extrapolation factor for the printer which you calculated at the end of Quad calibration.  
+        The resulting value is the predicted/extrapolated average of a quad-beam print.  
+    3. Divide the average value (either the extrapolated value ) by 140 (the designed length in millimeters of the beams). The resulting value (say somewhere in the 0.95~0.99 range) is the shrinkage value of the filament.  
+    4. Use this value to adjust the filament's X/Y shrinkage compensation.  
         For Orca/Bambu, edit the filament's settings, and locate the XY shrinkage option.  
         ![XY shrinkage setting](./Images/shrinkage-adjust-1.png)  
         Then, multiply the existing value by the obtained shrinkage value.  

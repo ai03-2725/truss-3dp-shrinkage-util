@@ -1,0 +1,11 @@
+/* Code tag */
+
+code {
+  font-family: "Chivo Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 275;
+  vertical-align: bottom;
+  padding: 0.225rem 0.4125em 0.225rem 0.4125rem;
+  background-color: #e0e0e0;
+  border-radius: var(--radius-medium);
+}

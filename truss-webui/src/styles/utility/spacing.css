@@ -1,0 +1,13 @@
+@import "./padding/top.css";
+@import "./padding/bottom.css";
+@import "./padding/start.css";
+@import "./padding/end.css";
+@import "./padding/x.css";
+@import "./padding/y.css";
+
+@import "./margin/top.css";
+@import "./margin/bottom.css";
+@import "./margin/start.css";
+@import "./margin/end.css";
+@import "./margin/x.css";
+@import "./margin/y.css";
