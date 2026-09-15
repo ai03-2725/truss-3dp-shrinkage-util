@@ -1,9 +1,24 @@
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-headings);
   font-optical-sizing: auto;
 }
 
-p, dl, dt, ul, ol, summary, figcaption, li, table, dd, small {
+p,
+dl,
+dt,
+ul,
+ol,
+summary,
+figcaption,
+li,
+table,
+dd,
+small {
   font-family: var(--font-body);
   color: var(--text-color-default);
 }
@@ -29,7 +44,7 @@ h4 {
 
 h5 {
   font-size: 1.25rem;
-  opacity: 0.70;
+  opacity: 0.7;
 }
 
 h6 {
@@ -72,8 +87,12 @@ li ul li:first-child {
   background-color: red;
 }
 
-address, cite, blockquote, blockquote p, dt {
-  font-family: "Chivo Mono", monospace;
+address,
+cite,
+blockquote,
+blockquote p,
+dt {
+  font-family: 'Chivo Mono', monospace;
   font-optical-sizing: auto;
   color: var(--text-color-default);
   font-weight: 363;
@@ -84,8 +103,9 @@ blockquote {
   font-style: italic;
 }
 
-var, dfn {
-  font-family: "Chivo Mono", monospace;
+var,
+dfn {
+  font-family: 'Chivo Mono', monospace;
   font-optical-sizing: auto;
   color: var(--text-color-default);
   font-weight: 300;
@@ -93,5 +113,5 @@ var, dfn {
 }
 
 small {
-  color: var(--text-color-deemphasized)
+  color: var(--text-color-deemphasized);
 }

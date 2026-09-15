@@ -1,5 +1,4 @@
 :root {
-
   --form-input-padding: 0.875em;
   --form-input-border: 1px solid #c3c3c3;
   --form-background-color: #fafafa;
@@ -7,8 +6,15 @@
 
   --label-margin: 0.4375rem;
 
-  --font-headings: "Inter", Inter, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Apple SD Gothic Neo", Meiryo, "Noto Sans JP", "Noto Sans KR", "Malgun Gothic", Osaka, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
-  --font-body: "Pretendard JP Variable", "Pretendard JP", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Apple SD Gothic Neo", Meiryo, "Noto Sans JP", "Noto Sans KR", "Malgun Gothic", Osaka, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --font-headings:
+    'Inter', Inter, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue',
+    'Segoe UI', 'Hiragino Sans', 'Apple SD Gothic Neo', Meiryo, 'Noto Sans JP', 'Noto Sans KR',
+    'Malgun Gothic', Osaka, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  --font-body:
+    'Pretendard JP Variable', 'Pretendard JP', Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Hiragino Sans', 'Apple SD Gothic Neo', Meiryo,
+    'Noto Sans JP', 'Noto Sans KR', 'Malgun Gothic', Osaka, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', sans-serif;
   --text-color-default: #414141;
   --text-color-emphasis: #151515;
   --text-color-deemphasized: #6a6a6a;
@@ -110,6 +116,4 @@
     calc(0.007869328px * var(--scalar)) calc(100% - (4.117642px * var(--scalar))),
     calc(0.002130375px * var(--scalar)) calc(100% - (4.558804px * var(--scalar))),
     0px calc(100% - (5px * var(--scalar))); */
-  
- 
 }

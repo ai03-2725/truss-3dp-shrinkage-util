@@ -108,6 +108,13 @@ truss-calibrator:v1:settings   -> { "version": 1, "skipPrerequisites": true|fals
 - Name is the identity; there is no hidden ID. Exported JSON stays human-readable and hand-editable.
 - **Precision:** full float precision is stored and used for all computation. Display rounding never feeds back into computation.
 
+**Versioning scheme (T03.2, final).** The version appears twice, deliberately:
+
+1. In the key name — `truss-calibrator:v1:…` — a coarse namespace. A future incompatible change ships as `v2`, which leaves `v1` data untouched and readable rather than silently reinterpreted.
+2. In the payload — `"version": 1` — the authoritative per-record check. A reader that does not recognise the payload version treats the value as *unreadable* (see §12: treated as empty, raw string retained for export).
+
+A key-name/payload version mismatch is a corruption case, not a migration case: nothing consumes it as data. **These key names are frozen at first ship.** Renaming them later orphans every user's stored printers, which is why they are settled here rather than at the point of first storage.
+
 ---
 
 ## 8. Calculations
@@ -139,7 +146,7 @@ Display values are **rounded half-up** (not truncated — this deliberately depa
 |---|---|
 | Extrapolation factor | 10 |
 | Shrinkage compensation ratio | 5 |
-| Final slicer percentage | 3 *(open item — see §13)* |
+| Final slicer percentage | 3 *(settled — see §13.1)* |
 
 Computation always uses full precision. The final percentage is **not** derived from the displayed ratio.
 
@@ -153,7 +160,9 @@ Computation always uses full precision. The final percentage is **not** derived 
 |---|---|
 | Measurement outside ~133–138.6mm | Designed length is 140mm and documented shrinkage is 0.95–0.99; outside this is almost certainly a misread or wrong unit. |
 | `inner ≥ outer` on the same axis | Inner and outer bracket the same nominal length; this ordering is physically impossible and indicates a misread. |
-| Large inner/outer divergence | Suggests the caliper was seated wrong — the guides warn this yields a bogus diagonal reading. *Threshold open — see §13.* |
+| Divergence > **2.0mm** between the inner and outer reading of one axis | Suggests the caliper was seated wrong — the guides warn this yields a bogus diagonal reading. *(Settled — see §13.2.)* |
+
+**Why 2.0mm for the divergence threshold.** The inner and outer readings of one axis differ by exactly the sum of the two end-wall thicknesses shown in the design — a fixed geometric quantity, not a shrinkage-dependent one, so the same absolute threshold is valid for every material. The shipped designs put that sum well under 1mm, and the worked fixtures in §14.1 use legitimate divergences up to 1.0mm. A divergence above 2mm is therefore not reachable by a correctly seated caliper on any of the three designs, while 2mm sits comfortably above every legitimate case so the warning cannot fire on a good measurement and train the user to ignore it.
 
 ---
 
@@ -299,13 +308,16 @@ Storage is treated as unreliable:
 
 ## 13. Open items
 
-1. **Final percentage precision** — 3dp is proposed (matching the outline's 5dp ratio); verify what Orca/Bambu fields accept. The guides' own example uses 1dp (`98.7%`).
-2. **Inner/outer divergence threshold** — a warning threshold is proposed (e.g. >2mm) but needs validation against real prints.
-3. **Image optimization targets** — display dimensions and output format for the 28 reused images.
-4. **Landing screen copy** — exact wording, and whether it links the canonical documentation.
-5. **Prerequisites reset control** — exact placement and labelling on the printer-data screen.
-6. **Printer list sort order** and delete-confirmation copy.
-7. **Storage key naming** — proposed in §7; confirm before first ship, as renaming later orphans user data.
+Status legend: **Closed** = decided and recorded here and in the section that owns it; **Deferred** = carried into the task that owns the screen.
+
+1. **Final percentage precision — Closed (T03.1). 3 decimal places.**
+   OrcaSlicer's field is `filament_shrink`, labelled "Shrinkage (XY)": a percentage stored as a double with a declared range of 50–150 and no representable-precision ceiling, so 3dp is storable. Of the two candidate values, 3dp is chosen because 2dp would round away up to 0.005% (≈0.007mm over a 140mm beam) *at the moment the value is handed to the slicer*, which is precisely the class of silent degradation this app exists to remove. 3dp is the finest precision that is still physically meaningful: 0.001% is ≈0.0014mm over the beam, an order of magnitude below the 0.01mm caliper resolution, so it adds fidelity without implying accuracy the measurement does not have. The guides' `98.7%` example is an illustrative 1dp rounding, not a constraint.
+2. **Inner/outer divergence threshold — Closed (T03.3). 2.0mm.** Rationale in §8.3.
+3. **Image optimization targets — Closed (T03.4).** Long edge capped at **1400px** (2× the 700px maximum content width defined by `global.css`, so the largest figure is crisp on a 2× display and never upscaled); aspect ratio preserved; **WebP quality 82** for everything, with the original file retained when the WebP is not smaller (protects small flat-colour diagrams); alpha preserved. **No `srcset`:** one 1400px asset is served to every display density and CSS constrains its display size, which keeps the markup and the copy step simple and still removes ~95% of the 38MB. Files are referenced by name from `src/assets/manifest` rather than by glob so an unreferenced image cannot silently ship.
+4. **Landing screen copy** — closed in T17.
+5. **Prerequisites reset control** — closed in T22.
+6. **Printer list sort order** and delete-confirmation copy — closed in T18 and T21.
+7. **Storage key naming — Closed (T03.2).** `truss-calibrator:v1:printers` and `truss-calibrator:v1:settings`, frozen. Versioning scheme in §7.
 
 ---
 

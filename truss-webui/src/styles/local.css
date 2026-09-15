@@ -1,0 +1,319 @@
+/*
+ * App-private styles (T13.3, T13.4).
+ *
+ * `src/styles/**` is bundled into the custom element's shadow root, so nothing in
+ * here can leak out to the host page and no host selector can reach in. Rules
+ * that are genuinely reusable elsewhere belong in `global.css`/`elements/*`;
+ * rules that only make sense for this app belong here.
+ *
+ * Two consequences of the shadow boundary are handled at the top of this file and
+ * are easy to miss, because they are invisible in a page context:
+ *
+ * 1. A host page's `*, *::before, *::after { box-sizing: border-box }` reset does
+ *    **not** reach inside a shadow root, so the app has to reset it itself. The
+ *    element stylesheets assume border-box (full-width inputs with padding), so
+ *    without this the layout is subtly wrong everywhere.
+ * 2. Nothing in the host page constrains media or preformatted text inside the
+ *    tree, so the app sets its own overflow guards. The mobile requirement is
+ *    "must not break", and an unconstrained screenshot is the usual way a
+ *    documentation-heavy flow breaks it.
+ */
+
+/* --- Resets the shadow boundary isolates us from --------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  /* Fill and shrink with the host slot, but never overflow it. */
+  max-width: 100%;
+  min-width: 0;
+  color: var(--text-color-default);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  /* Disables mobile "text inflation", which would otherwise resize our own type
+     scale on a phone. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* --- Inherited properties must be re-established inside the tree ------------ */
+
+/*
+ * `:host` is *not* enough for inherited properties, and the reason is a CSS
+ * scoping rule rather than a bug: rules in the outer tree take precedence over
+ * `:host` rules, so a host page's `* { color: … }` wins on the host element and
+ * every shadow descendant inherits it. The app therefore re-establishes its
+ * baseline on its own root element, whose rules the page cannot reach — that is
+ * what makes "renders identically standalone and embedded" true (decision 13)
+ * rather than aspirational.
+ *
+ * Font *size* is the one thing this cannot fully control: `rem` resolves against
+ * the document root even inside a shadow tree, so a host page with a
+ * non-default root font-size still scales the widget's rem-based type scale.
+ * Setting an explicit `1rem` here stops the host *element*'s font-size from
+ * compounding it, which is the part that can be controlled.
+ */
+.truss-calibrator-root {
+  color: var(--text-color-default);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* --- Layout ---------------------------------------------------------------- */
+
+/*
+ * Labels must not float inside this app.
+ *
+ * The element stylesheets float every `label` and give it `width: 100%` — a
+ * pattern that works in a light-DOM page, where the label is the last thing on
+ * its line. Here it is actively broken: the float consumes the whole line, and
+ * the `display: flex` row that follows it (which holds each measurement input
+ * and its unit) establishes its own formatting context, so its *available* width
+ * is zero. The input then renders at its intrinsic minimum — about 30px — and a
+ * reading cannot be read or typed into it. Measured in a browser: a 30px input
+ * at every viewport width, with the row reporting `width: 0`.
+ *
+ * `float: none` is correct for every label this app renders: they are all
+ * block-level and own their line. (The per-component rules below, such as
+ * `label.check`, already did this in one place; this makes it a property of the
+ * app rather than of one component.)
+ */
+label {
+  float: none;
+}
+
+.truss-calibrator-root {
+  display: block;
+  margin-inline: auto;
+  padding: 0.5rem;
+  max-width: 700px;
+  /* Long words and URLs must wrap rather than widen the widget. */
+  overflow-wrap: break-word;
+}
+
+/*
+ * A field and its unit share the line: the input grows, `mm` sits after it.
+ * Without this the input keeps `width: 100%` from the element stylesheet, fills
+ * the flex line, and wraps the unit onto a line of its own.
+ */
+.row > input[type='text'] {
+  flex: 1 1 auto;
+  inline-size: auto;
+  min-inline-size: 0;
+}
+
+.stack > * + * {
+  margin-top: 1rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.measurement-grid {
+  display: grid;
+  gap: 0.75rem;
+  /* Two up when there is room, one up on a phone. */
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+/* A label/value row in a details block: the value hugs the inline end so a column
+   of numbers lines up on the right, which is how they are compared. */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.detail-row dd {
+  margin: 0;
+  text-align: end;
+}
+
+.detail-row dd[data-emphasis='true'] {
+  color: var(--text-color-emphasis);
+  font-weight: 600;
+}
+
+/* --- Overflow guards (mobile must not break) ------------------------------- */
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+pre,
+code,
+samp,
+kbd,
+table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* --- Instructional media --------------------------------------------------- */
+
+figure {
+  margin: 0;
+}
+
+figure img {
+  border-radius: var(--radius-medium);
+  background-color: var(--form-background-color);
+}
+
+figcaption {
+  font-size: 0.875rem;
+  color: var(--text-color-deemphasized);
+  margin-top: 0.25rem;
+}
+
+/* --- Controls -------------------------------------------------------------- */
+
+/* The element stylesheets style text inputs and buttons but deliberately leave
+   checkboxes and radios to the browser; at phone sizes the browser default is
+   below a comfortable tap-target minimum, so the app sets it. */
+input[type='checkbox'],
+input[type='radio'] {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  min-inline-size: 1.25rem;
+  accent-color: var(--button-bg-primary);
+  margin: 0;
+  flex: none;
+}
+
+label.check {
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-start;
+  padding: 0.5rem 0;
+  float: none;
+  width: auto;
+  cursor: pointer;
+}
+
+/* --- Numeric output -------------------------------------------------------- */
+
+/* Tabular figures keep a column of measurements aligned digit-for-digit, which
+   is the point of the details block: the user reads numbers off it. */
+.numeric {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* The transcribable hero: large, tabular digits that survive being read off one
+   screen and typed into another (PRD §10). */
+.readout {
+  font-family: var(--font-headings);
+  font-variant-numeric: tabular-nums;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-color-emphasis);
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 26rem) {
+  .readout {
+    /* Still comfortably legible at 320px, and never clipped. */
+    font-size: 1.625rem;
+  }
+}
+
+/* --- Messages -------------------------------------------------------------- */
+
+.warning {
+  border-left: 3px solid #a35b00;
+  background-color: #fff8e6;
+  color: #5c3600;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-small);
+}
+
+.error {
+  color: #9b1c1c;
+}
+
+.muted {
+  color: var(--text-color-deemphasized);
+}
+
+.banner {
+  border-left: 3px solid #9b1c1c;
+  background-color: #fdecec;
+  color: #7f1d1d;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-small);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Motion ---------------------------------------------------------------- */
+
+/*
+ * PRD §6.4. The app animates very little, but "very little" is not "none": any
+ * transition or animation the flow gains later is disabled here rather than
+ * having to remember this requirement at the point it is added.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus must always be visible: keyboard-only operation is a functional
+   requirement, and the browser default ring is easy to lose against the form
+   styles. */
+:focus-visible {
+  outline: 2px solid var(--text-color-emphasis);
+  outline-offset: 2px;
+}
+
+/*
+ * Touch targets (T34.4). The inherited button tokens land at 41px at a 16px root
+ * font size — above the WCAG 2.5.8 minimum of 24px, but below the 44px that both
+ * Apple's and Google's guidance gives as the comfortable floor for a thumb. This
+ * is set in `px` on purpose: `rem` inside a shadow tree resolves against the
+ * *host page's* root font size, so a host with `html { font-size: 10px }` would
+ * shrink the buttons to 26px. The floor is the one measurement in this widget
+ * that should not scale with someone else's typography.
+ */
+button,
+.button,
+input[type='submit'],
+input[type='button'],
+input[type='reset'] {
+  min-height: 44px;
+}

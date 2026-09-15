@@ -1,5 +1,4 @@
 :root {
-
 }
 
 /* Don't style form/fieldset by default - leave that to an outer container as necessary */
@@ -30,18 +29,17 @@ label {
 }
 
 /* All regular inputs */
-input:is([type="text"]),
-input:is([type="password"]),
-input:is([type="url"]),
-input:is([type="email"]),
-input:is([type="number"]),
-input:is([type="tel"]),
-input:is([type="search"]),
-input:is([type="date"]),
-input:is([type="month"]),
-input:is([type="week"]),
-input:is([type="datetime-local"])
-{
+input:is([type='text']),
+input:is([type='password']),
+input:is([type='url']),
+input:is([type='email']),
+input:is([type='number']),
+input:is([type='tel']),
+input:is([type='search']),
+input:is([type='date']),
+input:is([type='month']),
+input:is([type='week']),
+input:is([type='datetime-local']) {
   display: block;
   width: 100%;
   max-width: fill-available;
@@ -59,7 +57,7 @@ input::placeholder {
   color: var(--form-placeholder-color);
 }
 
-input:is([type="color"]) {
+input:is([type='color']) {
   box-sizing: border-box;
   display: block;
   font-family: var(--font-body);
@@ -69,16 +67,16 @@ input:is([type="color"]) {
   background-color: var(--form-background-color);
   height: 2.875rem;
 }
-input[type="color"]::-webkit-color-swatch-wrapper {
-	padding: 0;
+input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
 }
-input[type="color"]::-webkit-color-swatch {
-	border: none;
+input[type='color']::-webkit-color-swatch {
+  border: none;
   border-radius: 1.5875px;
 }
 
 /* File-input specific */
-input[type="file"] {
+input[type='file'] {
   font-family: var(--font-body);
   font-size: 0.875rem;
   padding: 0.3125rem 0 0 0;
@@ -93,7 +91,7 @@ input[type="file"] {
 }
 
 /* Horizontal input/button groups */
-fieldset[role="group"] {
+fieldset[role='group'] {
   display: flex;
   flex-direction: row;
 
@@ -116,14 +114,14 @@ fieldset[role="group"] {
 }
 
 /* Spacing for inputs after labels */
-label > input, label > select {
+label > input,
+label > select {
   margin-top: var(--label-margin);
 }
 
 ::file-selector-button {
   display: block;
   margin: 0 0 0.375rem 0;
-
 }
 
 select {
@@ -150,7 +148,7 @@ select:not([multiple]) {
 }
 
 /* Multi select */
-select[multiple] { 
+select[multiple] {
   padding: 1rem 1.03125rem 0.5rem 1.03125rem;
 }
 
@@ -171,7 +169,7 @@ li > label {
   display: inline;
 }
 
-textarea {  
+textarea {
   display: block;
   width: 100%;
   max-width: fill-available;

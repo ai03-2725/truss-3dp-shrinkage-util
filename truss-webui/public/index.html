@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Truss Calibrator — standalone preview</title>
+  </head>
+  <body>
+    <!--
+      Standalone preview / host-page harness.
+
+      Copied verbatim into `dist/`, so `pnpm preview` serves the *built* element
+      with no build-time knowledge of this page. Every URL is relative, which is
+      what lets the same directory be served from the site root or from any
+      sub-path — the embedding requirement in one file (PRD §6.1, §6.3).
+
+      Deliberately plain: it also carries deliberately hostile global styles, so a
+      styling leak out of the shadow root would be visible here (T13.5, T36.3).
+    -->
+    <style>
+      /* Host styles that would wreck the widget if anything leaked across the
+         shadow boundary. */
+      * {
+        font-family: 'Comic Sans MS', cursive;
+        color: rebeccapurple;
+        background: #ffefd5;
+      }
+      button,
+      input,
+      h1,
+      h2,
+      p,
+      label {
+        all: unset;
+      }
+    </style>
+
+    <main>
+      <h1>Host page</h1>
+      <p>Everything above this line is the host's. Below it is the widget.</p>
+      <truss-calibrator></truss-calibrator>
+    </main>
+
+    <script type="module" src="./truss-calibrator.js"></script>
+  </body>
+</html>

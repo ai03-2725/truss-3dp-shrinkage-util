@@ -5,7 +5,7 @@
 /* @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap'); */
 
 /* Import Pretendard font */
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.min.css");
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.min.css');
 
 /* Import Chivo Mono font */
 @import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:ital,wght@0,100..900;1,100..900&display=swap');
@@ -14,17 +14,17 @@
 /* @import "./elements/clothoid-corners.css"; */
 
 /* Import individual element styling */
-@import "./elements/vars.css";
-@import "./elements/kbd.css";
-@import "./elements/code.css";
-@import "./elements/samp.css";
-@import "./elements/pre.css";
-@import "./elements/form.css";
-@import "./elements/text.css";
-@import "./elements/button.css";
+@import './elements/vars.css';
+@import './elements/kbd.css';
+@import './elements/code.css';
+@import './elements/samp.css';
+@import './elements/pre.css';
+@import './elements/form.css';
+@import './elements/text.css';
+@import './elements/button.css';
 
 /* Import spacing utilities */
-@import "./utility/spacing.css";
+@import './utility/spacing.css';
 
 html {
   font-size: 100%;
@@ -50,8 +50,6 @@ html {
   }
 }
 
-
-
 /* Avoid styling the stock iframe element since some sites override styles on their own */
 .iframe-pretty {
   border-style: none;
@@ -66,7 +64,6 @@ html {
   @media (min-width: 768px) {
     max-width: 700px;
   }
-
 }
 
 .spacer {
@@ -95,7 +92,6 @@ html {
   /* position: fixed;
   overflow-y: scroll; */
 }
-
 
 /* Colors */
 :root {

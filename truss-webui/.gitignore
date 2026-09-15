@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Test output
+coverage
+
+# Generated asset copies. The repo-root STLs and Documentation/Images are the
+# single source of truth; `pnpm assets:sync` reproduces these on every build, so
+# committed copies would only be able to drift.
+public/assets/
+src/assets/stl/
+src/assets/img/
+

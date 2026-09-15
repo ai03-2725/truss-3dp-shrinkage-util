@@ -4,10 +4,25 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>truss-webui</title>
+    <meta
+      name="description"
+      content="Development harness for the Truss Calibrator webapp. Not shipped UI."
+    />
+    <meta name="robots" content="noindex" />
+    <title>Truss Calibrator — dev harness</title>
   </head>
   <body>
-    <div id="root"></div>
+    <!--
+      This page is the *development harness* only.
+
+      It mounts the widget the way a host page does — include the script, write
+      the tag — so the zero-config embedding contract is exercised by the normal
+      development loop rather than only at release time. It is not the shipped
+      artefact: that is `dist/truss-calibrator.js` plus `dist/assets/`.
+    -->
+    <main id="root">
+      <truss-calibrator></truss-calibrator>
+    </main>
     <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

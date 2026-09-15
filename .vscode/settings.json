@@ -1,0 +1,9 @@
+{
+  "chat.tools.terminal.autoApprove": {
+    "pnpm": true,
+    "/^node -e \"\nconst mean8 = 1099\\.70/8;\nconst meanX = 137\\.50;\nconst F = mean8/meanX;\nconsole\\.log\\('mean8        ', mean8\\);\nconsole\\.log\\('F            ', F, F\\.toPrecision\\(20\\)\\);\nconst singleBasis = 137\\.60/2 \\+ 137\\.40/2;\nconst mean2 = \\(137\\.60\\+137\\.40\\)/2;\nconsole\\.log\\('mean2        ', mean2\\);\nconst extF = mean2\\*F;\nconsole\\.log\\('mean2\\*F      ', extF, extF\\.toPrecision\\(20\\)\\);\nconsole\\.log\\('target 137\\.4625'\\);\nconst rA = extF/140;\nconst rB = mean8/140;\nconsole\\.log\\('single ratio ', rA, rA\\.toPrecision\\(20\\)\\);\nconsole\\.log\\('quad   ratio ', rB, rB\\.toPrecision\\(20\\)\\);\nconsole\\.log\\('ratio\\*100    ', \\(extF/140\\)\\*100, \\(mean8/140\\)\\*100\\);\nconst rhu=\\(v,p\\)=>\\{const \\[m,e=''\\]=String\\(v\\+'e'\\)\\.split\\('e'\\);const s=Number\\(m\\+'e'\\+\\(Number\\(e\\|\\|0\\)\\+p\\)\\);const r=Math\\.round\\(Math\\.abs\\(s\\)\\);const \\[m2,e2=''\\]=String\\(\\(s<0\\?-r:r\\)\\+'e'\\)\\.split\\('e'\\);return Number\\(m2\\+'e'\\+\\(Number\\(e2\\|\\|0\\)-p\\)\\);\\};\nconsole\\.log\\('display single ratio', rhu\\(rA,5\\)\\.toFixed\\(5\\), 'quad', rhu\\(rB,5\\)\\.toFixed\\(5\\)\\);\nconsole\\.log\\('display pct single', rhu\\(rA\\*100,3\\)\\.toFixed\\(3\\), 'quad', rhu\\(rB\\*100,3\\)\\.toFixed\\(3\\)\\);\n\"\n$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
+  }
+}

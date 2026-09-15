@@ -1,7 +1,7 @@
 /* Keyboard KBD tag */
 
 kbd {
-  font-family: "Chivo Mono", monospace;
+  font-family: 'Chivo Mono', monospace;
   font-optical-sizing: auto;
   font-weight: 175;
   vertical-align: bottom;

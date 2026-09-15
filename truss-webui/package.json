@@ -3,18 +3,49 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@10.5.2",
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": ">=10"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predev": "pnpm assets:sync",
+    "prebuild": "pnpm assets:sync",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "pretest": "pnpm assets:sync",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "assets:sync": "node scripts/sync-assets.mjs"
   },
   "dependencies": {
     "solid-js": "^1.9.15"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@solidjs/testing-library": "^0.8.10",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/user-event": "^14.6.7",
     "@types/node": "^24.13.3",
+    "@vitest/coverage-v8": "^5.0.1",
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-solid": "^0.18.0",
+    "globals": "^17.12.0",
+    "jsdom": "^30.0.1",
+    "prettier": "^3.9.6",
+    "sharp": "^0.35.4",
     "typescript": "~6.0.2",
+    "typescript-eslint": "^8.70.0",
     "vite": "^8.3.0",
-    "vite-plugin-solid": "^2.11.14"
+    "vite-plugin-solid": "^2.11.14",
+    "vitest": "^5.0.1"
   }
 }
