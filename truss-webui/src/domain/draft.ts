@@ -145,11 +145,12 @@ export function setPrinterName(draft: CalibrationDraft, name: string | null): Ca
 /**
  * Whether the user has entered *anything* at all.
  *
- * This is the trigger for the exit confirmation (PRD §9.3): it asks "has the
- * user done work that would be lost", so it counts non-blank text rather than
- * valid numbers. Someone who typed a reading and then wants to leave still gets
- * the confirmation even if what they typed is currently invalid — which is
- * exactly when losing it would sting most.
+ * This is what the exit confirmation is honest *about* (PRD §9.3): it asks "has
+ * the user done work that would be lost", so it counts non-blank text rather
+ * than valid numbers. Someone who typed a reading and then wants to leave is
+ * told it will be discarded even if what they typed is currently invalid — which
+ * is exactly when losing it would sting most. The confirmation itself appears
+ * either way; only its wording changes.
  */
 export function hasAnyMeasurementText(draft: CalibrationDraft): boolean {
   return AXES.some((axis) => {

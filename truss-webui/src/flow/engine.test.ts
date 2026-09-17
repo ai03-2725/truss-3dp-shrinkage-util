@@ -326,16 +326,27 @@ describe('next and back', () => {
 })
 
 describe('exit confirmation matrix', () => {
-  it('leaves without confirming before any measurement exists', () => {
+  it('confirms on the first step, where nothing has been entered yet', () => {
+    const engine = setup()
+    engine.startCalibration()
+    expect(engine.step()?.id).toBe('C1')
+    expect(engine.hasMeasurements()).toBe(false)
+
+    engine.requestExit()
+
+    expect(engine.exitRequested()).toBe(true)
+    expect(engine.screen()).toBe('flow')
+  })
+
+  it('confirms on an instructional step, which also has nothing to lose', () => {
     const engine = setup()
     engine.startCalibration()
     advanceTo(engine, 'Q4')
 
-    expect(engine.isComplete()).toBe(false)
     engine.requestExit()
 
-    expect(engine.exitRequested()).toBe(false)
-    expect(engine.screen()).toBe('landing')
+    expect(engine.exitRequested()).toBe(true)
+    expect(engine.screen()).toBe('flow')
   })
 
   it('confirms once a measurement exists', () => {
@@ -344,6 +355,7 @@ describe('exit confirmation matrix', () => {
     advanceTo(engine, 'Q5')
     satisfyMeasurements(engine, ['X'])
 
+    expect(engine.hasMeasurements()).toBe(true)
     engine.requestExit()
 
     expect(engine.exitRequested()).toBe(true)
@@ -359,23 +371,29 @@ describe('exit confirmation matrix', () => {
     expect(engine.exitRequested()).toBe(true)
   })
 
-  it('does not confirm once the result has been reached', () => {
+  it('confirms on the results step, which used to be exempt for being complete', () => {
     const engine = setup()
     engine.startCalibration()
     advanceTo(engine, 'Q8')
 
     expect(engine.isComplete()).toBe(true)
     engine.requestExit()
-    expect(engine.exitRequested()).toBe(false)
-    expect(engine.screen()).toBe('landing')
+
+    expect(engine.exitRequested()).toBe(true)
+    expect(engine.screen()).toBe('flow')
   })
 
-  it('does not confirm on the final step', () => {
+  it('confirms on the final step too; its own Done control is the path that does not ask', () => {
     const engine = setup()
     engine.startCalibration()
     advanceTo(engine, 'Q9')
 
     engine.requestExit()
+    expect(engine.exitRequested()).toBe(true)
+    expect(engine.screen()).toBe('flow')
+
+    // What the finished screen's Done button calls: the success path.
+    engine.goToLanding()
     expect(engine.screen()).toBe('landing')
   })
 
@@ -414,11 +432,13 @@ describe('exit confirmation matrix', () => {
     expect(engine.step()?.id).toBe('C1')
 
     engine.back()
-    expect(engine.screen()).toBe('landing')
-    expect(engine.exitRequested()).toBe(false)
+
+    // C1's Back *is* the exit, so it asks like the Cancel button does.
+    expect(engine.exitRequested()).toBe(true)
+    expect(engine.screen()).toBe('flow')
   })
 
-  it('holds for the quick flow too, whose first step allows no measurements', () => {
+  it('holds for the quick flow too', () => {
     const engine = setup()
     engine.startCalibration()
     advanceTo(engine, 'S5', 'returning')
@@ -426,6 +446,19 @@ describe('exit confirmation matrix', () => {
 
     engine.requestExit()
     expect(engine.exitRequested()).toBe(true)
+  })
+
+  it('reports whether leaving would discard anything, which is what the copy reads', () => {
+    const engine = setup()
+    engine.startCalibration()
+    advanceTo(engine, 'Q5')
+
+    expect(engine.hasMeasurements()).toBe(false)
+
+    // Any text at all counts, valid or not: someone who typed a reading and
+    // wants to leave still needs to be told it is about to go.
+    satisfyMeasurements(engine, ['X'])
+    expect(engine.hasMeasurements()).toBe(true)
   })
 })
 

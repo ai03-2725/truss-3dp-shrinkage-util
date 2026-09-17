@@ -6,6 +6,7 @@ import {
   fieldIds,
   focusStepHeading,
   STEP_HEADING_ATTRIBUTE,
+  trapFocus,
 } from './a11y'
 import { parseNumber } from '../domain/number'
 import type { MeasurementWarning } from '../domain/validation'
@@ -38,6 +39,14 @@ export interface StepChromeProps {
   readonly exit: () => void
   /** Whether the exit confirmation is showing. */
   readonly exitRequested: boolean
+  /**
+   * Whether the draft holds anything that leaving would lose.
+   *
+   * Read only by the confirmation's wording: pressing Cancel always asks, but a
+   * step where nothing has been entered must not be told its measurements are
+   * about to be discarded.
+   */
+  readonly hasMeasurements: boolean
   readonly confirmExit: () => void
   readonly cancelExit: () => void
   /** Hide the Next control on steps that leave through their own button. */
@@ -61,6 +70,7 @@ export function StepChrome(props: StepChromeProps): JSX.Element {
   const blocked = () => !props.gate.allowed && props.gate.reason !== null
 
   let root: HTMLElement | undefined
+  let background: HTMLDivElement | undefined
 
   createEffect(
     on(
@@ -79,111 +89,218 @@ export function StepChrome(props: StepChromeProps): JSX.Element {
     ),
   )
 
+  /*
+   * While the confirmation is open, the step it is asking about goes `inert`: out
+   * of the tab order and out of the accessibility tree, so the question cannot be
+   * answered by accident on the screen behind it.
+   *
+   * Set as an attribute rather than as a property because that is what `inert`
+   * is, and the jsdom these tests run in has no IDL reflection for it — a
+   * property write would be an unverifiable claim about the shipped widget.
+   */
+  createEffect(() => {
+    if (background === undefined) {
+      return
+    }
+    if (props.exitRequested) {
+      background.setAttribute('inert', '')
+    } else {
+      background.removeAttribute('inert')
+    }
+  })
+
   return (
     <section
-      class="stack"
       aria-label={props.title}
       ref={(element) => {
         root = element
       }}
     >
-      <Show when={props.position !== undefined && props.total !== undefined}>
-        <p class="muted" data-testid="step-progress">
-          Step {props.position} of {props.total}
-        </p>
-      </Show>
+      {/*
+       * One wrapper around everything the dialog is *not*, so that the modal can
+       * be marked as the only live region of the step without the two nests
+       * fighting over who owns `inert`.
+       */}
+      <div
+        class="stack"
+        ref={(element) => {
+          background = element
+        }}
+      >
+        <Show when={props.position !== undefined && props.total !== undefined}>
+          <p class="muted" data-testid="step-progress">
+            Step {props.position} of {props.total}
+          </p>
+        </Show>
 
-      <h2 tabindex="-1" {...{ [STEP_HEADING_ATTRIBUTE]: '' }}>
-        {props.title}
-      </h2>
+        <h2 tabindex="-1" {...{ [STEP_HEADING_ATTRIBUTE]: '' }}>
+          {props.title}
+        </h2>
 
-      {props.children}
+        {props.children}
 
-      <Show when={props.exitRequested}>
-        <ExitConfirmation onConfirm={props.confirmExit} onCancel={props.cancelExit} />
-      </Show>
+        <div class="row">
+          <Show when={props.back !== null}>
+            <button type="button" onClick={() => props.back?.()}>
+              Back
+            </button>
+          </Show>
 
-      <div class="row">
-        <Show when={props.back !== null}>
-          <button type="button" onClick={() => props.back?.()}>
-            Back
-          </button>
+          <Show when={props.showNext ?? true}>
+            <button
+              type="button"
+              onClick={() => props.next()}
+              disabled={!props.gate.allowed}
+              aria-describedby={blocked() ? reasonId : undefined}
+              data-testid="next"
+            >
+              {props.nextLabel ?? 'Next'}
+            </button>
+          </Show>
+        </div>
+
+        <Show when={blocked()}>
+          <p class="muted" id={reasonId} data-testid="gate-reason">
+            {props.gate.reason}
+          </p>
         </Show>
 
         {/*
-         * Exit is offered on every step, not only on the first: the flow is the
+         * Cancel is offered on every step, not only on the first: the flow is the
          * only thing the user came here to do, and making them walk Back through
-         * eight screens to find the way out is not a navigation scheme. Whether
-         * it confirms first is the engine's decision (PRD §9.2, decision 15) —
-         * before the first measurement there is nothing to lose.
+         * eight screens to find the way out is not a navigation scheme.
+         *
+         * It sits *below* the navigation row, under its own spacing, rather than
+         * beside Next: Back and Next are pressed repeatedly and half-attentively,
+         * and the one control on the screen that throws the readings away must not
+         * be one mis-aimed press away from the one pressed to continue. The outline
+         * treatment says the same thing visually — this is the way out of the
+         * screen, not the way through it.
          */}
-        <button type="button" onClick={() => props.exit()} data-testid="exit">
-          Exit
-        </button>
-
-        <Show when={props.showNext ?? true}>
+        <div class="flow-cancel">
           <button
             type="button"
-            onClick={() => props.next()}
-            disabled={!props.gate.allowed}
-            aria-describedby={blocked() ? reasonId : undefined}
-            data-testid="next"
+            class="button-outline"
+            onClick={() => props.exit()}
+            data-testid="exit"
           >
-            {props.nextLabel ?? 'Next'}
+            Cancel calibration
           </button>
-        </Show>
+        </div>
       </div>
 
-      <Show when={blocked()}>
-        <p class="muted" id={reasonId} data-testid="gate-reason">
-          {props.gate.reason}
-        </p>
+      <Show when={props.exitRequested}>
+        <ExitConfirmation
+          hasMeasurements={props.hasMeasurements}
+          onConfirm={props.confirmExit}
+          onCancel={props.cancelExit}
+        />
       </Show>
     </section>
   )
 }
 
+/** The confirmation heading's id, which `aria-labelledby` points at. */
+const EXIT_TITLE_ID = 'exit-confirmation-title'
+
 /**
- * The exit confirmation (T15.4's rule, surfaced).
+ * The exit confirmation, as a modal.
  *
  * Focus lands on **Stay**, not on the destructive action: a confirmation that
  * defaults to discarding measurements turns a stray Enter into data loss. The
  * measurements being discarded are eight caliper readings that cannot be
  * recovered — by design (PRD §12) — so the safe default matters more here than
  * the convenience of confirming with one keystroke.
+ *
+ * Every other way out of a dialog means the same thing. Escape and a click on the
+ * wash behind the card both cancel it, because the answer to "are you sure you
+ * want to throw this away?" must never be *given* by the gesture that dismisses
+ * the question. Leaving stays an explicit press of a labelled button.
+ *
+ * Hand-rolled rather than a native `<dialog>`: `showModal()` is the browser API
+ * for exactly this, but the jsdom the tests run in has no implementation of it,
+ * so the shipped behaviour — focus containment above all — could not be tested at
+ * all. What the native element would have given for free (top layer, `inert`
+ * background, focus containment) is done explicitly here instead.
+ *
+ * The dialog appears on every step, so its wording has to be true on every step:
+ * on the checklist and the instructional screens there is nothing to discard
+ * yet, and being told otherwise would teach the user to dismiss the one warning
+ * that does matter.
  */
-function ExitConfirmation(props: { onConfirm: () => void; onCancel: () => void }): JSX.Element {
+function ExitConfirmation(props: {
+  hasMeasurements: boolean
+  onConfirm: () => void
+  onCancel: () => void
+}): JSX.Element {
+  let card: HTMLDivElement | undefined
   let stay: HTMLButtonElement | undefined
 
   // Focus after mount, not from the ref callback: a ref fires while the subtree
   // is still detached, and focusing a detached element does nothing.
   onMount(() => stay?.focus())
 
+  const onKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      props.onCancel()
+      return
+    }
+    trapFocus(card ?? null, event)
+  }
+
   return (
     <div
-      class="warning"
-      role="group"
-      aria-label="Confirm leaving the calibration"
-      data-testid="exit-confirmation"
+      class="modal-overlay"
+      data-testid="exit-overlay"
+      onClick={(event) => {
+        // Only the wash itself: a click that lands on the card — including its
+        // padding — is a click *inside* the question, not on the way out of it.
+        if (event.target === event.currentTarget) {
+          props.onCancel()
+        }
+      }}
+      onKeyDown={(event) => onKeyDown(event)}
     >
-      <p>
-        <strong>Leave the calibration?</strong> Your measurements will be discarded, and this flow
-        does not save them (there is nothing to resume).
-      </p>
-      <div class="row">
-        <button
-          type="button"
-          ref={(element) => {
-            stay = element
-          }}
-          onClick={() => props.onCancel()}
-          data-testid="stay"
+      <div
+        class="modal-card stack"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={EXIT_TITLE_ID}
+        data-testid="exit-confirmation"
+        ref={(element) => {
+          card = element
+        }}
+      >
+        <h2 class="modal-title" id={EXIT_TITLE_ID}>
+          Leave the calibration?
+        </h2>
+
+        <Show
+          when={props.hasMeasurements}
+          fallback={<p>Nothing has been entered yet, so there is nothing to lose.</p>}
         >
-          Stay
-        </button>
-        <button type="button" onClick={() => props.onConfirm()} data-testid="leave">
-          Leave and discard
-        </button>
+          <p>
+            Your measurements will be discarded, and this flow does not save them (there is nothing
+            to resume).
+          </p>
+        </Show>
+
+        <div class="row">
+          <button
+            type="button"
+            ref={(element) => {
+              stay = element
+            }}
+            onClick={() => props.onCancel()}
+            data-testid="stay"
+          >
+            Stay
+          </button>
+          <button type="button" onClick={() => props.onConfirm()} data-testid="leave">
+            {props.hasMeasurements ? 'Leave and discard' : 'Leave'}
+          </button>
+        </div>
       </div>
     </div>
   )

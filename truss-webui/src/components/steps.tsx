@@ -126,7 +126,9 @@ export function StepScreen(props: StepScreenProps): JSX.Element {
       /* ---- Exit screens (T30.2, T32.3) ------------------------------- */
       case 'Q9':
       case 'S7':
-        return <FinishedStep onExit={() => props.engine.requestExit()} />
+        // The success path, not a cancellation: it leaves directly, without the
+        // confirmation the chrome's Cancel control always asks for.
+        return <FinishedStep onExit={() => props.engine.goToLanding()} />
     }
   }
 
@@ -140,6 +142,7 @@ export function StepScreen(props: StepScreenProps): JSX.Element {
       next={() => props.engine.next()}
       exit={() => props.engine.requestExit()}
       exitRequested={props.engine.exitRequested()}
+      hasMeasurements={props.engine.hasMeasurements()}
       confirmExit={() => props.engine.confirmExit()}
       cancelExit={() => props.engine.cancelExit()}
       showNext={props.step.showNext ?? true}

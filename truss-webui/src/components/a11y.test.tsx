@@ -14,6 +14,7 @@ import {
   prefersReducedMotion,
   resetAnnouncements,
   STEP_HEADING_ATTRIBUTE,
+  trapFocus,
 } from './a11y'
 
 afterEach(() => {
@@ -96,6 +97,67 @@ describe('focusElement and focusFirstControl', () => {
   it('returns false for nothing to focus', () => {
     expect(focusElement(null)).toBe(false)
     expect(focusFirstControl(document.createElement('div'))).toBe(false)
+  })
+})
+
+describe('trapFocus', () => {
+  /** A dialog with three controls, plus a control outside it to escape to. */
+  function trap(): HTMLElement {
+    const { container } = render(() => (
+      <div>
+        <button type="button">Outside</button>
+        <div id="dialog">
+          <button type="button">Stay</button>
+          <button type="button">Leave</button>
+          <button type="button">Help</button>
+        </div>
+      </div>
+    ))
+    return container.querySelector<HTMLElement>('#dialog')!
+  }
+
+  const press = (key: string, shiftKey = false): KeyboardEvent =>
+    new KeyboardEvent('keydown', { key, shiftKey, bubbles: true, cancelable: true })
+
+  it('wraps Tab from the last control back to the first', () => {
+    const dialog = trap()
+    screen.getByRole('button', { name: 'Help' }).focus()
+
+    expect(trapFocus(dialog, press('Tab'))).toBe(true)
+    expect(document.activeElement).toHaveTextContent('Stay')
+  })
+
+  it('wraps Shift+Tab from the first control to the last', () => {
+    const dialog = trap()
+    screen.getByRole('button', { name: 'Stay' }).focus()
+
+    expect(trapFocus(dialog, press('Tab', true))).toBe(true)
+    expect(document.activeElement).toHaveTextContent('Help')
+  })
+
+  it('leaves Tab alone in the middle, where the browser is already right', () => {
+    const dialog = trap()
+    screen.getByRole('button', { name: 'Leave' }).focus()
+
+    expect(trapFocus(dialog, press('Tab'))).toBe(false)
+    expect(document.activeElement).toHaveTextContent('Leave')
+  })
+
+  it('pulls focus back in when it has escaped the dialog', () => {
+    const dialog = trap()
+    screen.getByRole('button', { name: 'Outside' }).focus()
+
+    expect(trapFocus(dialog, press('Tab'))).toBe(true)
+    expect(document.activeElement).toHaveTextContent('Stay')
+  })
+
+  it('is inert for other keys, for an empty container and for no container', () => {
+    const dialog = trap()
+
+    expect(trapFocus(dialog, press('Escape'))).toBe(false)
+    expect(trapFocus(dialog, press('Enter'))).toBe(false)
+    expect(trapFocus(document.createElement('div'), press('Tab'))).toBe(false)
+    expect(trapFocus(null, press('Tab'))).toBe(false)
   })
 })
 

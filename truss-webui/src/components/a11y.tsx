@@ -89,6 +89,60 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(', ')
 
+/**
+ * Keep Tab inside a container — the focus trap a modal dialog needs.
+ *
+ * Tab from the last control in a dialog must not walk into the screen behind it:
+ * that is the content the user is being asked to decide about, and a keyboard
+ * user who lands there has no way to tell the question is still open. This is
+ * the *second* line of defence — the step behind the dialog is also marked
+ * `inert`, so in a browser the tab order never reaches it — but `inert` is not
+ * something jsdom enforces, and a trap that exists only in browsers is a trap no
+ * test can see.
+ *
+ * Visibility is deliberately not checked. jsdom performs no layout, so an
+ * `offsetParent`/`getClientRects` filter would empty the control list and disable
+ * the trap in exactly the environment the tests run in; the dialogs this is used
+ * for are small and hold nothing hidden.
+ *
+ * Returns whether it moved focus, so a caller (or a test) can tell "handled" from
+ * "nothing to do". The caller is responsible for `preventDefault`ing — it is
+ * done here only when focus actually moves.
+ */
+export function trapFocus(container: ParentNode | null | undefined, event: KeyboardEvent): boolean {
+  if (event.key !== 'Tab' || container === null || container === undefined) {
+    return false
+  }
+
+  const controls = Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+  const first = controls[0] ?? null
+  const last = controls[controls.length - 1] ?? null
+  if (first === null || last === null) {
+    return false
+  }
+
+  // Focus inside a shadow root is invisible to `document.activeElement`, so the
+  // index is found through the shadow-aware helper rather than by identity.
+  const index = controls.findIndex((control) => elementBelongsToFocus(control))
+
+  let target: HTMLElement | null = null
+  if (index === -1) {
+    // Focus is outside the dialog (or on `<body>`): pull it back in, from
+    // whichever end the user was heading towards.
+    target = event.shiftKey ? last : first
+  } else if (event.shiftKey && index === 0) {
+    target = last
+  } else if (!event.shiftKey && index === controls.length - 1) {
+    target = first
+  }
+
+  if (target === null) {
+    return false
+  }
+  event.preventDefault()
+  return focusElement(target)
+}
+
 /* -------------------------------------------------------------------------- */
 /* Reduced motion                                                              */
 /* -------------------------------------------------------------------------- */

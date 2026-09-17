@@ -6,7 +6,7 @@ import {
   isChecked,
   type CalibrationDraft,
 } from '../domain/draft'
-import { exitDecision, type GateStatus, type ScreenId, type StepId } from '../domain/flow'
+import type { GateStatus, ScreenId, StepId } from '../domain/flow'
 import type { SettingsStore } from '../storage/settings'
 import {
   branchTarget,
@@ -27,9 +27,13 @@ import {
  * 2. **No mid-flow persistence.** The draft is created at flow entry and dies
  *    with the screen, so a reload restarts at step 1 by construction rather than
  *    by remembering to clear something (decision 1, §12's accepted limitation).
- * 3. **Exit confirmation is a function of the draft, not of the step number.**
- *    It appears once measurements exist and before the flow completes, so the
- *    rule cannot drift out of step with the flow's shape as steps are added.
+ * 3. **Leaving the flow always confirms.** Cancel calibration asks before
+ *    anything is discarded, on every step, because the draft is the only home of
+ *    the readings (§12) and "nothing is lost yet" is not something the user can
+ *    tell by looking at the button. The confirmation's *copy* is what varies —
+ *    see {@link FlowEngine.hasMeasurements} — not whether it appears. The one
+ *    exception is the finished step's own control, which is the success path
+ *    rather than a cancellation and calls `goToLanding` directly.
  * 4. **Navigation is internal state.** No URL, no history, no deep links — the
  *    browser's Back button is explicitly not a navigation mechanism here, and
  *    touching it would rewrite the *host page's* URL (PRD §6.1).
@@ -45,6 +49,14 @@ export interface FlowEngine {
   gate(): GateStatus
   /** Whether the run has reached its results or final step. */
   isComplete(): boolean
+  /**
+   * Whether anything has been typed into the draft that leaving would lose.
+   *
+   * Only the confirmation's wording reads this: pressing Cancel always asks,
+   * but a step where nothing has been entered must not be told its measurements
+   * will be discarded.
+   */
+  hasMeasurements(): boolean
 
   /* Navigation */
   goToLanding(): void
@@ -56,7 +68,7 @@ export interface FlowEngine {
 
   /* Exit */
   exitRequested(): boolean
-  /** Ask to leave the flow; may set the confirmation flag instead of leaving. */
+  /** Ask to leave the flow. Always opens the confirmation; never leaves directly. */
   requestExit(): void
   confirmExit(): void
   cancelExit(): void
@@ -99,15 +111,11 @@ export function createFlowEngine(dependencies: FlowEngineDependencies): FlowEngi
   }
 
   function requestExit(): void {
-    const decision = exitDecision({
-      hasMeasurements: hasAnyMeasurementText(draft()),
-      isComplete: isComplete(),
-    })
-    if (decision === 'confirm') {
-      setExitRequested(true)
-      return
-    }
-    goToLanding()
+    // Unconditional on purpose. The old rule — "leave straight away when nothing
+    // has been measured yet" — made one button mean two different things on two
+    // different screens, and the user had no way to know which before pressing
+    // it. Asking every time costs one keypress and cannot lose a reading.
+    setExitRequested(true)
   }
 
   return {
@@ -115,6 +123,10 @@ export function createFlowEngine(dependencies: FlowEngineDependencies): FlowEngi
     step: currentStep,
     draft,
     isComplete,
+
+    hasMeasurements(): boolean {
+      return hasAnyMeasurementText(draft())
+    },
 
     gate(): GateStatus {
       const current = currentStep()

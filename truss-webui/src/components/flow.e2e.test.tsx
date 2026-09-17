@@ -234,7 +234,7 @@ describe('leaving a flow (T26.6, T33)', () => {
     await next(user)
     await measure(user, 'X', FIXTURE_B.X)
 
-    await user.click(screen.getByRole('button', { name: 'Exit' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel calibration' }))
 
     expect(screen.getByTestId('exit-confirmation')).toBeInTheDocument()
     // The safe default: focus must not sit on the destructive button.
@@ -263,7 +263,7 @@ describe('leaving a flow (T26.6, T33)', () => {
     await next(user)
     await measure(user, 'X', FIXTURE_B.X)
 
-    await user.click(screen.getByRole('button', { name: 'Exit' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel calibration' }))
     await user.click(screen.getByTestId('leave'))
 
     expect(screen.getByTestId('start')).toBeInTheDocument()
@@ -393,7 +393,7 @@ describe('every step can be left, and the branch is not a dead end (regressions)
     expect(screen.getByLabelText(/Temperature settings/)).toBeInTheDocument()
   })
 
-  it('offers Exit beside Back and leaves without confirming before any measurement', async () => {
+  it('offers Cancel calibration on a step that has a Back, and asks before leaving', async () => {
     const app = createTestApp()
     const user = mount(app)
 
@@ -402,12 +402,19 @@ describe('every step can be left, and the branch is not a dead end (regressions)
     await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
     await next(user)
 
-    // Q1 has a Back, and still has an Exit.
+    // Q1 has a Back, and still has a way out of the flow without walking it.
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     await user.click(screen.getByTestId('exit'))
 
-    // Nothing has been measured, so there is nothing to confirm (PRD §9.2).
+    // Asking is unconditional; only the wording reflects an empty draft.
+    expect(screen.getByTestId('exit-confirmation')).toHaveTextContent(
+      'Nothing has been entered yet',
+    )
+    await user.click(screen.getByTestId('stay'))
     expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
+
+    await user.click(screen.getByTestId('exit'))
+    await user.click(screen.getByTestId('leave'))
     expect(screen.getByTestId('start')).toBeInTheDocument()
   })
 
@@ -438,11 +445,12 @@ describe('every step can be left, and the branch is not a dead end (regressions)
 describe('no path discards measurements without asking (T33.5)', () => {
   /*
    * The draft is the only home of the eight readings — nothing is persisted mid
-   * flow by design (PRD §12, decision 15). So every exit from a measured state has
-   * to pass through the confirmation, and there must be no *other* control that
+   * flow by design (PRD §12, decision 15). So every departure from the flow has to
+   * pass through the confirmation, and there must be no *other* control that
    * navigates away. This walks the controls that exist on a measured step and
    * checks that stepping backwards (which is lossless) never confirms while
-   * leaving (which is not) always does.
+   * leaving (which is not) always does — from every screen, whatever the draft
+   * happens to hold.
    */
   it('never leaves a measured step without confirming, and never confirms a step back', async () => {
     const app = createTestApp()
@@ -469,9 +477,8 @@ describe('no path discards measurements without asking (T33.5)', () => {
     await user.click(screen.getByRole('button', { name: 'Back' }))
     expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
 
-    // …but leaving from here does, because the readings are still in the draft and
-    // leaving would discard them. The rule is about what would be lost, not about
-    // which screen happens to be showing.
+    // …but leaving from here does too: asking is unconditional, so it does not
+    // depend on which screen happens to be showing.
     await user.click(screen.getByTestId('exit'))
     expect(screen.getByTestId('exit-confirmation')).toBeInTheDocument()
     await user.click(screen.getByTestId('leave'))
@@ -492,8 +499,9 @@ describe('no path discards measurements without asking (T33.5)', () => {
     await runQuadToSaveGate(user)
 
     // The printer detour exists on C2, before anything is measured. On a measured
-    // step the navigation controls are Back, Exit and Next (plus the save button
-    // on Q7, which stores the factor rather than navigating away).
+    // step the navigation controls are Back and Next, with Cancel calibration at
+    // the bottom of the step (plus the save button on Q7, which stores the factor
+    // rather than navigating away).
     expect(screen.queryByTestId('open-printers')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Saved printers' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
@@ -549,22 +557,25 @@ describe('keyboard-only operation (T34.1, T34.2)', () => {
       await user.tab()
     }
 
-    // Third checkbox, then the opt-out, then Exit and Next. (C1 has no Back: the
-    // row's first control is Exit.)
+    // Third checkbox, then the opt-out, then Next. (C1 has no Back: the
+    // navigation row is Next alone.)
     expect(document.activeElement?.id).toBe('dont-ask-again')
     await user.tab()
-    expect(document.activeElement).toHaveTextContent('Exit')
-    await user.tab()
-    // Identity, not text: an assertion on `document.body`'s text would pass for
-    // every string on the screen.
     expect(document.activeElement).toBe(screen.getByTestId('next'))
     expect(document.activeElement).toBeEnabled()
+
+    // Cancel calibration is at the bottom of the step, after the navigation row,
+    // so it is not one stray Tab away from the control that continues.
+    await user.tab()
+    expect(document.activeElement).toHaveTextContent('Cancel calibration')
+    await user.tab({ shift: true })
+    expect(document.activeElement).toBe(screen.getByTestId('next'))
 
     await user.keyboard('{Enter}')
     expect(currentHeading()).toHaveTextContent('First time on this printer?')
   })
 
-  it('keeps the exit confirmation reachable and focused on Stay', async () => {
+  it('keeps the exit confirmation reachable by keyboard, and cancellable with Escape', async () => {
     const app = createTestApp()
     const user = mount(app)
 
@@ -573,8 +584,14 @@ describe('keyboard-only operation (T34.1, T34.2)', () => {
     await user.click(screen.getByTestId('exit'))
     expect(screen.getByTestId('stay')).toHaveFocus()
 
-    // Escape is not wired as a shortcut, so the confirmed-by-keyboard path is
-    // Enter on Stay — which is the safe choice being the default.
+    // Escape dismisses the question the safe way: it cancels rather than leaving.
+    await user.keyboard('{Escape}')
+    expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
+    expect(currentHeading()).toHaveTextContent('Save the extrapolation factor')
+
+    // And the confirmed-by-keyboard path is Enter on Stay — the safe choice being
+    // the default.
+    await user.click(screen.getByTestId('exit'))
     await user.keyboard('{Enter}')
     expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
     expect(currentHeading()).toHaveTextContent('Save the extrapolation factor')

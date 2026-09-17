@@ -128,6 +128,64 @@ label {
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 }
 
+/* --- Modal ----------------------------------------------------------------- */
+
+/*
+ * The blocking confirmation the flow uses before it throws work away.
+ *
+ * `position: fixed` rather than absolute: the card has to interrupt the
+ * *viewport*, not the flow's column, which may be scrolled anywhere. The one
+ * `z-index` is only about the widget's own content — a shadow root cannot
+ * outrank a host page's stacking contexts, so claiming more would be a promise
+ * this cannot keep.
+ *
+ * The card is centred with `margin: auto` rather than by the overlay's
+ * `align-items`, because a centred flex item taller than the viewport is clipped
+ * at the top with no way to scroll to it; auto margins inside a scrollable flex
+ * container are the version that keeps the whole card reachable.
+ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  padding: 1rem;
+  background-color: rgb(0 0 0 / 50%);
+  overflow-y: auto;
+}
+
+.modal-card {
+  margin: auto;
+  inline-size: 100%;
+  max-inline-size: 30rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-large);
+  background-color: #fff;
+  color: var(--text-color-default);
+  /* The wash separates the card from the page behind it; the shadow keeps it
+     looking lifted where the wash is not doing much (a light host page). */
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 30%);
+}
+
+.modal-title {
+  /* A question about the screen, not another screen: one step down from the step
+     heading it interrupts. */
+  font-size: 1.375rem;
+  margin: 0;
+}
+
+/*
+ * The flow's Cancel calibration control (T16.1).
+ *
+ * Its own line at the bottom of the step, with more space above it than the
+ * stack gap. Back and Next are pressed repeatedly and often without reading;
+ * separating the one control that discards the readings from them is what stops
+ * a mis-aimed press from being an accident waiting to happen.
+ */
+.flow-cancel {
+  margin-top: 2rem;
+}
+
 /* A label/value row in a details block: the value hugs the inline end so a column
    of numbers lines up on the right, which is how they are compared. */
 .detail-row {

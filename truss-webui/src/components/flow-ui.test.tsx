@@ -27,6 +27,7 @@ describe('StepChrome', () => {
       next: vi.fn(),
       exit: vi.fn(),
       exitRequested: false,
+      hasMeasurements: false,
       confirmExit: vi.fn(),
       cancelExit: vi.fn(),
       children: <p>content</p>,
@@ -74,13 +75,27 @@ describe('StepChrome', () => {
     expect(document.getElementById('step-gate-reason')).not.toBeNull()
   })
 
-  it('offers Exit instead of Back on the first step', async () => {
+  it('offers Cancel calibration instead of Back on the first step', async () => {
     const user = userEvent.setup()
     const { props } = chrome({ back: null })
 
-    await user.click(screen.getByRole('button', { name: 'Exit' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel calibration' }))
     expect(props.exit).toHaveBeenCalledOnce()
     expect(screen.queryByRole('button', { name: 'Back' })).toBeNull()
+  })
+
+  it('puts Cancel calibration below the navigation row, styled as an outline', () => {
+    chrome()
+
+    const next = screen.getByTestId('next')
+    const cancel = screen.getByTestId('exit')
+
+    // Not in the row with Back and Next…
+    expect(next.parentElement).not.toContainElement(cancel)
+    // …but after it in document order, at the bottom of the step.
+    expect(next.compareDocumentPosition(cancel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(cancel).toHaveClass('button-outline')
+    expect(cancel.parentElement).toHaveClass('flow-cancel')
   })
 
   it('hides Next on steps that leave through their own action', () => {
@@ -90,7 +105,7 @@ describe('StepChrome', () => {
 
   it('asks before discarding measurements, defaulting focus to Stay', async () => {
     const user = userEvent.setup()
-    const { props } = chrome({ exitRequested: true })
+    const { props } = chrome({ exitRequested: true, hasMeasurements: true })
 
     expect(screen.getByTestId('exit-confirmation')).toBeInTheDocument()
     await new Promise((resolve) => setTimeout(resolve, 0))
@@ -99,6 +114,85 @@ describe('StepChrome', () => {
 
     await user.click(screen.getByTestId('leave'))
     expect(props.confirmExit).toHaveBeenCalledOnce()
+  })
+
+  it('shows the confirmation as a modal dialog over the step', () => {
+    chrome({ exitRequested: true, hasMeasurements: true })
+
+    const dialog = screen.getByRole('dialog', { name: 'Leave the calibration?' })
+    expect(dialog).toHaveAttribute('aria-modal', 'true')
+    expect(dialog).toHaveClass('modal-card')
+    expect(screen.getByTestId('exit-overlay')).toHaveClass('modal-overlay')
+  })
+
+  it('takes the step behind the dialog out of the tab order while it is open', () => {
+    const { container } = chrome({ exitRequested: true, hasMeasurements: true })
+
+    const background = container.querySelector('[inert]')
+    expect(background).not.toBeNull()
+    // Everything but the dialog: the navigation controls cannot be reached.
+    expect(background).toContainElement(screen.getByTestId('next'))
+    expect(background).not.toContainElement(screen.getByTestId('exit-confirmation'))
+  })
+
+  it('leaves the step interactive when no dialog is open', () => {
+    const { container } = chrome()
+
+    expect(container.querySelector('[inert]')).toBeNull()
+  })
+
+  it('keeps Tab inside the dialog', async () => {
+    const user = userEvent.setup()
+    chrome({ exitRequested: true, hasMeasurements: true })
+
+    expect(screen.getByTestId('stay')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByTestId('leave')).toHaveFocus()
+    // Past the last control, focus wraps rather than walking into the step.
+    await user.tab()
+    expect(screen.getByTestId('stay')).toHaveFocus()
+    await user.tab({ shift: true })
+    expect(screen.getByTestId('leave')).toHaveFocus()
+  })
+
+  it('cancels on Escape, because dismissing the question must not answer it', async () => {
+    const user = userEvent.setup()
+    const { props } = chrome({ exitRequested: true, hasMeasurements: true })
+
+    await user.keyboard('{Escape}')
+
+    expect(props.cancelExit).toHaveBeenCalledOnce()
+    expect(props.confirmExit).not.toHaveBeenCalled()
+  })
+
+  it('cancels when the wash behind the card is clicked, but not when the card is', async () => {
+    const user = userEvent.setup()
+    const { props } = chrome({ exitRequested: true, hasMeasurements: true })
+
+    await user.click(screen.getByRole('heading', { name: 'Leave the calibration?' }))
+    expect(props.cancelExit).not.toHaveBeenCalled()
+
+    await user.click(screen.getByTestId('exit-overlay'))
+    expect(props.cancelExit).toHaveBeenCalledOnce()
+  })
+
+  it('promises to discard measurements only when there are some', () => {
+    chrome({ exitRequested: true, hasMeasurements: true })
+
+    expect(screen.getByTestId('exit-confirmation')).toHaveTextContent(
+      'Your measurements will be discarded',
+    )
+    expect(screen.getByTestId('leave')).toHaveTextContent('Leave and discard')
+  })
+
+  it('asks anyway on a step where nothing has been entered, and says so', () => {
+    chrome({ exitRequested: true, hasMeasurements: false })
+
+    // The confirmation is not conditional — only its wording is.
+    expect(screen.getByTestId('exit-confirmation')).toHaveTextContent(
+      'Nothing has been entered yet',
+    )
+    expect(screen.getByTestId('leave')).toHaveTextContent('Leave')
   })
 })
 

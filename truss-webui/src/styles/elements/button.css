@@ -43,3 +43,27 @@ button:disabled,
   background-color: var(--button-bg-disabled) !important;
   color: var(--button-text-disabled) !important;
 }
+
+/*
+ * The outline variant.
+ *
+ * Same shape, padding and hit target as a filled button — it only loses the
+ * fill, so it reads as the way *out* of a screen rather than the way through it.
+ * That distinction is the whole point: the flow's Cancel calibration control
+ * sits near Next, and the two must not look like each other.
+ *
+ * Declared after the filled rules on purpose, so it also wins for an element
+ * that carries both classes (`class="button button-outline"`), where the two
+ * selectors have equal specificity.
+ */
+.button-outline {
+  background-color: transparent;
+  color: var(--button-bg-primary);
+  border: 1px solid var(--button-bg-primary);
+}
+
+.button-outline:disabled {
+  background-color: transparent !important;
+  color: var(--button-text-disabled) !important;
+  border-color: var(--button-bg-disabled) !important;
+}

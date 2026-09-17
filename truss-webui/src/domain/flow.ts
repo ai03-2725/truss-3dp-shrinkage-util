@@ -62,23 +62,12 @@ export interface StepDefinition {
   readonly back: StepId | null
 }
 
-/** Everything the exit rule needs to know about the current run. */
-export interface FlowProgress {
-  /** At least one measurement has been entered. */
-  readonly hasMeasurements: boolean
-  /** The flow's final step has been reached. */
-  readonly isComplete: boolean
-}
-
-export type ExitDecision = 'leave' | 'confirm'
-
-/**
- * PRD §9.3: confirm only once measurements exist and before the flow completes.
+/*
+ * The exit rule that used to live here (`exitDecision`) is gone.
  *
- * Steps C1–C2 and the instructional steps exit without confirmation — nothing
- * has been measured, so there is nothing to lose. And once the flow is complete,
- * leaving is the flow's own success path and must not be second-guessed.
+ * It confirmed once a measurement existed and stayed quiet before that, which
+ * made one control mean two different things on two different screens with
+ * nothing on screen to say which it would be. Cancelling the flow now always
+ * asks; `hasMeasurements` in the engine decides only what the confirmation's
+ * wording is honest about.
  */
-export function exitDecision(progress: FlowProgress): ExitDecision {
-  return progress.hasMeasurements && !progress.isComplete ? 'confirm' : 'leave'
-}
