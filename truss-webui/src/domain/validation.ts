@@ -9,7 +9,7 @@ import { parseNumber } from './number'
  * - **Blocking** — empty, non-numeric, ≤ 0, non-finite. Implemented by the
  *   reader in `math.ts`, because a value that is not a number cannot take part in
  *   arithmetic at all.
- * - **Non-blocking warnings** — plausible-range, ordering, divergence. These are
+ * - **Non-blocking warnings** — plausible-range, divergence. These are
  *   *judgements about a number that is perfectly usable*, so they never stop the
  *   user: they say "this is probably a misread, look again". A warning that
  *   blocked progression would be a validation error wearing the wrong label, and
@@ -19,9 +19,13 @@ import { parseNumber } from './number'
  * constants are named here so the copy and the rules cannot drift apart.
  */
 
-/** Documented shrinkage is 0.95–0.99 of the 140mm beam, i.e. 133–138.6mm. */
-export const PLAUSIBLE_MIN_MM = 133
-export const PLAUSIBLE_MAX_MM = 138.6
+/**
+ * Documented shrinkage puts the reading just under the 140mm beam, so this band
+ * is deliberately generous: it brackets the designed length and only objects to
+ * readings that cannot plausibly be this print.
+ */
+export const PLAUSIBLE_MIN_MM = 132
+export const PLAUSIBLE_MAX_MM = 142
 
 /**
  * The inner and outer readings differ by the sum of two end-wall thicknesses —
@@ -30,7 +34,7 @@ export const PLAUSIBLE_MAX_MM = 138.6
  */
 export const MAX_DIVERGENCE_MM = 2
 
-export type MeasurementWarningKind = 'implausible-length' | 'inner-not-smaller' | 'divergence'
+export type MeasurementWarningKind = 'implausible-length' | 'divergence'
 
 export interface MeasurementWarning {
   readonly kind: MeasurementWarningKind
@@ -42,24 +46,17 @@ function implausibleLength(value: number): MeasurementWarning {
     kind: 'implausible-length',
     message:
       `A ${value}mm reading is unlikely: the beam is designed to be ${DESIGNED_LENGTH_MM}mm and ` +
-      'shrinkage is normally 0.95–0.99 of that (133–138.6mm). Check the calipers and the units.',
+      `measurements normally fall between ${PLAUSIBLE_MIN_MM} and ${PLAUSIBLE_MAX_MM}mm. ` +
+      'Check the calipers and the units.',
   }
-}
-
-const INNER_NOT_SMALLER: MeasurementWarning = {
-  kind: 'inner-not-smaller',
-  message:
-    'The inner reading is not smaller than the outer one. Both measure the same beam, so this ' +
-    'means one of them was read or seated incorrectly.',
 }
 
 function divergence(gap: number): MeasurementWarning {
   return {
     kind: 'divergence',
     message:
-      `Outer and inner differ by ${gap.toFixed(2)}mm, which is more than this design can produce ` +
-      `(${MAX_DIVERGENCE_MM}mm). The calipers are probably not seated against the support walls — ` +
-      'check the correct/incorrect examples before continuing.',
+      `Outer and inner differ by ${gap.toFixed(2)}mm, which is much more than the expected maximum deviation ` +
+      `(${MAX_DIVERGENCE_MM}mm). Please ensure that the calipers are seated properly as per the example images, and that the printer is not excessively skewed.`,
   }
 }
 
@@ -77,18 +74,26 @@ export function checkReading(value: number): MeasurementWarning | null {
 }
 
 /**
- * Warnings for a completed axis: the ordering check and the divergence check.
+ * Warnings for a completed axis: the divergence check.
  *
- * Both need both readings, so neither can be evaluated per-field — which is why
- * this takes the pair rather than one value.
+ * The readings are deliberately not required to be ordered — the shipped designs
+ * can measure the inner span as equal to or longer than the outer one — so only
+ * the size of the gap between them is judged, in either direction.
  */
 export function checkAxisPair(outer: number, inner: number): readonly MeasurementWarning[] {
   const warnings: MeasurementWarning[] = []
 
-  if (inner >= outer) {
-    warnings.push(INNER_NOT_SMALLER)
-  } else if (outer - inner > MAX_DIVERGENCE_MM) {
-    warnings.push(divergence(outer - inner))
+  /*
+   * The *size* of the gap, not its sign.
+   *
+   * Because order is not evidence of anything (see above), an inner span 5mm
+   * longer than the outer one is precisely the misread that an outer span 5mm
+   * longer than the inner one is, and has to warn the same way. Comparing the
+   * signed difference reported the first and silently accepted the second.
+   */
+  const gap = Math.abs(outer - inner)
+  if (gap > MAX_DIVERGENCE_MM) {
+    warnings.push(divergence(gap))
   }
 
   const implausible = checkReading(outer) ?? checkReading(inner)
@@ -102,10 +107,10 @@ export function checkAxisPair(outer: number, inner: number): readonly Measuremen
 /**
  * Warnings to show on **one** field, given both typed values on that axis.
  *
- * Attribution matters: the ordering and divergence warnings are about the *pair*,
- * so they belong on whichever field the user is looking at, while an implausible
- * length belongs to the reading it describes. Both fields therefore show the pair
- * warnings, and each shows its own length warning.
+ * Attribution matters: the divergence warning is about the *pair*, so it belongs
+ * on whichever field the user is looking at, while an implausible length belongs
+ * to the reading it describes. Both fields therefore show the pair warning, and
+ * each shows its own length warning.
  *
  * A value that does not parse is ignored rather than reported: a half-typed
  * reading is the blocking tier's business, and inventing a warning for it would

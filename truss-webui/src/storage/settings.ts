@@ -12,9 +12,9 @@ import { checkSettingsPayload } from './schema'
  * The settings store (PRD §9.2, decision 4).
  *
  * One global flag, `skipPrerequisites`, set by the "Don't ask again" control on
- * C1 and reset **only** from the printer-data screen — the reset is the user's
- * only route back to the prerequisite guidance, so it is deliberately not on the
- * landing page.
+ * C1 and changed **only** from the printer-data screen — that screen's toggle is
+ * the user's only route back to the prerequisite guidance, so it is deliberately
+ * not on the landing page.
  *
  * The subtlety worth getting right: this flag is the one piece of persisted state
  * whose failure is *silent and directional*. If it were applied in memory after a
@@ -37,8 +37,6 @@ export interface SettingsStore {
   state(): SettingsState
   skipPrerequisites(): boolean
   setSkipPrerequisites(skip: boolean): SettingsChange
-  /** Clear the flag so C1 is shown again on the next run (PRD §9.2). */
-  resetPrerequisites(): SettingsChange
 }
 
 export function createSettingsStore(storage: StorageAdapter): SettingsStore {
@@ -80,10 +78,6 @@ export function createSettingsStore(storage: StorageAdapter): SettingsStore {
 
     setSkipPrerequisites(skip: boolean): SettingsChange {
       return apply({ skipPrerequisites: skip })
-    },
-
-    resetPrerequisites(): SettingsChange {
-      return apply({ skipPrerequisites: false })
     },
   }
 }

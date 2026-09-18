@@ -160,11 +160,6 @@ optgroup > option:first-child {
   margin-top: 0.25rem;
 }
 
-fieldset > ul {
-  background-color: red;
-  display: inline;
-}
-
 li > label {
   display: inline;
 }

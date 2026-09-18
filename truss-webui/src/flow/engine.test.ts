@@ -82,7 +82,7 @@ function advanceTo(
         satisfyMeasurements(engine, ['Y', 'A', 'B'])
         break
       case 'Q7':
-        satisfyChecks(engine, [CHECKS.printerSaved])
+        satisfyChecks(engine, [CHECKS.printerNameReady])
         break
       case 'Q8':
         satisfyMeasurements(engine, ['X', 'Y', 'A', 'B'])
@@ -109,13 +109,23 @@ describe('registry', () => {
   })
 
   it('links every step forward and back consistently', () => {
+    /*
+     * The two results steps are deliberate gaps in the chain backwards. Each is
+     * the last screen of its flow, and Finish — not Back — is the way out; on the
+     * quad side there is also nothing left to edit, since Q7 has already written
+     * the printer record. Everywhere else the chain is unbroken both ways.
+     */
+    const unreachableFrom: readonly string[] = ['Q8', 'S6']
+
     for (const definition of Object.values(FLOW_DEFINITIONS)) {
       for (const [index, id] of definition.steps.entries()) {
         const step = stepById(id)
         const previous = definition.steps[index - 1]
         const following = definition.steps[index + 1]
 
-        expect(step.back, `${id} back`).toBe(previous ?? null)
+        expect(step.back, `${id} back`).toBe(
+          unreachableFrom.includes(id) ? null : (previous ?? null),
+        )
         // C2 branches, so its `next` is decided at runtime.
         if (id !== 'C2') {
           expect(step.next, `${id} next`).toBe(following ?? null)
@@ -308,12 +318,13 @@ describe('next and back', () => {
     expect(branchEngine.gate().allowed).toBe(true)
   })
 
-  it('does nothing at the final step, which leaves through its own control', () => {
-    advanceTo(engine, 'Q9')
-    expect(engine.step()?.id).toBe('Q9')
+  it('finishes from the results step, which leaves through its own control', () => {
+    advanceTo(engine, 'Q8')
+    expect(engine.step()?.id).toBe('Q8')
 
     engine.next()
-    expect(engine.step()?.id).toBe('Q9')
+    expect(engine.screen()).toBe('landing')
+    expect(engine.step()).toBeNull()
   })
 
   it('keeps entered measurements when going back', () => {
@@ -383,18 +394,23 @@ describe('exit confirmation matrix', () => {
     expect(engine.screen()).toBe('flow')
   })
 
-  it('confirms on the final step too; its own Done control is the path that does not ask', () => {
+  it('finishes from the results step without asking, while Cancel would still confirm', () => {
     const engine = setup()
     engine.startCalibration()
-    advanceTo(engine, 'Q9')
+    advanceTo(engine, 'Q8')
 
+    // The engine's rule is unchanged — asking is unconditional for anything that
+    // leaves the flow — even though the results screen no longer offers the
+    // control that asks.
     engine.requestExit()
     expect(engine.exitRequested()).toBe(true)
     expect(engine.screen()).toBe('flow')
+    engine.cancelExit()
 
-    // What the finished screen's Done button calls: the success path.
-    engine.goToLanding()
+    // What the Finish control calls: the success path, with no dialog.
+    engine.next()
     expect(engine.screen()).toBe('landing')
+    expect(engine.exitRequested()).toBe(false)
   })
 
   it('cancelling the confirmation stays on the step with the measurements intact', () => {
@@ -510,5 +526,16 @@ describe('a full quick run end to end', () => {
     expect(draft.flow).toBe('single')
     expect(engine.step()?.id).toBe('S6')
     expect(draft.entries.X.outer).toBe('137.5')
+  })
+
+  it('finishes from the results step, as the quad flow does', () => {
+    const engine = setup()
+    engine.startCalibration()
+    advanceTo(engine, 'S6', 'returning')
+
+    engine.next()
+
+    expect(engine.screen()).toBe('landing')
+    expect(engine.step()).toBeNull()
   })
 })

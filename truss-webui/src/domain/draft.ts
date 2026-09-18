@@ -85,8 +85,15 @@ export const CHECKS = {
   /** Confirmations. */
   sliced: 'step.sliced',
   printed: 'step.printed',
-  /** Q7's mandatory save gate. */
-  printerSaved: 'printer.saved',
+  /**
+   * Q7: the typed printer name is usable — non-empty and not already taken.
+   *
+   * The *screen* decides this, because answering it means reading the printers
+   * repository and a step gate is deliberately a pure function of the draft. It
+   * is the same trade the degraded-mode skip makes: the step mirrors the outside
+   * fact into the draft rather than the registry learning about storage.
+   */
+  printerNameReady: 'printer.nameReady',
 } as const
 
 export function isChecked(draft: CalibrationDraft, key: string): boolean {

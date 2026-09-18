@@ -121,13 +121,6 @@ label {
   align-items: center;
 }
 
-.measurement-grid {
-  display: grid;
-  gap: 0.75rem;
-  /* Two up when there is room, one up on a phone. */
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-}
-
 /* --- Modal ----------------------------------------------------------------- */
 
 /*
@@ -203,6 +196,145 @@ label {
 .detail-row dd[data-emphasis='true'] {
   color: var(--text-color-emphasis);
   font-weight: 600;
+}
+
+/* --- Tables ---------------------------------------------------------------- */
+
+/*
+ * Two tables so far, sharing every visual rule below.
+ *
+ * Q6's measurement table: one row per beam, one column per side. Its point is
+ * density — step 5 has already shown the caliper seating at full width, so
+ * repeating that photograph three more times would turn the second measurement
+ * step into a wall of the same picture and bury the six readings the user came
+ * here to type. Headers carry the naming, which is why the fields inside the
+ * cells hide their labels and move them to `aria-label` instead (see
+ * `MeasurementField`).
+ *
+ * The saved-printer list (T18): name, extrapolation factor and that row's
+ * controls are three columns of the same kind of comparison.
+ */
+.measurement-table,
+.printer-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+
+.measurement-table th,
+.measurement-table td,
+.printer-table th,
+.printer-table td {
+  text-align: start;
+  vertical-align: top;
+  padding: 0.5rem 0.75rem 0.5rem 0;
+}
+
+/* There is no column after this one for the trailing gap to separate. */
+.measurement-table th:last-child,
+.measurement-table td:last-child,
+.printer-table th:last-child,
+.printer-table td:last-child {
+  padding-inline-end: 0;
+}
+
+.measurement-table thead th,
+.printer-table thead th {
+  font-weight: 600;
+  border-block-end: 1px solid #c3c3c3;
+}
+
+/* The beam letter names the row, so it sits level with the value beside it
+   rather than at the top of a cell that grows when a warning appears. */
+.measurement-table tbody th {
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+/* A field with no label: the input and any message, stacked tightly enough that
+   six of them still read as a table. */
+.measurement-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* A printer row is a name and a factor beside two controls: all four sit on one
+   line, level with each other. Only the name is a heading. */
+.printer-table tbody th {
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.printer-table tbody td {
+  vertical-align: middle;
+}
+
+/*
+ * The element stylesheet makes every button full width, which is right for a
+ * screen whose whole purpose is one control ("Next", "Start calibration") and
+ * wrong for a table cell: full-width buttons become a full-width *column*, and
+ * the two actions stack on top of each other.
+ *
+ * `inline-size: auto` restores the intrinsic width so Edit and Delete sit side
+ * by side in a column only as wide as they are. Scoped to the actions cell — the
+ * editor that opens below is a form like any other, and its buttons stay the
+ * full-width controls the rest of the app uses.
+ */
+.printer-actions button {
+  display: inline-block;
+  inline-size: auto;
+}
+
+/* --- Cards ----------------------------------------------------------------- */
+
+/*
+ * A bordered surface for content that sits inside another block's flow without
+ * being part of it.
+ *
+ * The saved-printer editor is why this exists: it opens in a row of the printer
+ * table, where a heading, two fields and a warning between two rows read as more
+ * table. The outline and the padding draw the boundary the table's own rules
+ * cannot — the editor belongs *to* that row, it is not another one.
+ *
+ * `#fff` matches `.modal-card`, the app's other lifted surface. It also keeps
+ * `--form-background-color` reading as a *field* fill: a card filled with the
+ * same grey as the inputs would flatten the fields into it.
+ */
+.card {
+  border: var(--form-input-border);
+  border-radius: var(--radius-large);
+  background-color: #fff;
+  padding: 1rem;
+}
+
+/*
+ * The padding is the whole gap between the card's edge and its content, so the
+ * first and last things inside must not add a margin of their own on top of it.
+ *
+ * Both levels are needed: the editor is a `<form>`, and its heading's default
+ * margin collapses out through the form to become the form's own top margin,
+ * where a rule matching only direct children would miss it.
+ */
+.card > :first-child,
+.card > :first-child > :first-child {
+  margin-block-start: 0;
+}
+
+.card > :last-child,
+.card > :last-child > :last-child {
+  margin-block-end: 0;
+}
+
+/*
+ * A card's heading names the panel, not the screen: the form's own heading is
+ * sized for a whole-screen form, and at that size it reopens the gap between the
+ * editor and the row it belongs to. Same reasoning — and the same size — as
+ * `.modal-title`, the app's other interrupted-screen heading.
+ */
+.card h1,
+.card h2,
+.card h3 {
+  font-size: 1.375rem;
 }
 
 /* --- Overflow guards (mobile must not break) ------------------------------- */
@@ -331,6 +463,28 @@ label.check {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/*
+ * `.sr-only` is a lone class (0,1,0), and the element stylesheets style controls
+ * by type and attribute: `input[type='file']` (0,1,1) sets `width: 100%` and its
+ * own padding. Being hidden means the element must also occupy no space, and
+ * that is the half of the contract the utility loses.
+ *
+ * Measured before this rule existed: the visually hidden import input on the
+ * printer screen computed to 1064px wide, absolutely positioned in its button
+ * row, putting the page 1px past the viewport — a horizontal scrollbar with
+ * nothing visibly wrong on the screen to explain it.
+ *
+ * Repeating the geometry against the element restores the tie, and `local.css`
+ * wins it by being imported after `elements/*` — the same declaration-order
+ * tie-break `button.css` documents for `.button-outline`. `shadow.test.ts` pins
+ * the winner, so a reordering fails loudly instead of silently reintroducing the
+ * scrollbar.
+ */
+input.sr-only {
+  width: 1px;
+  padding: 0;
 }
 
 /* --- Motion ---------------------------------------------------------------- */

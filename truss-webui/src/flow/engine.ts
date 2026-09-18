@@ -155,6 +155,14 @@ export function createFlowEngine(dependencies: FlowEngineDependencies): FlowEngi
         return
       }
 
+      if (current.finishes === true) {
+        // The end of the flow is the success path, not a cancellation: it leaves
+        // directly rather than asking the question Cancel always asks. The draft
+        // is discarded exactly as it would be on any other exit.
+        goToLanding()
+        return
+      }
+
       if (current.id === 'C2') {
         // The branch: the only step whose destination is the user's answer. The
         // draft's flow switches here, which is what makes the results screens and

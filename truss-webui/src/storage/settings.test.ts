@@ -53,17 +53,6 @@ describe('settings store', () => {
     expect(reopened.skipPrerequisites()).toBe(true)
   })
 
-  it('resets the flag, consuming the reset from the printer-data screen', () => {
-    const { store } = setup()
-    store.setSkipPrerequisites(true)
-
-    expect(store.resetPrerequisites()).toEqual({
-      state: { skipPrerequisites: false },
-      persisted: true,
-    })
-    expect(store.skipPrerequisites()).toBe(false)
-  })
-
   it('treats a corrupt payload as unset and keeps the raw text', () => {
     const host = new FakeHost()
     host.seed(STORAGE_KEY_SETTINGS, '{"version":1,"skipPrerequisites":"yes"}')
@@ -101,8 +90,8 @@ describe('settings store', () => {
       quota.name = 'QuotaExceededError'
       host.failWrites = quota
 
-      const reset = store.resetPrerequisites()
-      expect(reset.persisted).toBe(false)
+      const cleared = store.setSkipPrerequisites(false)
+      expect(cleared.persisted).toBe(false)
       // Showing the checklist again is the harmless direction, so clearing takes
       // effect even without a successful write.
       expect(store.skipPrerequisites()).toBe(false)

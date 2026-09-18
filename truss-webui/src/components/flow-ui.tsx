@@ -52,6 +52,21 @@ export interface StepChromeProps {
   /** Hide the Next control on steps that leave through their own button. */
   readonly showNext?: boolean
   readonly nextLabel?: string
+  /**
+   * How the next control is styled.
+   *
+   * `outline` marks the control that *ends* the flow rather than advancing
+   * through it, so the last step does not offer the same filled button that has
+   * meant "carry on" on every screen before it.
+   */
+  readonly nextVariant?: 'primary' | 'outline'
+  /**
+   * Whether the flow's own Cancel control is offered. Defaults to shown.
+   *
+   * The finishing step hides it: its own control leaves the flow too, and a
+   * second way out that asks a question first is a chance to press the wrong one.
+   */
+  readonly showExit?: boolean
   readonly children: JSX.Element
 }
 
@@ -149,6 +164,7 @@ export function StepChrome(props: StepChromeProps): JSX.Element {
           <Show when={props.showNext ?? true}>
             <button
               type="button"
+              class={props.nextVariant === 'outline' ? 'button-outline' : undefined}
               onClick={() => props.next()}
               disabled={!props.gate.allowed}
               aria-describedby={blocked() ? reasonId : undefined}
@@ -177,16 +193,18 @@ export function StepChrome(props: StepChromeProps): JSX.Element {
          * treatment says the same thing visually — this is the way out of the
          * screen, not the way through it.
          */}
-        <div class="flow-cancel">
-          <button
-            type="button"
-            class="button-outline"
-            onClick={() => props.exit()}
-            data-testid="exit"
-          >
-            Cancel calibration
-          </button>
-        </div>
+        <Show when={props.showExit ?? true}>
+          <div class="flow-cancel">
+            <button
+              type="button"
+              class="button-outline"
+              onClick={() => props.exit()}
+              data-testid="exit"
+            >
+              Cancel calibration
+            </button>
+          </div>
+        </Show>
       </div>
 
       <Show when={props.exitRequested}>
@@ -278,12 +296,9 @@ function ExitConfirmation(props: {
 
         <Show
           when={props.hasMeasurements}
-          fallback={<p>Nothing has been entered yet, so there is nothing to lose.</p>}
+          fallback={<p>Your current progress will be discarded.</p>}
         >
-          <p>
-            Your measurements will be discarded, and this flow does not save them (there is nothing
-            to resume).
-          </p>
+          <p>Your entered measurements and progress will be discarded.</p>
         </Show>
 
         <div class="row">
@@ -376,13 +391,23 @@ export interface MeasurementFieldProps {
   /**
    * Warnings for this field, computed by the owning step from the whole axis.
    *
-   * Passed in rather than derived here because the ordering and divergence
-   * warnings are about the *pair* of readings: a field that only knew its own
-   * value could not tell whether the calipers were seated wrong.
+   * Passed in rather than derived here because the divergence warning is about
+   * the *pair* of readings: a field that only knew its own value could not tell
+   * whether the calipers were seated wrong.
    */
   readonly warnings?: readonly MeasurementWarning[]
   /** Free-text hints or examples rendered under the label. */
   readonly hint?: string
+  /**
+   * How the label reaches the user.
+   *
+   * `stacked` (the default) is the ordinary field: a visible `<label>` above the
+   * input. `cell` is for a table, where the row and column headers already name
+   * the field on screen — the label then rides on the input as an `aria-label`
+   * and the block spacing tightens, so a row is not made taller by text that
+   * only restates the headers above it.
+   */
+  readonly labelMode?: 'stacked' | 'cell'
 }
 
 /**
@@ -408,6 +433,8 @@ export function MeasurementField(props: MeasurementFieldProps): JSX.Element {
   // references pointing at it.
   // eslint-disable-next-line solid/reactivity
   const ids = fieldIds(props.id)
+
+  const inCell = (): boolean => props.labelMode === 'cell'
 
   const error = (): string | null => {
     if (props.value.trim() === '') {
@@ -446,8 +473,10 @@ export function MeasurementField(props: MeasurementFieldProps): JSX.Element {
   }
 
   return (
-    <div class="stack">
-      <label for={ids.control}>{props.label}</label>
+    <div class={inCell() ? 'measurement-cell' : 'stack'}>
+      <Show when={!inCell()}>
+        <label for={ids.control}>{props.label}</label>
+      </Show>
       <Show when={props.hint !== undefined}>
         <p class="muted" id={ids.hint}>
           {props.hint}
@@ -460,6 +489,7 @@ export function MeasurementField(props: MeasurementFieldProps): JSX.Element {
           inputmode="decimal"
           autocomplete="off"
           value={props.value}
+          aria-label={inCell() ? props.label : undefined}
           aria-invalid={error() === null ? 'false' : 'true'}
           aria-describedby={describedBy(ids, {
             hint: props.hint,

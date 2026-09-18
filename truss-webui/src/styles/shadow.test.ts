@@ -176,3 +176,40 @@ describe('installStyles', () => {
     element.remove()
   })
 })
+
+describe('the app’s stylesheet wins where the element styles cannot yield', () => {
+  /*
+   * The failure this guards against is invisible on screen by definition: the
+   * loser of the cascade is not the *visibility* of a hidden control — the
+   * element stylesheets do not touch `clip-path` — but its *size*. Invisible
+   * content that still occupies a full-width box can put a horizontal scrollbar
+   * on the page with nothing visibly wrong to explain it.
+   *
+   * jsdom cascades author styles with specificity, so this can be pinned here
+   * rather than believed.
+   */
+  it('sizes the visually hidden file input at 1px, not the element styles’ 100%', () => {
+    const style = document.createElement('style')
+    // `:host` blocks cannot match in a document, and only they need rewriting:
+    // the cascade between `.sr-only` and `input[type='file']` is the same one
+    // that runs inside the shadow root.
+    style.textContent = stylesheet.replace(/:host/g, '.truss-calibrator-root')
+    document.head.append(style)
+
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.className = 'sr-only'
+    document.body.append(input)
+
+    try {
+      // The import control on the printer screen is a visible button plus this
+      // input behind it. Left at 100%, the absolute box reached past the widget
+      // and added 1px of scrollable width to the whole page.
+      expect(getComputedStyle(input).width).toBe('1px')
+      expect(getComputedStyle(input).paddingTop).toBe('0px')
+    } finally {
+      style.remove()
+      input.remove()
+    }
+  })
+})

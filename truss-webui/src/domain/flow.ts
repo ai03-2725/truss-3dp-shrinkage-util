@@ -17,10 +17,10 @@ export type ScreenId = (typeof SCREENS)[number]
 export type CommonStepId = 'C1' | 'C2'
 
 /** Quad (first-time) flow steps (PRD §9.3). */
-export type QuadStepId = 'Q1' | 'Q2' | 'Q3' | 'Q4' | 'Q5' | 'Q6' | 'Q7' | 'Q8' | 'Q9'
+export type QuadStepId = 'Q1' | 'Q2' | 'Q3' | 'Q4' | 'Q5' | 'Q6' | 'Q7' | 'Q8'
 
 /** Single (quick) flow steps (PRD §9.4). */
-export type SingleStepId = 'S1' | 'S2' | 'S3' | 'S4' | 'S5' | 'S6' | 'S7'
+export type SingleStepId = 'S1' | 'S2' | 'S3' | 'S4' | 'S5' | 'S6'
 
 export type StepId = CommonStepId | QuadStepId | SingleStepId
 

@@ -396,16 +396,16 @@ flowchart TB
 
 ---
 
-### T22 — Prerequisites reset control
+### T22 — Prerequisites checklist toggle
 **Size:** S · **Depends on:** T18, T09 · **Unblocks:** T33
 
-**Context:** PRD §9.2 — because C1 is skipped silently once the flag is set, this control is the user's **only** path back to the prerequisite guidance (decision 4 deliberately put it here rather than on the landing page).
+**Context:** PRD §9.2 — because C1 is skipped silently once the flag is set, this control is the user's **only** path back to the prerequisite guidance (decision 4 deliberately put it here rather than on the landing page). It is **two-way**: one checkbox that both sets and clears the flag, so the screen can turn the checklist off as well as on.
 
 **Subtasks**
 - [x] T22.1 Decide and record placement and labelling (§13.5)
-- [x] T22.2 Implement the control reflecting current flag state
-- [x] T22.3 Wire it to the settings store reset
-- [x] T22.4 Tests: flag clears and C1 reappears on the next run
+- [x] T22.2 Implement the toggle reflecting current flag state
+- [x] T22.3 Wire it to `setSkipPrerequisites`, the store's single write path
+- [x] T22.4 Tests: the flag is set and cleared from the box, C1 is skipped or reappears accordingly, and a skip that could not be persisted is refused
 
 ---
 
@@ -454,7 +454,7 @@ flowchart TB
 
 > **Note (T25.3).** The detour is a plain button to the printers screen, placed under the closing copy. Because returning from that screen always lands on the landing page (decision 17), the user re-enters the flow and reaches C2 again with a freshly read list — which is the point of the detour. The list itself is a reactive read of the repository, so no explicit "re-read on entry" code is needed (T25.4).
 >
-> **Note (T25.1) — bug found by the T30.4 end-to-end test.** C2's `next` is `null` because the branch decides the destination, and `StepChrome` read "no literal next" as "hide Next". C2 therefore had no way forward at all: the second screen of the app was a dead end. `StepSpec` now carries an explicit `showNext` (default `true`), set to `false` only on the two terminal steps (Q9, S7), and Next's visibility is no longer inferred from `next`.
+> **Note (T25.1) — bug found by the T30.4 end-to-end test.** C2's `next` is `null` because the branch decides the destination, and `StepChrome` read "no literal next" as "hide Next". C2 therefore had no way forward at all: the second screen of the app was a dead end. `StepSpec` now carries an explicit `showNext` (default `true`), set to `false` only on the single flow's terminal step (S7), and Next's visibility is no longer inferred from `next`.
 
 ---
 
@@ -480,31 +480,36 @@ flowchart TB
 ### T27 — Quad measurement steps Q5–Q6
 **Size:** L · **Depends on:** T26, T16, T06 · **Unblocks:** T28, T31
 
-**Context:** PRD §9.3, §8.3 — two inputs at Q5 and six at Q6, carrying the seating guidance and the correct/incorrect caliper examples. This is the highest-risk screen in the product: the guides explicitly warn that an incorrectly seated caliper yields a meaningless diagonal reading, and a wrong value here propagates into a slicer setting.
+**Context:** PRD §9.3, §8.3 — two inputs at Q5 and six at Q6, carrying the seating guidance and the correct/incorrect caliper examples. This is the highest-risk screen in the product: the guides explicitly warn that an incorrectly seated caliper yields a meaningless diagonal reading, and a wrong value here propagates into a slicer setting. The guidance lives on Q5 only; Q6 is a compact entry table.
 
 **Subtasks**
 - [x] T27.1 Q5: X outer/inner inputs with guidance and warnings
-- [x] T27.2 Q6: Y, A, B outer/inner inputs, repeating the measurement guidance
+- [x] T27.2 Q6: Y, A, B outer/inner inputs in a table of beams against sides, without repeating Q5's guidance or figures
 - [x] T27.3 Apply PRD §8.3 validation: blocking (empty/non-numeric/≤0) and non-blocking (plausible range, `inner ≥ outer`, divergence per T03.3)
 - [x] T27.4 Persist entered values into the shared draft so Back navigation preserves them
 - [x] T27.5 Tests: full validation matrix, warnings non-blocking, Back preserves values, no cross-axis value mixing
+
+> **Note (measurement layout).** Q5 is one section per dimension, each ordered diagram → photograph → field, which is the guide's own order (step 9) and puts the visual context before the number. The inner-jaws guidance lives inside the inner section, between its photograph and its field, because it is advice about that measurement alone. Q6 does not repeat the guidance or its figures — it is a table of beams against sides, with the headers naming each field on screen and `aria-label` naming it to assistive technology. `steps.test.tsx` pins both arrangements, including the rendered order, because a Solid `<template>` is parsed by the browser and can silently reorder invalid nesting.
 
 ---
 
 ### T28 — Quad factor step Q7 (compute + mandatory save gate)
 **Size:** L · **Depends on:** T27, T06, T08, T07 · **Unblocks:** T30, T33
 
-**Context:** PRD §9.3, §12, decisions 9–10, 15 — display the factor at 10dp, then require a unique name and a successful save before the user may continue. A collision is a hard block, and because flow state is not persisted, its error copy must state the recovery path explicitly (Exit → delete the record → restart, losing all eight measurements) or users will read it as a bug. When storage is unavailable the gate is skipped as unsatisfiable, the banner is shown, and the factor is still displayed so the user can write it down.
+**Context:** PRD §9.3, §12, decisions 9–10, 15, 27 — display the factor at 10dp, then require a usable name before the user may continue. **Next is the save**, so the screen has no second button: a name is only ever written on the way out, and a saved name can no longer be reported as already taken. A collision is a hard block surfaced while the user types. When storage is unavailable the gate is skipped as unsatisfiable, the banner is shown, and the factor is still displayed so the user can write it down.
 
 **Subtasks**
 - [x] T28.1 Compute and display the extrapolation factor (10dp)
 - [x] T28.2 Implement the name field with live uniqueness feedback against the repository
-- [x] T28.3 Implement the collision hard block including the explicit data-loss recovery copy
+- [x] T28.3 Implement the collision hard block: Next stays disabled while the typed name is taken
 - [x] T28.4 Implement the storage-unavailable path: skip the gate, show the banner, still show the factor
-- [x] T28.5 Gate Next on a successful save, or on degraded mode
+- [x] T28.5 Make Next itself the write, gated on a usable name (or skipped in degraded mode)
 - [x] T28.6 Tests: save success, collision block, degraded mode, factor formatting
+- [x] T28.7 Rule out returning to Q7 from Q8, so a written record cannot be edited
 
-> **Note (T28.4).** Degraded mode marks `CHECKS.printerSaved` from `onMount` rather than teaching the gate registry about storage. The gate stays a pure function of the draft, and the *reason* the check is satisfied is documented at the call site. The name field and save button are hidden entirely, so there is no field the user can fill in that silently does nothing.
+> **Note (T28.4).** Degraded mode marks `CHECKS.printerNameReady` from `onMount` rather than teaching the gate registry about storage. The gate stays a pure function of the draft, and the *reason* the check is satisfied is documented at the call site. The name field is hidden entirely, so there is no field the user can fill in that silently does nothing.
+>
+> **Note (T28, rewritten).** The step used to pair a name field with its own *Save printer* button, and the button wrote the record while the field kept the name — so the moment a save succeeded, the live collision warning fired for the name the user had just saved, and a second press produced a hard error quoting a record that was already in storage. Users read that as "it errored *and* saved". Q7 now has no save button: it records the typed name and its readiness in the draft on every keystroke, and `StepScreen` writes the printer on the way out. `flow.e2e.test.tsx` pins both halves — nothing is stored while typing, and the record appears only after Next. `Q8.back` is `null` for the same reason: the factor on the results screen is already saved under the name Q7 wrote, so there is nothing there to edit.
 
 ---
 
@@ -525,20 +530,23 @@ flowchart TB
 
 ---
 
-### T30 — Quad results integration and exit (Q8–Q9)
+### T30 — Quad results integration and exit (Q8)
 **Size:** M · **Depends on:** T28, T29, T15 · **Unblocks:** T32, T33
 
-**Context:** PRD §9.3 — the save gate precedes the result (decision 9), and exit returns to the landing screen (decision 17). The exit-confirmation rule must hold from the first measurement onward.
+**Context:** PRD §9.3, decision 28 — the save gate precedes the result (decision 9), and exiting returns to the landing screen (decision 17). The exit-confirmation rule must hold from the first measurement onward. The flow ends *at* the result: there is no separate “finished” screen to confirm that it is over.
 
 **Subtasks**
 - [x] T30.1 Wire Q7 → Q8 results using T29
-- [x] T30.2 Implement the exit action returning to the landing screen
-- [x] T30.3 Verify the exit-confirmation rule at every step from Q5 onward
-- [x] T30.4 End-to-end test: full quad flow from landing to exit using Fixture B
+- [x] T30.2 Finish from Q8: its primary control returns to the landing screen
+- [x] T30.3 Verify the exit rule at every step from Q5 onward
+- [x] T30.4 End-to-end test: full quad flow from landing to finish using Fixture B
+- [x] T30.5 Tests: Finish leaves without a confirmation, and the results step offers no Cancel
 
 > **Note (T30.3) — bug found by the end-to-end test.** Exit was implemented as the *fallback* for the Back slot in `StepChrome`, so it existed only on C1. From Q1 onward the only way out of a flow was to walk Back through every screen. PRD §9.2 (and the §14 acceptance table) require Back + Next + Exit on every step, with the confirmation conditioned on whether a measurement has been entered. The chrome now always renders Exit, and `requestExit` still decides whether to confirm — which is what makes C1–C2 and Q1–Q4 leave without a dialog.
 >
 > **Note (T30.4).** The end-to-end suite lives in `src/components/flow.e2e.test.tsx` and drives the real screens through the real engine with a storage double. This is the layer that caught both wiring bugs above: each component was correct in isolation, and the mistakes were in how they were connected.
+>
+> **Note (T30, revised — Q9 removed).** Q9 was a screen whose only content was a Done button doing what the results screen's own control does. It is gone, and `StepSpec` grew two fields to say so declaratively rather than by special-casing the step: `finishes` (this step's control ends the flow — the engine returns to the landing screen instead of advancing) and `nextLabel` ("Finish", since "Next" is not what pressing it does). `showExit: false` drops the Cancel control from the same step. **The single flow's S7 was removed the same way**, so `FinishedStep` and its `exit-to-landing` control no longer exist in either flow, and no step currently sets `showNext`. Both results steps also carry `back: null` — they are the last screen of their flow, and Finish is the way out — which is the one place the registry's forward/back chain is deliberately broken (`engine.test.ts` lists them). `StepChrome` gained `nextVariant` for the same reason, set to `outline` wherever a step finishes: the control is Next-shaped and sits in Next's slot, but it must not be the filled button that has meant "carry on" on every screen before it.
 
 ---
 
@@ -561,16 +569,16 @@ flowchart TB
 
 ---
 
-### T32 — Quick flow results and exit (S6–S7)
+### T32 — Quick flow results and finish (S6)
 **Size:** M · **Depends on:** T31, T29, T30 · **Unblocks:** T33
 
-**Context:** PRD §8.1 — the single flow multiplies the measured average by the stored factor using the **same canonical order** as the quad flow, then reuses the results screen. Fixture C is the acceptance test that the extrapolation model is implemented consistently: with a basis equal to the quad calibration's X average, the single flow must reproduce that calibration's ratio exactly.
+**Context:** PRD §8.1 — the single flow multiplies the measured average by the stored factor using the **same canonical order** as the quad flow, then reuses the results screen. Fixture C is the acceptance test that the extrapolation model is implemented consistently: with a basis equal to the quad calibration's X average, the single flow must reproduce that calibration's ratio exactly. The flow ends at the result, as the quad flow's does (decision 28).
 
 **Subtasks**
 - [x] T32.1 Wire S5 → S6 results using T29's single variant
 - [x] T32.2 Verify Fixture C end-to-end through the UI
-- [x] T32.3 Implement S7 exit to landing with the confirmation rule
-- [x] T32.4 End-to-end test: full quick flow
+- [x] T32.3 Finish from S6: its primary control returns to the landing screen, with Back and Cancel hidden
+- [x] T32.4 End-to-end test: full quick flow, through to finishing
 
 > **Note (T32.2).** Fixture C is verified twice: as arithmetic in `math.test.ts`, and through the UI in `flow.e2e.test.tsx` (seed the repository with Fixture B's factor, measure 137.60/137.40, read 98.188 off the hero). The UI test is the one that proves the *stored* factor is what the single flow extrapolates by, rather than a value recomputed at display precision.
 

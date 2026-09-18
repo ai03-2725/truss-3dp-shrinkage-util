@@ -84,7 +84,6 @@ li ul li:first-child {
 
 ::marker {
   color: var(--text-color-default);
-  background-color: red;
 }
 
 address,

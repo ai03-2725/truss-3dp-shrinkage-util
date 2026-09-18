@@ -19,6 +19,7 @@ button,
   color: var(--button-text-primary);
   border: none;
   cursor: pointer;
+  text-decoration: none;
 }
 
 input::file-selector-button {
@@ -51,6 +52,11 @@ button:disabled,
  * fill, so it reads as the way *out* of a screen rather than the way through it.
  * That distinction is the whole point: the flow's Cancel calibration control
  * sits near Next, and the two must not look like each other.
+ *
+ * The control that *finishes* a flow uses it for the same reason. It is
+ * Next-shaped and sits in the same slot, but it ends the run instead of moving
+ * through it, so it must not be the filled button that has meant "carry on" on
+ * every screen before it.
  *
  * Declared after the filled rules on purpose, so it also wins for an element
  * that carries both classes (`class="button button-outline"`), where the two

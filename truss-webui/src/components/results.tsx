@@ -8,10 +8,9 @@ import {
   evaluateSingle,
   type CalibrationOutcome,
 } from '../domain/math'
-import { formatMeasurement, formatPercent, parseNumber } from '../domain/number'
+import { formatPercent, parseNumber } from '../domain/number'
 import type { PrinterRepository } from '../storage/printers'
 import { announce } from './a11y'
-import { DetailsBlock, type DetailRow } from './flow-ui'
 
 /**
  * The results screen (T29, PRD §10, decision 8).
@@ -117,26 +116,6 @@ export function ResultsStep(props: ResultsStepProps): JSX.Element {
     }
   }
 
-  const detailRows = (result: CalibrationOutcome): DetailRow[] => {
-    if (result.flow === 'quad') {
-      return [
-        { label: 'Average of all 8 measurements', value: result.display.mean },
-        { label: 'X beam average', value: result.display.basis },
-        { label: 'Extrapolation factor', value: result.display.factor, emphasis: true },
-        { label: 'Shrinkage compensation ratio', value: result.display.ratio },
-      ]
-    }
-    const x = result.pairs[0]
-    return [
-      { label: 'Outer measurement', value: formatMeasurement(x.outer) },
-      { label: 'Inner measurement', value: formatMeasurement(x.inner) },
-      { label: 'Their average', value: result.display.mean },
-      { label: 'Stored extrapolation factor', value: result.display.factor, emphasis: true },
-      { label: 'Extrapolated average', value: formatMeasurement(result.extrapolatedAverage) },
-      { label: 'Shrinkage compensation ratio', value: result.display.ratio },
-    ]
-  }
-
   return (
     <div class="stack">
       <Show
@@ -146,15 +125,14 @@ export function ResultsStep(props: ResultsStepProps): JSX.Element {
         {(result) => (
           <>
             <p>
-              Your slicer’s XY shrinkage setting multiplies the shrinkage into the model. This
-              calibration measured a ratio of{' '}
-              <strong class="numeric">{result().display.ratio}</strong> — enter what your slicer
-              currently has, and the value to replace it with appears below.
+              The calculated shrinkage ratio against the current setting is{' '}
+              <strong class="numeric">{result().display.ratio}</strong>.<br />
+              First enter your current filament's XY shrinkage setting (100% by default):
             </p>
 
             <div class="stack">
               <label for="current-slicer-value">
-                Current XY shrinkage value in your slicer (%)
+                Current filament XY shrinkage value in your slicer (%)
               </label>
               <input
                 id="current-slicer-value"
@@ -194,7 +172,7 @@ export function ResultsStep(props: ResultsStepProps): JSX.Element {
             </div>
 
             <div class="stack">
-              <h3>Enter this in your slicer</h3>
+              <h3>New XY Shrinkage Value</h3>
               <p class="readout numeric" data-testid="hero-percentage">
                 {display()}
               </p>
@@ -224,12 +202,12 @@ export function ResultsStep(props: ResultsStepProps): JSX.Element {
               <h3>Where to put it</h3>
               <p>
                 In your slicer, open the filament you are using and find its XY shrinkage setting.
-                Replace the value with the one above — it already includes the current value, so do
-                not multiply again.
+                <br />
+                Replace the value with the one above.
               </p>
               <p class="muted">
-                OrcaSlicer and Bambu Studio: Filament settings → “Shrinkage (XY)”. Other slicers use
-                the same name or “XY compensation”.
+                Example for OrcaSlicer and Bambu Studio: Filament settings → “Shrinkage (XY)”. Other
+                slicers use the same name or “XY compensation”.
               </p>
               <img
                 src={IMAGES.shrinkageAdjust1}
@@ -241,16 +219,17 @@ export function ResultsStep(props: ResultsStepProps): JSX.Element {
                 alt="The XY shrinkage value changed."
                 loading="lazy"
               />
+              <small>Example of the value being adjusted.</small>
+              <br />
             </div>
 
-            <DetailsBlock title="How this was calculated" rows={detailRows(result())} />
-
-            <Show when={result().flow === 'quad'}>
-              <p class="muted">
-                The extrapolation factor above is worth writing down. If it could not be saved to
-                this browser, it can be added by hand on the saved printers screen.
-              </p>
-            </Show>
+            {/*
+             * The "How this was calculated" block and the reminder to write the
+             * factor down are turned off here. Their rows and import are in git
+             * history (`git show HEAD:truss-webui/src/components/results.tsx`).
+             * PRD §10 still asks for the ratio and factor to be shown, so this is
+             * a temporary state rather than a decision.
+             */}
           </>
         )}
       </Show>

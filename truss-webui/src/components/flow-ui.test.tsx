@@ -103,6 +103,28 @@ describe('StepChrome', () => {
     expect(screen.queryByTestId('next')).toBeNull()
   })
 
+  it('labels the next control when "Next" is not what pressing it does', () => {
+    chrome({ nextLabel: 'Finish' })
+    expect(screen.getByTestId('next')).toHaveTextContent('Finish')
+  })
+
+  it('leaves the ordinary Next control filled', () => {
+    chrome()
+    expect(screen.getByTestId('next')).not.toHaveClass('button-outline')
+  })
+
+  it('styles the control that ends the flow as an outline', () => {
+    chrome({ nextLabel: 'Finish', nextVariant: 'outline' })
+    expect(screen.getByTestId('next')).toHaveClass('button-outline')
+  })
+
+  it('hides Cancel calibration on a step whose own control leaves the flow', () => {
+    // The finishing step: two ways out, one of them asking a question first, is a
+    // chance to press the wrong one.
+    chrome({ showExit: false })
+    expect(screen.queryByTestId('exit')).toBeNull()
+  })
+
   it('asks before discarding measurements, defaulting focus to Stay', async () => {
     const user = userEvent.setup()
     const { props } = chrome({ exitRequested: true, hasMeasurements: true })
@@ -180,7 +202,7 @@ describe('StepChrome', () => {
     chrome({ exitRequested: true, hasMeasurements: true })
 
     expect(screen.getByTestId('exit-confirmation')).toHaveTextContent(
-      'Your measurements will be discarded',
+      'Your entered measurements and progress will be discarded',
     )
     expect(screen.getByTestId('leave')).toHaveTextContent('Leave and discard')
   })
@@ -190,7 +212,7 @@ describe('StepChrome', () => {
 
     // The confirmation is not conditional — only its wording is.
     expect(screen.getByTestId('exit-confirmation')).toHaveTextContent(
-      'Nothing has been entered yet',
+      'Your current progress will be discarded',
     )
     expect(screen.getByTestId('leave')).toHaveTextContent('Leave')
   })

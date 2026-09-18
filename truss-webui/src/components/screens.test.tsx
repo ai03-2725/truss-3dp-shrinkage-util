@@ -97,17 +97,30 @@ describe('printer list (T18)', () => {
     expect(screen.getByTestId('empty-state')).toHaveTextContent('import')
   })
 
-  it('lists printers with their factor at display precision, in canonical order', () => {
+  it('lists printers as a table of name, factor and per-row controls', () => {
     const app = createTestApp()
     app.printers.add({ name: 'voron 2.4', extrapolationFactor: 0.9987272727 })
     app.printers.add({ name: 'X1C', extrapolationFactor: 1.0034215686 })
     renderPrinterData(app)
 
-    const items = within(screen.getByTestId('printer-list')).getAllByRole('listitem')
-    expect(items[0]).toHaveTextContent('voron 2.4')
-    expect(items[1]).toHaveTextContent('X1C')
+    const table = screen.getByTestId('printer-list')
+    expect(
+      within(table)
+        .getAllByRole('columnheader')
+        .map((cell) => cell.textContent),
+    ).toEqual(['Printer', 'Extrapolation factor', 'Actions'])
+
+    // One row per printer, in canonical order (the first row is the headers).
+    const rows = within(table).getAllByRole('row').slice(1)
+    expect(rows.map((row) => within(row).getByRole('rowheader').textContent)).toEqual([
+      'voron 2.4',
+      'X1C',
+    ])
     // The stored value is full precision; the 10dp display is what is shown.
-    expect(items[1]).toHaveTextContent('1.0034215686')
+    expect(rows[1]).toHaveTextContent('1.0034215686')
+    // Every row owns the two controls that act on it.
+    expect(within(rows[1]).getByRole('button', { name: 'Edit' })).toBeInTheDocument()
+    expect(within(rows[1]).getByRole('button', { name: 'Delete' })).toBeInTheDocument()
   })
 
   it('returns to the landing page (decision 17)', async () => {
@@ -195,13 +208,50 @@ describe('editing a printer (T20)', () => {
     expect(app.printers.list()).toEqual([{ name: 'X1 Carbon', extrapolationFactor: 1.05 }])
   })
 
+  it('opens the editor in a row below the printer it belongs to', async () => {
+    const user = userEvent.setup()
+    const app = createTestApp()
+    app.printers.add({ name: 'X1C', extrapolationFactor: 1 })
+    app.printers.add({ name: 'Voron', extrapolationFactor: 2 })
+    renderPrinterData(app)
+
+    await user.click(screen.getByTestId('edit-X1C'))
+
+    const rows = within(screen.getByTestId('printer-list')).getAllByRole('row')
+    // headers, Voron, X1C, and X1C's editor directly below it.
+    expect(rows).toHaveLength(4)
+    expect(within(rows[1]).getByRole('rowheader')).toHaveTextContent('Voron')
+    expect(within(rows[2]).getByRole('rowheader')).toHaveTextContent('X1C')
+    expect(within(rows[3]).getByLabelText('Printer name')).toHaveValue('X1C')
+    // The editor is a panel belonging to a row, not another row: it is carded.
+    expect(rows[3].querySelector('.card')).not.toBeNull()
+    // The row being changed stays on screen: it is the form's context.
+    expect(within(rows[2]).getByRole('button', { name: 'Edit' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+  })
+
+  it('closes the editor when Edit is pressed again', async () => {
+    const user = userEvent.setup()
+    const app = createTestApp()
+    app.printers.add({ name: 'X1C', extrapolationFactor: 1 })
+    renderPrinterData(app)
+
+    await user.click(screen.getByTestId('edit-X1C'))
+    await user.click(screen.getByTestId('edit-X1C'))
+
+    expect(screen.queryByLabelText('Printer name')).toBeNull()
+    expect(within(screen.getByTestId('printer-list')).getAllByRole('row')).toHaveLength(2)
+  })
+
   it('carries the same factor warning as adding', async () => {
     const user = userEvent.setup()
     const app = createTestApp()
     app.printers.add({ name: 'X1C', extrapolationFactor: 1 })
     renderPrinterData(app)
 
-    await user.click(screen.getByRole('button', { name: 'Edit' }))
+    await user.click(screen.getByTestId('edit-X1C'))
     expect(screen.getByTestId('factor-warning')).toHaveTextContent('quad')
   })
 
@@ -212,9 +262,7 @@ describe('editing a printer (T20)', () => {
     app.printers.add({ name: 'Voron', extrapolationFactor: 2 })
     renderPrinterData(app)
 
-    await user.click(
-      within(screen.getByTestId('printer-list')).getAllByRole('button', { name: 'Edit' })[1],
-    )
+    await user.click(screen.getByTestId('edit-X1C'))
     await user.clear(screen.getByLabelText('Printer name'))
     await user.type(screen.getByLabelText('Printer name'), 'voron')
     await user.click(screen.getByTestId('submit-printer'))
@@ -229,7 +277,7 @@ describe('editing a printer (T20)', () => {
     app.printers.add({ name: 'X1C', extrapolationFactor: 1 })
     renderPrinterData(app)
 
-    await user.click(screen.getByRole('button', { name: 'Edit' }))
+    await user.click(screen.getByTestId('edit-X1C'))
     await user.clear(screen.getByLabelText('Printer name'))
     await user.type(screen.getByLabelText('Printer name'), 'Something else')
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
@@ -245,7 +293,7 @@ describe('deleting a printer (T21)', () => {
     app.printers.add({ name: 'X1C', extrapolationFactor: 1 })
     renderPrinterData(app)
 
-    await user.click(screen.getByRole('button', { name: 'Delete' }))
+    await user.click(screen.getByTestId('delete-X1C'))
     const confirmation = screen.getByRole('group', { name: 'Confirm deleting X1C' })
     expect(confirmation).toHaveTextContent('cannot be undone')
 
@@ -254,13 +302,33 @@ describe('deleting a printer (T21)', () => {
     expect(screen.queryByRole('group', { name: 'Confirm deleting X1C' })).toBeNull()
   })
 
+  it('asks in a row below the printer, leaving that row readable', async () => {
+    const user = userEvent.setup()
+    const app = createTestApp()
+    app.printers.add({ name: 'X1C', extrapolationFactor: 1 })
+    app.printers.add({ name: 'Voron', extrapolationFactor: 2 })
+    renderPrinterData(app)
+
+    await user.click(screen.getByTestId('delete-X1C'))
+
+    const rows = within(screen.getByTestId('printer-list')).getAllByRole('row')
+    // headers, Voron, X1C, and X1C's confirmation directly below it.
+    expect(rows).toHaveLength(4)
+    expect(within(rows[2]).getByRole('rowheader')).toHaveTextContent('X1C')
+    expect(within(rows[2]).getByRole('button', { name: 'Delete' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(within(rows[3]).getByRole('group', { name: 'Confirm deleting X1C' })).toBeInTheDocument()
+  })
+
   it('deletes once confirmed', async () => {
     const user = userEvent.setup()
     const app = createTestApp()
     app.printers.add({ name: 'X1C', extrapolationFactor: 1 })
     renderPrinterData(app)
 
-    await user.click(screen.getByRole('button', { name: 'Delete' }))
+    await user.click(screen.getByTestId('delete-X1C'))
     await user.click(screen.getByTestId('confirm-delete-X1C'))
 
     expect(app.printers.list()).toEqual([])
@@ -273,33 +341,81 @@ describe('deleting a printer (T21)', () => {
     app.printers.add({ name: 'X1C', extrapolationFactor: 1 })
     renderPrinterData(app)
 
-    await user.click(screen.getByRole('button', { name: 'Delete' }))
+    await user.click(screen.getByTestId('delete-X1C'))
     expect(screen.getByRole('group', { name: 'Confirm deleting X1C' })).toHaveTextContent(
       'never overwrites',
     )
   })
 })
 
-describe('prerequisites reset (T22)', () => {
-  it('says the checklist is skipped, then brings it back for the next run', async () => {
+describe('prerequisites checklist toggle (T22)', () => {
+  it('reflects the stored flag and turns the checklist back on', async () => {
     const user = userEvent.setup()
     const app = createTestApp({ skipPrerequisites: true })
     renderPrinterData(app)
 
-    expect(screen.getByTestId('prereq-state')).toHaveTextContent('currently skipped')
+    const toggle = screen.getByRole('checkbox', { name: /Before you start/ })
+    expect(toggle).not.toBeChecked()
 
-    await user.click(screen.getByTestId('reset-prereq'))
+    await user.click(toggle)
 
     expect(app.settings.skipPrerequisites()).toBe(false)
-    expect(screen.getByTestId('prereq-state')).toHaveTextContent('will be shown')
+    expect(toggle).toBeChecked()
+    // Nothing is announced: the box is the feedback.
+    expect(screen.queryByTestId('printer-status')).toBeNull()
 
+    // The flag is the whole point: the next run starts at the checklist again.
     app.engine.startCalibration()
     expect(app.engine.step()?.id).toBe('C1')
   })
 
-  it('shows the control only when the flag is set', () => {
-    renderPrinterData()
-    expect(screen.queryByTestId('reset-prereq')).toBeNull()
+  it('turns the checklist off, so the next run starts after it', async () => {
+    const user = userEvent.setup()
+    const app = createTestApp()
+    renderPrinterData(app)
+
+    const toggle = screen.getByRole('checkbox', { name: /Before you start/ })
+    expect(toggle).toBeChecked()
+
+    await user.click(toggle)
+
+    expect(app.settings.skipPrerequisites()).toBe(true)
+    expect(screen.queryByTestId('printer-status')).toBeNull()
+
+    app.engine.startCalibration()
+    expect(app.engine.step()?.id).toBe('C2')
+  })
+
+  it('goes back rather than claim a skip the browser would not save', async () => {
+    const user = userEvent.setup()
+    const app = createTestApp({ host: null })
+    renderPrinterData(app)
+
+    const toggle = screen.getByRole('checkbox', { name: /Before you start/ })
+    await user.click(toggle)
+
+    // The store only applies a skip once it has actually persisted, so the box
+    // must follow the store rather than the click.
+    expect(toggle).toBeChecked()
+    expect(app.settings.skipPrerequisites()).toBe(false)
+    // The box cannot explain a failure on its own, so this one is reported.
+    expect(screen.getByTestId('printer-status')).toHaveTextContent('will still be shown')
+  })
+
+  it('says a clearing that could not be saved is only for this session', async () => {
+    const user = userEvent.setup()
+    const host = new FakeHost()
+    const app = createTestApp({ host })
+    app.settings.setSkipPrerequisites(true)
+    renderPrinterData(app)
+
+    // Clearing is the safe direction, so it still takes effect — but it will not
+    // survive the page, and the box cannot say so.
+    host.failWrites = quotaError()
+    await user.click(screen.getByRole('checkbox', { name: /Before you start/ }))
+
+    expect(app.settings.skipPrerequisites()).toBe(false)
+    expect(screen.getByTestId('printer-status')).toHaveTextContent('could not be saved')
   })
 })
 
@@ -390,8 +506,11 @@ describe('export and import (T23)', () => {
   it('states the existing-wins consequence and the workaround', () => {
     renderPrinterData()
 
-    expect(screen.getByText(/saved values always win/i)).toBeInTheDocument()
-    expect(screen.getByText(/delete those printers here first/i)).toBeInTheDocument()
+    // The "not" sits in a `<strong>`, and `getByText` only sees an element's own
+    // text nodes — so the paragraph is asserted as a whole.
+    const copy = screen.getByText(/printers of the same name are/i)
+    expect(copy).toHaveTextContent('printers of the same name are not overwritten')
+    expect(copy).toHaveTextContent('delete it from the table')
   })
 })
 

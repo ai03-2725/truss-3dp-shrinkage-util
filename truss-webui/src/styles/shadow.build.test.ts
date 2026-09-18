@@ -129,4 +129,31 @@ describe('the shipped bundle', () => {
     expect(scaffoldAt).toBeGreaterThan(-1)
     expect(correctionAt).toBeGreaterThan(scaffoldAt)
   })
+
+  it('keeps the visually hidden file input at 1px, not the element styles’ 100%', async () => {
+    const { css } = await buildBundle()
+    const style = document.createElement('style')
+    style.textContent = toShadowStylesheet(css).replace(/:host/g, '.truss-calibrator-root')
+    document.head.append(style)
+
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.className = 'sr-only'
+    document.body.append(input)
+
+    try {
+      /*
+       * Same cascade-order hazard as above, with a quieter symptom: `.sr-only` is
+       * a lone class and `input[type='file']` sets `width: 100%`, so the
+       * correction in `local.css` wins only by arriving last. A minifier is
+       * entitled to rewrite the stylesheet, so the winner is *measured* here
+       * rather than assumed. Left at 100%, the invisible import input reached 1px
+       * past the viewport and put a horizontal scrollbar on the page.
+       */
+      expect(getComputedStyle(input).width).toBe('1px')
+    } finally {
+      style.remove()
+      input.remove()
+    }
+  })
 })

@@ -54,6 +54,29 @@ export interface StepSpec {
   readonly back: StepId | null
   /** Hide the Next control: the step provides its own way out. Defaults to shown. */
   readonly showNext?: boolean
+  /** The Next control's label, where "Next" is not what pressing it does. */
+  readonly nextLabel?: string
+  /**
+   * This step's Next control ends the flow.
+   *
+   * The results screen is the last thing the user needs, so its primary control
+   * finishes — returning to the landing screen — rather than advancing to a
+   * screen that has nothing left to say. Spelled out rather than inferred from
+   * `next === null`, which is also what C2 means before the branch has picked a
+   * destination.
+   *
+   * The chrome also reads it for styling: a finishing control is drawn as an
+   * outline, because it leaves the flow rather than moving through it.
+   */
+  readonly finishes?: boolean
+  /**
+   * Whether the flow's own Cancel control is offered here. Defaults to shown.
+   *
+   * Hidden on the finishing step, where Finish leaves the flow anyway: two
+   * controls that both leave — one of them asking a question first — is a chance
+   * to press the wrong one.
+   */
+  readonly showExit?: boolean
 }
 
 /** Build the `(draft) => GateStatus` the engine evaluates. */
@@ -202,10 +225,12 @@ const QUAD_STEPS: readonly StepSpec[] = [
     id: 'Q7',
     flow: 'quad',
     title: 'Save the extrapolation factor',
+    // Satisfied while the typed name is non-empty and unused. Q7's Next is what
+    // writes the record, so this is the whole of "may the user leave".
     gate: {
       kind: 'all',
-      keys: [CHECKS.printerSaved],
-      reason: 'Save the factor for this printer to continue.',
+      keys: [CHECKS.printerNameReady],
+      reason: 'Enter a printer name that is not already saved to continue.',
     },
     next: 'Q8',
     back: 'Q6',
@@ -215,18 +240,17 @@ const QUAD_STEPS: readonly StepSpec[] = [
     flow: 'quad',
     title: 'Your slicer setting',
     gate: { kind: 'measurements', axes: AXES },
-    next: 'Q9',
-    back: 'Q7',
-  },
-  {
-    id: 'Q9',
-    flow: 'quad',
-    title: 'Finished',
-    gate: { kind: 'open' },
     next: null,
-    back: 'Q8',
-    // The only step with no Next: it has a Done button of its own.
-    showNext: false,
+    // No Back. Q7 has already written the printer record by the time this screen
+    // is reached, so returning to it would mean either a second record or a
+    // rename of one already saved — the factor the user is reading here would no
+    // longer be the factor under that name.
+    back: null,
+    // The flow ends here. Finish is the success path, so it leaves without the
+    // confirmation Cancel would put in front of the same outcome.
+    finishes: true,
+    nextLabel: 'Finish',
+    showExit: false,
   },
 ]
 
@@ -291,17 +315,14 @@ const SINGLE_STEPS: readonly StepSpec[] = [
     flow: 'single',
     title: 'Your slicer setting',
     gate: { kind: 'measurements', axes: ['X'] },
-    next: 'S7',
-    back: 'S5',
-  },
-  {
-    id: 'S7',
-    flow: 'single',
-    title: 'Finished',
-    gate: { kind: 'open' },
     next: null,
-    back: 'S6',
-    showNext: false,
+    // No Back, matching the quad flow's results step: this is the last screen of
+    // the flow, and Finish is the way out of it.
+    back: null,
+    // The flow ends here, exactly as the quad flow's does (decision 28).
+    finishes: true,
+    nextLabel: 'Finish',
+    showExit: false,
   },
 ]
 
@@ -355,17 +376,17 @@ export interface FlowDefinition {
 export const FLOW_DEFINITIONS: Readonly<Record<FlowId, FlowDefinition>> = {
   quad: {
     id: 'quad',
-    steps: ['C1', 'C2', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9'],
+    steps: ['C1', 'C2', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8'],
     firstInstructionalStep: 'Q1',
     resultsStep: 'Q8',
-    lastStep: 'Q9',
+    lastStep: 'Q8',
   },
   single: {
     id: 'single',
-    steps: ['C1', 'C2', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'],
+    steps: ['C1', 'C2', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6'],
     firstInstructionalStep: 'S1',
     resultsStep: 'S6',
-    lastStep: 'S7',
+    lastStep: 'S6',
   },
 }
 

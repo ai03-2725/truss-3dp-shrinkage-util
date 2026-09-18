@@ -159,8 +159,7 @@ Computation always uses full precision. The final percentage is **not** derived 
 | Condition | Why |
 |---|---|
 | Measurement outside ~133–138.6mm | Designed length is 140mm and documented shrinkage is 0.95–0.99; outside this is almost certainly a misread or wrong unit. |
-| `inner ≥ outer` on the same axis | Inner and outer bracket the same nominal length; this ordering is physically impossible and indicates a misread. |
-| Divergence > **2.0mm** between the inner and outer reading of one axis | Suggests the caliper was seated wrong — the guides warn this yields a bogus diagonal reading. *(Settled — see §13.2.)* |
+| Divergence > **2.0mm** between the inner and outer reading of one axis, **in either direction** | Suggests the caliper was seated wrong — the guides warn this yields a bogus diagonal reading. The size of the gap is what matters: which reading is the larger of the two is not evidence of a misread, so the warning must not depend on it. *(Settled — see §13.2.)* |
 
 **Why 2.0mm for the divergence threshold.** The inner and outer readings of one axis differ by exactly the sum of the two end-wall thicknesses shown in the design — a fixed geometric quantity, not a shrinkage-dependent one, so the same absolute threshold is valid for every material. The shipped designs put that sum well under 1mm, and the worked fixtures in §14.1 use legitimate divergences up to 1.0mm. A divergence above 2mm is therefore not reachable by a correctly seated caliper on any of the three designs, while 2mm sits comfortably above every legitimate case so the warning cannot fire on a good measurement and train the user to ignore it.
 
@@ -185,7 +184,7 @@ Entry point. Offers:
 
 Next is gated on all three. A "Don't ask again" checkbox becomes available once all three are ticked; when set, it is persisted as a **single global flag** (`skipPrerequisites`) and C1 is skipped on subsequent runs.
 
-The flag is **resettable from the printer-data screen** — not from the landing page. This is the only path back to the checklist content, so the reset control must be discoverable there.
+The flag is **set and cleared from a checkbox on the printer-data screen** — not from the landing page. This is the only path back to the checklist content, so the toggle must be discoverable there.
 
 **C2 — First time on this printer?** Yes → Quad flow. No → Single flow.
 
@@ -205,15 +204,14 @@ Content is authored fresh for the flow; source steps are noted for reference.
 | Q2 | Slice the Quad STL. Download button + guidance on seam placement off measurement surfaces. *(guide steps 3–5)* | Confirm-sliced |
 | Q3 | Print. Warning: do not force off the plate; cool fully; do not measure on the plate. *(guide steps 6–7)* | Confirm-printed |
 | Q4 | Locate the X-beam (X label). *(guide step 8)* | Next |
-| Q5 | Measure X — outer and inner. Includes the seating warnings and correct/incorrect examples. *(guide step 9)* | 2 valid values |
-| Q6 | Measure Y, A, B — outer and inner each. Repeats step 9's measurement guidance. *(guide step 10)* | 6 valid values |
-| Q7 | Compute and display $F$ (rounded to 10dp). **Mandatory save gate:** name the printer and save. *(guide step 12)* | Unique name + successful save |
-| Q8 | Results screen (§10). Slicer adjustment instructions. *(guide step 11)* | — |
-| Q9 | Exit to landing screen. | — |
+| Q5 | Measure X — one section per dimension, each ordered CAD diagram → real-world photograph → field. The general seating warnings lead the page; the inner-jaws correct/incorrect guidance sits *inside* the inner section, between its photograph and its field. *(guide step 9)* | 2 valid values |
+| Q6 | Measure Y, A, B — outer and inner each, as a compact table of beams (rows) against sides (columns). Does **not** repeat step 5's guidance or figures. *(guide step 10)* | 6 valid values |
+| Q7 | Compute and display $F$ (rounded to 10dp). The user names the printer; a name already in use blocks Next while it is typed, and **Next is the save** — there is no separate button. *(guide step 12)* | Non-empty, unused name |
+| Q8 | Results screen (§10). Slicer adjustment instructions. **No Back** (Q7 has already written the printer record) and **Finish replaces Next**: it ends the flow and returns to the landing screen. **No Cancel** either — a second way out, arriving with a confirmation in front of it, is a chance to press the wrong one. *(guide step 11)* | Finish |
 
 **Navigation:** Back + Next across all steps, with a single in-memory calibration draft shared by every step (so Back is free and Next validates). **No mid-flow persistence** — closing or reloading restarts at step 1.
 
-**Exit confirmation:** shown when the user leaves the flow after entering at least one measurement and before completing it (i.e. Q5 onward). Steps C1–C2 and Q1–Q4 exit without confirmation.
+**Exit confirmation:** shown when the user leaves the flow after entering at least one measurement and before completing it (i.e. Q5/S5 onward). Steps C1–C2 and Q1–Q4 exit without confirmation. Both flows' results screens (Q8, S6) are the exception on both counts: they offer no Cancel control, and their Finish control is the success path, so it returns to the landing screen without asking. The engine's rule is unchanged — *any* exit request still confirms — those steps simply no longer offer the control that requests one.
 
 ### 9.4 Single calibration flow (fast)
 
@@ -224,10 +222,9 @@ Content is authored fresh for the flow; source steps are noted for reference.
 | S3 | Slice the Single STL; seams off measurement faces. *(guide step 3)* | Confirm-sliced |
 | S4 | Print + cooling warning. *(guide steps 4–5)* | Confirm-printed |
 | S5 | Measure X — outer and inner, with full seating guidance. *(guide step 6)* | 2 valid values |
-| S6 | Results screen (§10) with the extrapolated value. *(guide step 7)* | — |
-| S7 | Exit to landing screen. | — |
+| S6 | Results screen (§10) with the extrapolated value. **Finish replaces Next**: it ends the flow and returns to the landing screen, and **there is no Cancel** — a second way out, arriving with a confirmation in front of it, is a chance to press the wrong one. *(guide step 7)* | Finish |
 
-Same navigation and exit-confirmation rules.
+Same navigation and exit-confirmation rules as the quad flow, including no Back on the results screen: S6 is the last step, and Finish is the way out of it.
 
 ---
 
@@ -300,7 +297,7 @@ Storage is treated as unreliable:
 | Quota exceeded | Same in-memory fallback + banner. |
 | Corrupt or foreign payload | Treated as empty, but **the raw string is preserved for export** rather than silently overwritten — import cannot restore it (existing-wins), so destroying it would be unrecoverable. |
 
-**Accepted limitation — name collision at the save gate.** A collision is a hard block (unique-name validation error). Because flow state is not persisted, a user who wants to reuse that name must Exit → delete the record from the printer-data screen → restart the flow, **losing all eight measurements**. The error message must state this recovery path explicitly, or users will read the dead end as a bug.
+**Accepted limitation — name collision at the save gate.** A collision is a hard block, surfaced as the user types: **Next stays disabled** until the typed name is free, so there is no failed save to recover from. Reusing an existing name is therefore impossible from inside the flow; a user who wants to must Exit → delete the record from the printer-data screen → restart the flow, **losing all eight measurements**. The inline warning names the way forward — choose another name — rather than presenting a dead end, because nothing has failed: the user has simply not finished naming the printer.
 
 **Accepted limitation — no mid-flow recovery.** Closing the tab mid-flow discards all entered measurements by design.
 
@@ -377,7 +374,7 @@ The single flow must reproduce the quad flow's result exactly when its basis equ
 | 7 | Full precision internally; round half-up for display (deviates from the outline's "truncate"). |
 | 8 | Slicer-ready percentage is the hero; ratio and factor in a secondary details block. |
 | 9 | Outline's ordering retained: factor → mandatory save gate → shrinkage result. |
-| 10 | Name collision at the save gate is a hard block (limitation documented in §12). |
+| 10 | Name collision at the save gate is a hard block — Next stays disabled while the typed name is taken (limitation documented in §12). |
 | 11 | STLs delivered by build-time copy from repo root; base-relative URLs only. |
 | 12 | Dual variant out of scope. |
 | 13 | Shadow DOM, fully self-contained styling; parent theming not inherited. |
@@ -393,3 +390,6 @@ The single flow must reproduce the quad flow's result exactly when its basis equ
 | 23 | Non-goals: history, filament profiles, sync, slicer integration, analytics. |
 | 24 | Localization and PWA deferred, not closed off. |
 | 25 | Success = numeric parity with the manual procedure + end-to-end completion. |
+| 26 | Q5 is one section per dimension, each ordered diagram → photograph → field, so the visual context precedes the number it describes and the inner-jaws guidance sits inside the inner section rather than above both. Q6 does not repeat the guidance or figures; the three remaining beams are entered in a table of beams against sides. |
+| 27 | Q7 has no save button: **Next writes the printer**, so a name can never be reported as taken while its record already sits in storage. A duplicate disables Next as the user types, and Q8 has no Back, since the factor it shows is already saved under the name Q7 wrote. |
+| 28 | Neither flow has a separate "Finished" step: the results screen's control is **Finish**, which returns to the landing screen without a confirmation, and it is drawn as an outline rather than the filled Next — it leaves the flow rather than advancing through it. Those steps are the end of the flow, so Back and Cancel are hidden there too: several controls that all leave, one of them asking a question first, is a chance to press the wrong one. |

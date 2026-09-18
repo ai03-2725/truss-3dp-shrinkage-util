@@ -68,8 +68,11 @@ async function measure(
   axis: AxisId,
   values: readonly [string, string],
 ): Promise<void> {
-  await user.type(screen.getByLabelText(new RegExp(`^${axis} outer`)), values[0])
-  await user.type(screen.getByLabelText(new RegExp(`^${axis} inner`)), values[1])
+  // Case-insensitive on purpose: Q5's sections label the fields themselves
+  // ("X Outer") while Q6's table names them from its headers ("Y outer (…)"),
+  // and neither capitalisation is what these tests are about.
+  await user.type(screen.getByLabelText(new RegExp(`^${axis} outer`, 'i')), values[0])
+  await user.type(screen.getByLabelText(new RegExp(`^${axis} inner`, 'i')), values[1])
 }
 
 /**
@@ -82,12 +85,12 @@ async function measure(
 async function runQuadToSaveGate(user: UserEvent): Promise<void> {
   await user.click(screen.getByTestId('start'))
   await passPrerequisites(user)
-  await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
+  await user.click(screen.getByLabelText(/have not used Truss Calibrator/))
   await next(user)
   await passFilament(user)
-  await tick(user, /no seams on the measured faces/)
+  await tick(user, /no seams on the measurement faces/)
   await next(user)
-  await tick(user, /cooled it, and removed it without forcing it/)
+  await tick(user, /printed the calibrator/)
   await next(user)
   await next(user) // Q4 is instructional only.
   await measure(user, 'X', FIXTURE_B.X)
@@ -102,17 +105,39 @@ async function runQuadToSaveGate(user: UserEvent): Promise<void> {
 async function runQuadToResults(user: UserEvent, printerName = 'Rig One'): Promise<void> {
   await runQuadToSaveGate(user)
 
-  // A browser that cannot store anything drops the save gate altogether, so the
-  // field is optional here rather than a step in the walk.
-  const nameField = screen.queryByLabelText(/Save this factor for/)
+  // A browser that cannot store anything hides the field and drops the gate, so
+  // the name is optional here rather than a step in the walk.
+  const nameField = screen.queryByLabelText(/Printer Name/)
   if (nameField !== null) {
     await user.type(nameField, printerName)
-    await user.click(screen.getByTestId('save-printer'))
   }
+
+  // Next *is* the save: there is no separate button to press.
   await next(user)
 }
 
 afterEach(cleanup)
+
+/** Walk the quick flow from the landing screen to the results screen. */
+async function runQuickToResults(user: UserEvent, printerName = 'Rig One'): Promise<void> {
+  await user.click(screen.getByTestId('start'))
+  await passPrerequisites(user)
+  await user.click(screen.getByLabelText(/calibrated on this printer before/))
+  await next(user)
+
+  // S1 — the picker.
+  await user.click(screen.getByLabelText(new RegExp(`^${printerName}`)))
+  await next(user)
+
+  await passFilament(user)
+  await tick(user, /no seams on the measurement faces/)
+  await next(user)
+  await tick(user, /printed the calibrator/)
+  await next(user)
+
+  await measure(user, 'X', ['137.6', '137.4'])
+  await next(user)
+}
 
 describe('quad flow — fixture B end to end (T30.4)', () => {
   it('produces 98.188% after eight readings typed through the UI', async () => {
@@ -124,17 +149,22 @@ describe('quad flow — fixture B end to end (T30.4)', () => {
     expect(screen.getByTestId('hero-percentage').textContent).toContain('98.188')
   })
 
-  it('shows the extrapolation factor at 10dp and the ratio at 5dp', async () => {
+  it('states the ratio at 5dp beside the value it multiplies', async () => {
     const app = createTestApp()
     const user = mount(app)
 
     await runQuadToResults(user)
 
-    const details = screen.getByTestId('details').textContent ?? ''
-    expect(details).toContain('0.9997272727')
-    expect(details).toContain('0.98188')
-    // The mean of all eight readings, at measurement precision.
-    expect(details).toContain('137.46')
+    // 137.50/140 rounded half-up to 5dp.
+    expect(screen.getByText(/0\.98188/)).toBeInTheDocument()
+    expect(screen.getByTestId('hero-percentage').textContent).toContain('98.188')
+
+    /*
+     * The factor at 10dp (0.9997272727) and the eight-reading mean (137.46) were
+     * asserted here from the "How this was calculated" block. That block is
+     * turned off on the results screen for now, so those assertions went with it
+     * — see the note in `results.tsx`.
+     */
   })
 
   it('saves the printer with the factor at full precision', async () => {
@@ -147,15 +177,22 @@ describe('quad flow — fixture B end to end (T30.4)', () => {
     expect(saved?.extrapolationFactor).toBe(FIXTURE_B_FACTOR)
   })
 
-  it('reaches the finished screen and returns to the landing screen', async () => {
+  it('finishes from the results screen and returns to the landing screen', async () => {
     const app = createTestApp()
     const user = mount(app)
 
     await runQuadToResults(user)
-    await next(user)
 
-    expect(screen.getByTestId('exit-to-landing')).toBeInTheDocument()
-    await user.click(screen.getByTestId('exit-to-landing'))
+    // The results screen is the end of the flow: its control finishes rather than
+    // advancing, is styled as a way out rather than a way through, and the
+    // redundant Back and Cancel controls are gone.
+    expect(screen.getByTestId('next')).toHaveTextContent('Finish')
+    expect(screen.getByTestId('next')).toHaveClass('button-outline')
+    expect(screen.queryByTestId('exit')).not.toBeInTheDocument()
+
+    await user.click(screen.getByTestId('next'))
+
+    expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
     expect(screen.getByTestId('start')).toBeInTheDocument()
   })
 
@@ -165,7 +202,7 @@ describe('quad flow — fixture B end to end (T30.4)', () => {
 
     await runQuadToResults(user)
 
-    const field = screen.getByLabelText(/Current XY shrinkage value/)
+    const field = screen.getByLabelText(/XY shrinkage value/)
     await user.clear(field)
     await user.type(field, '98.5')
 
@@ -180,25 +217,30 @@ describe('quick flow — fixture C end to end (T32.2, T32.4)', () => {
     app.printers.add({ name: 'Rig One', extrapolationFactor: FIXTURE_B_FACTOR })
     const user = mount(app)
 
-    await user.click(screen.getByTestId('start'))
-    await passPrerequisites(user)
-    await user.click(screen.getByLabelText(/already has a saved factor/))
-    await next(user)
-
-    // S1 — the picker.
-    await user.click(screen.getByLabelText(/^Rig One/))
-    await next(user)
-
-    await passFilament(user)
-    await tick(user, /no seams on the measured faces/)
-    await next(user)
-    await tick(user, /cooled it, and removed it without forcing it/)
-    await next(user)
-
-    await measure(user, 'X', ['137.6', '137.4'])
-    await next(user)
+    await runQuickToResults(user)
 
     expect(screen.getByTestId('hero-percentage').textContent).toContain('98.188')
+  })
+
+  it('finishes from the results screen and returns to the landing screen', async () => {
+    const app = createTestApp()
+    app.printers.add({ name: 'Rig One', extrapolationFactor: FIXTURE_B_FACTOR })
+    const user = mount(app)
+
+    await runQuickToResults(user)
+
+    // Same ending as the quad flow (decision 28): Finish replaces Next — styled as
+    // the way out it is — and the Back and Cancel controls are both gone.
+    expect(screen.getByTestId('step-progress')).toHaveTextContent('Step 6 of 6')
+    expect(screen.getByTestId('next')).toHaveTextContent('Finish')
+    expect(screen.getByTestId('next')).toHaveClass('button-outline')
+    expect(screen.queryByTestId('exit')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByTestId('next'))
+
+    expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
+    expect(screen.getByTestId('start')).toBeInTheDocument()
   })
 
   it('disables the single-beam branch until a printer is saved', async () => {
@@ -208,10 +250,10 @@ describe('quick flow — fixture C end to end (T32.2, T32.4)', () => {
     await user.click(screen.getByTestId('start'))
     await passPrerequisites(user)
 
-    expect(screen.getByLabelText(/already has a saved factor/)).toBeDisabled()
+    expect(screen.getByLabelText(/calibrated on this printer before/)).toBeDisabled()
     expect(
       screen.getByText(
-        'No printers saved - run a first-time calibration first or import saved printer profiles.',
+        'This option is available when a first-time calibration is run and saved on at least one printer.',
       ),
     ).toBeInTheDocument()
   })
@@ -224,12 +266,12 @@ describe('leaving a flow (T26.6, T33)', () => {
 
     await user.click(screen.getByTestId('start'))
     await passPrerequisites(user)
-    await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
+    await user.click(screen.getByLabelText(/have not used Truss Calibrator/))
     await next(user)
     await passFilament(user)
-    await tick(user, /no seams on the measured faces/)
+    await tick(user, /no seams on the measurement faces/)
     await next(user)
-    await tick(user, /cooled it, and removed it without forcing it/)
+    await tick(user, /printed the calibrator/)
     await next(user)
     await next(user)
     await measure(user, 'X', FIXTURE_B.X)
@@ -243,8 +285,8 @@ describe('leaving a flow (T26.6, T33)', () => {
     await user.click(screen.getByTestId('stay'))
 
     expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
-    expect((screen.getByLabelText(/^X outer/) as HTMLInputElement).value).toBe('138.0')
-    expect((screen.getByLabelText(/^X inner/) as HTMLInputElement).value).toBe('137.0')
+    expect((screen.getByLabelText(/^X outer/i) as HTMLInputElement).value).toBe('138.0')
+    expect((screen.getByLabelText(/^X inner/i) as HTMLInputElement).value).toBe('137.0')
   })
 
   it('discards the readings when the user confirms', async () => {
@@ -253,12 +295,12 @@ describe('leaving a flow (T26.6, T33)', () => {
 
     await user.click(screen.getByTestId('start'))
     await passPrerequisites(user)
-    await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
+    await user.click(screen.getByLabelText(/have not used Truss Calibrator/))
     await next(user)
     await passFilament(user)
-    await tick(user, /no seams on the measured faces/)
+    await tick(user, /no seams on the measurement faces/)
     await next(user)
-    await tick(user, /cooled it, and removed it without forcing it/)
+    await tick(user, /printed the calibrator/)
     await next(user)
     await next(user)
     await measure(user, 'X', FIXTURE_B.X)
@@ -271,15 +313,15 @@ describe('leaving a flow (T26.6, T33)', () => {
     // Starting again is a new flow: nothing was retained.
     await user.click(screen.getByTestId('start'))
     await passPrerequisites(user)
-    await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
+    await user.click(screen.getByLabelText(/have not used Truss Calibrator/))
     await next(user)
     await passFilament(user)
-    await tick(user, /no seams on the measured faces/)
+    await tick(user, /no seams on the measurement faces/)
     await next(user)
-    await tick(user, /cooled it, and removed it without forcing it/)
+    await tick(user, /printed the calibrator/)
     await next(user)
     await next(user)
-    expect((screen.getByLabelText(/^X outer/) as HTMLInputElement).value).toBe('')
+    expect((screen.getByLabelText(/^X outer/i) as HTMLInputElement).value).toBe('')
   })
 })
 
@@ -299,7 +341,7 @@ describe('prerequisites persistence (T24.5)', () => {
 
     await next(user)
     // C2 follows directly: the checklist is behind us.
-    expect(screen.getByLabelText(/have not calibrated this printer yet/)).toBeInTheDocument()
+    expect(screen.getByLabelText(/have not used Truss Calibrator/)).toBeInTheDocument()
   })
 })
 
@@ -321,47 +363,58 @@ describe('storage-less browser (T33)', () => {
 })
 
 describe('name collision at the save gate (T28.6)', () => {
-  it('blocks with the recovery copy, then accepts a different name without losing readings', async () => {
+  it('warns while the typed name is taken, and writes nothing until Next', async () => {
     const app = createTestApp()
     app.printers.add({ name: 'Rig', extrapolationFactor: 0.999 })
     const user = mount(app)
 
-    await user.click(screen.getByTestId('start'))
-    await passPrerequisites(user)
-    await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
-    await next(user)
-    await passFilament(user)
-    await tick(user, /no seams on the measured faces/)
-    await next(user)
-    await tick(user, /cooled it, and removed it without forcing it/)
-    await next(user)
-    await next(user)
-    await measure(user, 'X', FIXTURE_B.X)
-    await next(user)
-    await measure(user, 'Y', FIXTURE_B.Y)
-    await measure(user, 'A', FIXTURE_B.A)
-    await measure(user, 'B', FIXTURE_B.B)
-    await next(user)
+    await runQuadToSaveGate(user)
 
-    // Case-insensitively a duplicate, so the save must be refused.
-    await user.type(screen.getByLabelText(/Save this factor for/), 'rig')
-    await user.click(screen.getByTestId('save-printer'))
+    // Case-insensitively a duplicate: the field says so and Next is blocked, so
+    // there is no press that could half-save it.
+    await user.type(screen.getByLabelText(/Printer Name/), 'rig')
 
-    const error = screen.getByTestId('save-error').textContent ?? ''
-    expect(error).toContain('already saved')
-    expect(error).toContain('discards all eight measurements')
+    expect(screen.getByTestId('collision-warning')).toHaveTextContent('already saved')
     expect(screen.getByTestId('next')).toBeDisabled()
+    expect(screen.getByTestId('gate-reason')).toHaveTextContent('not already saved')
+    expect(app.printers.list()).toHaveLength(1)
 
-    // The recovery path the copy recommends: a different name, same readings.
-    const field = screen.getByLabelText(/Save this factor for/)
+    // A different name, same readings: the gate opens…
+    const field = screen.getByLabelText(/Printer Name/)
     await user.clear(field)
     await user.type(field, 'Rig Two')
-    await user.click(screen.getByTestId('save-printer'))
+
+    expect(screen.queryByTestId('collision-warning')).not.toBeInTheDocument()
+    expect(screen.getByTestId('next')).toBeEnabled()
+    expect(app.printers.list()).toHaveLength(1)
+
+    // …and Next is what saves it.
+    await next(user)
 
     expect(app.printers.getByName('Rig Two')?.extrapolationFactor).toBe(FIXTURE_B_FACTOR)
-    expect(screen.getByTestId('next')).toBeEnabled()
-    await next(user)
     expect(screen.getByTestId('hero-percentage').textContent).toContain('98.188')
+  })
+
+  it('saves on the way out, and offers no way back to the saved name (T28)', async () => {
+    const app = createTestApp()
+    const user = mount(app)
+
+    await runQuadToSaveGate(user)
+    await user.type(screen.getByLabelText(/Printer Name/), 'Rig One')
+
+    // Typing a usable name writes nothing. The bug this replaced was a save
+    // button that stored a record and then reported that same name as already
+    // taken on the next press, so the data looked saved *and* rejected.
+    expect(app.printers.list()).toHaveLength(0)
+
+    await next(user)
+
+    expect(app.printers.list()).toHaveLength(1)
+    expect(app.printers.getByName('Rig One')?.extrapolationFactor).toBe(FIXTURE_B_FACTOR)
+
+    // Q7 now sits behind a written record, so the results screen has no Back.
+    expect(screen.getByTestId('hero-percentage')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
   })
 })
 
@@ -386,7 +439,7 @@ describe('every step can be left, and the branch is not a dead end (regressions)
     await passPrerequisites(user)
 
     expect(screen.getByTestId('next')).toBeDisabled()
-    await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
+    await user.click(screen.getByLabelText(/have not used Truss Calibrator/))
     expect(screen.getByTestId('next')).toBeEnabled()
 
     await next(user)
@@ -399,7 +452,7 @@ describe('every step can be left, and the branch is not a dead end (regressions)
 
     await user.click(screen.getByTestId('start'))
     await passPrerequisites(user)
-    await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
+    await user.click(screen.getByLabelText(/have not used Truss Calibrator/))
     await next(user)
 
     // Q1 has a Back, and still has a way out of the flow without walking it.
@@ -408,7 +461,7 @@ describe('every step can be left, and the branch is not a dead end (regressions)
 
     // Asking is unconditional; only the wording reflects an empty draft.
     expect(screen.getByTestId('exit-confirmation')).toHaveTextContent(
-      'Nothing has been entered yet',
+      'Your current progress will be discarded',
     )
     await user.click(screen.getByTestId('stay'))
     expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
@@ -438,7 +491,7 @@ describe('every step can be left, and the branch is not a dead end (regressions)
 
     await user.click(screen.getByTestId('start'))
     await passPrerequisites(user)
-    expect(screen.getByLabelText(/already has a saved factor/)).toBeEnabled()
+    expect(screen.getByLabelText(/calibrated on this printer before/)).toBeEnabled()
   })
 })
 
@@ -471,7 +524,7 @@ describe('no path discards measurements without asking (T33.5)', () => {
     // Back again to Q5 — the first measurement step.
     await user.click(screen.getByRole('button', { name: 'Back' }))
     expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
-    expect((screen.getByLabelText(/^X outer/) as HTMLInputElement).value).toBe('138.0')
+    expect((screen.getByLabelText(/^X outer/i) as HTMLInputElement).value).toBe('138.0')
 
     // And back to Q4, which is instructional: stepping back never confirms…
     await user.click(screen.getByRole('button', { name: 'Back' }))
@@ -487,7 +540,7 @@ describe('no path discards measurements without asking (T33.5)', () => {
     // And the confirm-every-time rule still holds on the way back in.
     await user.click(screen.getByTestId('start'))
     await passPrerequisites(user)
-    await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
+    await user.click(screen.getByLabelText(/have not used Truss Calibrator/))
     await next(user)
     expect(screen.queryByTestId('exit-confirmation')).not.toBeInTheDocument()
   })
@@ -500,8 +553,8 @@ describe('no path discards measurements without asking (T33.5)', () => {
 
     // The printer detour exists on C2, before anything is measured. On a measured
     // step the navigation controls are Back and Next, with Cancel calibration at
-    // the bottom of the step (plus the save button on Q7, which stores the factor
-    // rather than navigating away).
+    // the bottom of the step — Q7's Next saves rather than navigating, and takes
+    // the user nowhere near the printers screen.
     expect(screen.queryByTestId('open-printers')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Saved printers' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
@@ -520,7 +573,7 @@ describe('keyboard-only operation (T34.1, T34.2)', () => {
     const user = mount(app)
 
     await user.tab()
-    expect(document.activeElement).toHaveTextContent('Start a calibration')
+    expect(document.activeElement).toHaveTextContent('Start calibration')
 
     await user.keyboard('{Enter}')
     expect(currentHeading()).toHaveTextContent('Before you start')
@@ -605,12 +658,12 @@ describe('validation is advisory, never destructive (T27.5)', () => {
 
     await user.click(screen.getByTestId('start'))
     await passPrerequisites(user)
-    await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
+    await user.click(screen.getByLabelText(/have not used Truss Calibrator/))
     await next(user)
     await passFilament(user)
-    await tick(user, /no seams on the measured faces/)
+    await tick(user, /no seams on the measurement faces/)
     await next(user)
-    await tick(user, /cooled it, and removed it without forcing it/)
+    await tick(user, /printed the calibrator/)
     await next(user)
     await next(user)
 
@@ -627,7 +680,7 @@ describe('results precision and the clipboard (T29.6)', () => {
 
     await runQuadToResults(user)
 
-    const field = screen.getByLabelText(/Current XY shrinkage value/)
+    const field = screen.getByLabelText(/XY shrinkage value/)
     await user.clear(field)
     await user.type(field, '98')
 
@@ -641,7 +694,7 @@ describe('results precision and the clipboard (T29.6)', () => {
 
     await runQuadToResults(user)
 
-    const field = screen.getByLabelText(/Current XY shrinkage value/)
+    const field = screen.getByLabelText(/XY shrinkage value/)
     await user.clear(field)
     await user.type(field, '150')
 
@@ -679,12 +732,12 @@ describe('back navigation keeps what was typed (T27.5)', () => {
 
     await user.click(screen.getByTestId('start'))
     await passPrerequisites(user)
-    await user.click(screen.getByLabelText(/have not calibrated this printer yet/))
+    await user.click(screen.getByLabelText(/have not used Truss Calibrator/))
     await next(user)
     await passFilament(user)
-    await tick(user, /no seams on the measured faces/)
+    await tick(user, /no seams on the measurement faces/)
     await next(user)
-    await tick(user, /cooled it, and removed it without forcing it/)
+    await tick(user, /printed the calibrator/)
     await next(user)
     await next(user)
     await measure(user, 'X', FIXTURE_B.X)
@@ -693,7 +746,7 @@ describe('back navigation keeps what was typed (T27.5)', () => {
 
     await user.click(screen.getByRole('button', { name: 'Back' }))
 
-    expect((screen.getByLabelText(/^X outer/) as HTMLInputElement).value).toBe('138.0')
-    expect((screen.getByLabelText(/^X inner/) as HTMLInputElement).value).toBe('137.0')
+    expect((screen.getByLabelText(/^X outer/i) as HTMLInputElement).value).toBe('138.0')
+    expect((screen.getByLabelText(/^X inner/i) as HTMLInputElement).value).toBe('137.0')
   })
 })

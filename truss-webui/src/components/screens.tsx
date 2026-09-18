@@ -38,25 +38,16 @@ export function Landing(props: { engine: FlowEngine }): JSX.Element {
       <h1 tabindex="-1" {...{ [STEP_HEADING_ATTRIBUTE]: '' }}>
         Truss Calibrator
       </h1>
-      <p>
-        Measure a printed calibration beam with calipers and get the XY shrinkage value to enter in
-        your slicer. All the arithmetic — the averaging, the extrapolation factor, the division by
-        the designed length — is done for you.
-      </p>
+      <p>Calibrate filament shrinkage settings quickly with minimal wasted filament.</p>
 
       <div class="stack">
         <button type="button" onClick={() => props.engine.startCalibration()} data-testid="start">
-          Start a calibration
+          Start calibration
         </button>
         <button type="button" onClick={() => props.engine.goToPrinters()} data-testid="printers">
-          Saved printers
+          Edit saved printers
         </button>
       </div>
-
-      <p class="muted">
-        Calibrated this printer before? Use “Saved printers” to check its extrapolation factor, then
-        start a calibration and choose the quick flow.
-      </p>
     </section>
   )
 }
@@ -80,6 +71,12 @@ export interface PrinterDataProps {
  * from two places (the landing page and C2's detour) and "go back where you came
  * from" would mean the C2 detour silently resumes a flow whose printer list the
  * user just changed.
+ *
+ * The list is a table of name, extrapolation factor and the two per-row controls
+ * (T18). Editing and the delete confirmation each open in a row *below* the
+ * printer they belong to rather than in a dialog: the row being changed is the
+ * context for the form (which name is being renamed, which factor is being
+ * replaced), and a table row keeps it on screen without any modal machinery.
  */
 export function PrinterData(props: PrinterDataProps): JSX.Element {
   const [editing, setEditing] = createSignal<string | null>(null)
@@ -236,87 +233,131 @@ export function PrinterData(props: PrinterDataProps): JSX.Element {
           </p>
         }
       >
-        <ul class="stack" data-testid="printer-list">
-          <For each={props.printers.list()}>
-            {(printer) => (
-              <li>
-                <Show
-                  when={editing() !== normalizeName(printer.name)}
-                  fallback={
-                    <PrinterForm
-                      title={`Edit ${printer.name}`}
-                      initial={printer}
-                      submitLabel="Save changes"
-                      onCancel={() => setEditing(null)}
-                      onSubmit={(record) => {
-                        const result = props.printers.update(printer.name, record)
-                        if (!result.ok) {
-                          report('error', describeError(result.error))
-                          return
-                        }
-                        setEditing(null)
-                        report(
-                          result.value.persisted ? 'ok' : 'error',
-                          result.value.persisted
-                            ? `Saved ${result.value.record?.name}.`
-                            : 'Changed, but not saved — storage is unavailable.',
-                        )
-                      }}
-                    />
-                  }
-                >
-                  <div class="row">
-                    <span>{printer.name}</span>
-                    <span class="numeric muted">{formatFactor(printer.extrapolationFactor)}</span>
-                    <button type="button" onClick={() => setEditing(normalizeName(printer.name))}>
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setPendingDelete(pendingDelete() === printer.name ? null : printer.name)
-                      }
-                      aria-expanded={pendingDelete() === printer.name}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </Show>
-
-                <Show when={pendingDelete() === printer.name}>
-                  <div class="warning" role="group" aria-label={`Confirm deleting ${printer.name}`}>
-                    <p>
-                      <strong>Delete “{printer.name}”?</strong> This cannot be undone, and its
-                      extrapolation factor is the only record of that calibration. Deleting is also
-                      the only way to replace a printer from an imported file: import never
-                      overwrites a saved name.
-                    </p>
-                    <div class="row">
-                      <button type="button" onClick={() => setPendingDelete(null)}>
-                        Keep
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const result = props.printers.remove(printer.name)
-                          setPendingDelete(null)
-                          if (!result.ok) {
-                            report('error', describeError(result.error))
-                            return
+        <table class="printer-table" data-testid="printer-list">
+          <caption class="sr-only">Saved printers and their extrapolation factors</caption>
+          <thead>
+            <tr>
+              <th scope="col">Printer</th>
+              <th scope="col">Extrapolation factor</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <For each={props.printers.list()}>
+              {(printer) => (
+                <>
+                  <tr>
+                    <th scope="row">{printer.name}</th>
+                    <td class="numeric">{formatFactor(printer.extrapolationFactor)}</td>
+                    <td class="printer-actions">
+                      <div class="row">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditing(
+                              editing() === normalizeName(printer.name)
+                                ? null
+                                : normalizeName(printer.name),
+                            )
                           }
-                          report('ok', `Deleted ${printer.name}.`)
-                        }}
-                        data-testid={`confirm-delete-${printer.name}`}
-                      >
-                        Delete permanently
-                      </button>
-                    </div>
-                  </div>
-                </Show>
-              </li>
-            )}
-          </For>
-        </ul>
+                          aria-expanded={editing() === normalizeName(printer.name)}
+                          data-testid={`edit-${printer.name}`}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setPendingDelete(pendingDelete() === printer.name ? null : printer.name)
+                          }
+                          aria-expanded={pendingDelete() === printer.name}
+                          data-testid={`delete-${printer.name}`}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  {/*
+                   * The editor opens in its own row *below* the printer, so the row
+                   * being changed — the name it is about to be renamed from — stays on
+                   * screen as the context for the form. The card is what stops the form
+                   * reading as more table: an outline says "this belongs to that row"
+                   * rather than "this is another row".
+                   */}
+                  <Show when={editing() === normalizeName(printer.name)}>
+                    <tr class="printer-detail-row">
+                      <td colspan="3">
+                        <div class="card">
+                          <PrinterForm
+                            title={`Edit ${printer.name}`}
+                            initial={printer}
+                            submitLabel="Save changes"
+                            onCancel={() => setEditing(null)}
+                            onSubmit={(record) => {
+                              const result = props.printers.update(printer.name, record)
+                              if (!result.ok) {
+                                report('error', describeError(result.error))
+                                return
+                              }
+                              setEditing(null)
+                              report(
+                                result.value.persisted ? 'ok' : 'error',
+                                result.value.persisted
+                                  ? `Saved ${result.value.record?.name}.`
+                                  : 'Changed, but not saved — storage is unavailable.',
+                              )
+                            }}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  </Show>
+
+                  <Show when={pendingDelete() === printer.name}>
+                    <tr class="printer-detail-row">
+                      <td colspan="3">
+                        <div
+                          class="warning"
+                          role="group"
+                          aria-label={`Confirm deleting ${printer.name}`}
+                        >
+                          <p>
+                            <strong>Delete “{printer.name}”?</strong> This cannot be undone, and its
+                            extrapolation factor is the only record of that calibration. Deleting is
+                            also the only way to replace a printer from an imported file: import
+                            never overwrites a saved name.
+                          </p>
+                          <div class="row">
+                            <button type="button" onClick={() => setPendingDelete(null)}>
+                              Keep
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const result = props.printers.remove(printer.name)
+                                setPendingDelete(null)
+                                if (!result.ok) {
+                                  report('error', describeError(result.error))
+                                  return
+                                }
+                                report('ok', `Deleted ${printer.name}.`)
+                              }}
+                              data-testid={`confirm-delete-${printer.name}`}
+                            >
+                              Delete permanently
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </Show>
+                </>
+              )}
+            </For>
+          </tbody>
+        </table>
       </Show>
 
       <Show
@@ -357,38 +398,66 @@ export function PrinterData(props: PrinterDataProps): JSX.Element {
       </div>
 
       <p class="muted">
-        Importing merges by name and <strong>saved values always win</strong>: a printer you already
-        have is skipped rather than replaced. To restore an older backup over current data, delete
-        those printers here first — importing will not overwrite them.
+        When importing printers from an exported file, printers of the same name are{' '}
+        <strong>not</strong> overwritten.
+        <br />
+        If you wish to replace a printer currently saved above with one of the same name when
+        importing a file, delete it from the table first.
       </p>
 
+      {/*
+       * The stored flag is "skip"; the control reads as "show". Same state, phrased
+       * the way the next run will behave, and two-way: the button this replaced
+       * could only ever turn the checklist back on.
+       */}
       <fieldset>
         <legend>Getting started checklist</legend>
         <p class="muted">
-          The “Before you start” checklist is skipped on runs where you asked not to see it again.
-          This is the only place to bring it back.
+          Shown at the start of every calibration run. Clearing the box skips those checks; this
+          screen is the only place to turn them back on.
         </p>
-        <Show
-          when={skipPrerequisites()}
-          fallback={<p data-testid="prereq-state">The checklist will be shown when you start.</p>}
-        >
-          <p data-testid="prereq-state">The checklist is currently skipped.</p>
-          <button
-            type="button"
-            onClick={() => {
-              const change = props.settings.resetPrerequisites()
-              report(
-                change.persisted ? 'ok' : 'error',
-                change.persisted
-                  ? 'The prerequisites checklist will be shown again.'
-                  : 'Shown again for this session, but the setting could not be saved.',
-              )
+        <label class="check" for="show-prereq-checklist">
+          <input
+            id="show-prereq-checklist"
+            type="checkbox"
+            checked={!skipPrerequisites()}
+            onChange={(event) => {
+              const input = event.currentTarget
+              const wantsChecklist = input.checked
+              const change = props.settings.setSkipPrerequisites(!wantsChecklist)
+
+              // The store is the source of truth, and it only applies a *skip*
+              // once the write has actually succeeded. A box that stayed where it
+              // was clicked would promise a setting that is not in effect.
+              const willShow = !change.state.skipPrerequisites
+              if (input.checked !== willShow) {
+                input.checked = willShow
+              }
+
+              /*
+               * A change that worked says nothing: the box is its own feedback,
+               * and a line at the top of the screen — above the printer table —
+               * is too far from the box to read as being about it.
+               *
+               * A change that failed is the one thing the box cannot explain on
+               * its own, so it is reported. Which failure it is depends on which
+               * way the user was trying to go, not on the state that resulted:
+               * a *skip* is refused outright (the store will not apply what it
+               * could not write), while *clearing* takes effect for this session.
+               */
+              if (!change.persisted) {
+                report(
+                  'error',
+                  wantsChecklist
+                    ? 'Shown again for this session, but the setting could not be saved.'
+                    : 'This browser will not save the setting, so the checklist will still be shown.',
+                )
+              }
             }}
-            data-testid="reset-prereq"
-          >
-            Show the checklist again
-          </button>
-        </Show>
+            data-testid="prereq-toggle"
+          />
+          <span>Show the “Before you start” checklist</span>
+        </label>
       </fieldset>
 
       <div class="row">
