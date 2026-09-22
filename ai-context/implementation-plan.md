@@ -43,11 +43,11 @@ add a test runner. Keep configuration minimal (PRD §4, §8).
 **Depends on:** —
 **Size:** S
 
-- [ ] T01.1 Verify `package.json` scripts: `dev`, `build`, `preview`; confirm `pnpm install` and `pnpm build` succeed on the clean scaffold.
-- [ ] T01.2 Enable TypeScript `strict` in `tsconfig.app.json` and confirm the project type-checks.
-- [ ] T01.3 Add Vitest with a `test` script and one smoke test to prove the runner works.
-- [ ] T01.4 Set Vite `base: '/'` in `vite.config.ts` and document why (standalone at subdomain root, PRD §19).
-- [ ] T01.5 Add a minimal lint/format script (ESLint + Prettier or Biome) and run it over the scaffold.
+- [x] T01.1 Verify `package.json` scripts: `dev`, `build`, `preview`; confirm `pnpm install` and `pnpm build` succeed on the clean scaffold.
+- [x] T01.2 Enable TypeScript `strict` in `tsconfig.app.json` and confirm the project type-checks.
+- [x] T01.3 Add Vitest with a `test` script and one smoke test to prove the runner works.
+- [x] T01.4 Set Vite `base: '/'` in `vite.config.ts` and document why (standalone at subdomain root, PRD §19).
+- [x] T01.5 Add a minimal lint/format script (ESLint + Prettier or Biome) and run it over the scaffold.
 
 ### T02 — Domain types & constants
 
@@ -57,11 +57,11 @@ one source of truth. No logic here — types and constants only.
 **Depends on:** T01
 **Size:** S
 
-- [ ] T02.1 Define `Printer = { name: string; extrapolationFactor: number }`.
-- [ ] T02.2 Define `PrintersStore = { version: number; printers: Printer[] }` and `Prefs = { skipPrerequisiteCheck: boolean }`.
-- [ ] T02.3 Define the axis identifiers (`X | Y | A | B`), measurement keys (outer/inner), and the in-progress `MeasurementState` shape.
-- [ ] T02.4 Define `ScreenId` union covering Home, ManagePrinters, all Quad screens, all Single screens.
-- [ ] T02.5 Define constants: `DESIGN_LENGTH_MM = 140`, `WARN_MIN_MM = 135`, `WARN_MAX_MM = 142`, `FACTOR_WARN_MIN = 0.9`, `FACTOR_WARN_MAX = 1.1`, storage keys, precision constants (5 dp / 4 dp), `STORE_VERSION = 1`.
+- [x] T02.1 Define `Printer = { name: string; extrapolationFactor: number }`.
+- [x] T02.2 Define `PrintersStore = { version: number; printers: Printer[] }` and `Prefs = { skipPrerequisiteCheck: boolean }`.
+- [x] T02.3 Define the axis identifiers (`X | Y | A | B`), measurement keys (outer/inner), and the in-progress `MeasurementState` shape.
+- [x] T02.4 Define `ScreenId` union covering Home, ManagePrinters, all Quad screens, all Single screens.
+- [x] T02.5 Define constants: `DESIGN_LENGTH_MM = 140`, `WARN_MIN_MM = 135`, `WARN_MAX_MM = 142`, `FACTOR_WARN_MIN = 0.9`, `FACTOR_WARN_MAX = 1.1`, storage keys, precision constants (5 dp / 4 dp), `STORE_VERSION = 1`.
 
 ### T03 — Storage module
 
@@ -72,11 +72,11 @@ localStorage directly.
 **Depends on:** T02
 **Size:** M
 
-- [ ] T03.1 Implement `isStorageAvailable()` with a try/catch probe.
-- [ ] T03.2 Implement `loadPrinters(): { printers: Printer[]; error: boolean }` — safe JSON parse, schema validation, corrupt data ⇒ empty list + `error: true`, never deletes stored data.
-- [ ] T03.3 Implement `savePrinters(printers: Printer[])` returning a success flag; catch quota/write errors (PRD §15.4).
-- [ ] T03.4 Implement `loadPrefs(): Prefs` and `savePrefs(prefs: Prefs)` with the same safety pattern.
-- [ ] T03.5 Add `parseImportedPrinters(json): { printers: Printer[]; invalid: number; versionError: boolean }` that validates version + per-entry shape (PRD §15.3).
+- [x] T03.1 Implement `isStorageAvailable()` with a try/catch probe.
+- [x] T03.2 Implement `loadPrinters(): { printers: Printer[]; error: boolean }` — safe JSON parse, schema validation, corrupt data ⇒ empty list + `error: true`, never deletes stored data.
+- [x] T03.3 Implement `savePrinters(printers: Printer[])` returning a success flag; catch quota/write errors (PRD §15.4).
+- [x] T03.4 Implement `loadPrefs(): Prefs` and `savePrefs(prefs: Prefs)` with the same safety pattern.
+- [x] T03.5 Add `parseImportedPrinters(json): { printers: Printer[]; invalid: number; versionError: boolean }` that validates version + per-entry shape (PRD §15.3).
 
 ### T04 — Calculation module
 
@@ -87,12 +87,12 @@ by both flows.
 **Depends on:** T02
 **Size:** S
 
-- [ ] T04.1 Implement `average(values: number[]): number`.
-- [ ] T04.2 Implement `quadExtrapolationFactor(measurements): number` = avg(all 8) / avg(X outer, X inner).
-- [ ] T04.3 Implement `quadCompensationRatio(measurements): number` = avg(all 8) / 140.
-- [ ] T04.4 Implement `singleExtrapolatedRatio(inner, outer, factor): number` = ((inner+outer)/2 / 140) × factor.
-- [ ] T04.5 Implement `finalShrinkagePercent(currentPercent, ratio): number` = current × ratio.
-- [ ] T04.6 Implement display formatters: `format5dp`, `format4dp` (rounding via `toFixed`, then trailing-zero handling as required).
+- [x] T04.1 Implement `average(values: number[]): number`.
+- [x] T04.2 Implement `quadExtrapolationFactor(measurements): number` = avg(all 8) / avg(X outer, X inner).
+- [x] T04.3 Implement `quadCompensationRatio(measurements): number` = avg(all 8) / 140.
+- [x] T04.4 Implement `singleExtrapolatedRatio(inner, outer, factor): number` = ((inner+outer)/2 / 140) × factor.
+- [x] T04.5 Implement `finalShrinkagePercent(currentPercent, ratio): number` = current × ratio.
+- [x] T04.6 Implement display formatters: `format5dp`, `format4dp` (rounding via `toFixed`, then trailing-zero handling as required).
 
 ### T05 — Validation module
 
@@ -102,11 +102,11 @@ so forms behave identically and the Continue-button gating is consistent.
 **Depends on:** T02
 **Size:** M
 
-- [ ] T05.1 `validateMeasurement(raw): { valid: boolean; warn: boolean }` — positive finite number; warn when `<135` or `>142`; no inner/outer comparison.
-- [ ] T05.2 `validatePercent(raw): boolean` — percentage input, `>0` and `≤1000`.
-- [ ] T05.3 `validatePrinterName(raw, existingNames, currentName?): { valid; error? }` — trimmed non-empty, ≤64 chars, case-insensitive uniqueness excluding the record being edited.
-- [ ] T05.4 `validateFactor(raw): { valid; warn }` — positive finite; warn outside `0.9–1.1`.
-- [ ] T05.5 Export the exact warning strings (measurement warning, factor warning, duplicate-name error) as constants.
+- [x] T05.1 `validateMeasurement(raw): { valid: boolean; warn: boolean }` — positive finite number; warn when `<135` or `>142`; no inner/outer comparison.
+- [x] T05.2 `validatePercent(raw): boolean` — percentage input, `>0` and `≤1000`.
+- [x] T05.3 `validatePrinterName(raw, existingNames, currentName?): { valid; error? }` — trimmed non-empty, ≤64 chars, case-insensitive uniqueness excluding the record being edited.
+- [x] T05.4 `validateFactor(raw): { valid; warn }` — positive finite; warn outside `0.9–1.1`.
+- [x] T05.5 Export the exact warning strings (measurement warning, factor warning, duplicate-name error) as constants.
 
 ### T06 — Asset pipeline
 
@@ -117,10 +117,10 @@ URL (PRD §16).
 **Depends on:** T01
 **Size:** S
 
-- [ ] T06.1 Copy the three root STL files into `src/assets/stl/` and the required `Documentation/Images/*` into `src/assets/img/`.
-- [ ] T06.2 Create `src/lib/assets.ts` exporting imported URLs for every image and STL used by the flows.
-- [ ] T06.3 Create an alt-text map (`Record<imageKey, string>`) derived from each image's context (PRD §16), since images carry no captions.
-- [ ] T06.4 Verify a production build emits the assets and that an STL `<a download>` link resolves correctly.
+- [x] T06.1 Copy the three root STL files into `src/assets/stl/` and the required `Documentation/Images/*` into `src/assets/img/`.
+- [x] T06.2 Create `src/lib/assets.ts` exporting imported URLs for every image and STL used by the flows.
+- [x] T06.3 Create an alt-text map (`Record<imageKey, string>`) derived from each image's context (PRD §16), since images carry no captions.
+- [x] T06.4 Verify a production build emits the assets and that an STL `<a download>` link resolves correctly.
 
 ### T07 — Unit tests for pure modules
 
@@ -130,11 +130,11 @@ UI depends on them (PRD §20.4). These are the highest-value tests in the app.
 **Depends on:** T03, T04, T05
 **Size:** M
 
-- [ ] T07.1 Test all four calculation formulas (PRD §13) against hand-computed known inputs, including a zero-skew factor ≈1.0.
-- [ ] T07.2 Test rounding: 5 dp for compensation/factor, 4 dp for final percentage.
-- [ ] T07.3 Test measurement validation boundaries (134.99, 135, 142, 142.01, 0, negative, NaN, empty).
-- [ ] T07.4 Test name uniqueness (case-insensitive, self-exclusion) and factor warning bounds.
-- [ ] T07.5 Test storage load with valid, corrupt, and missing data; test import parse with duplicate/skipped/invalid entries and unknown version.
+- [x] T07.1 Test all four calculation formulas (PRD §13) against hand-computed known inputs, including a zero-skew factor ≈1.0.
+- [x] T07.2 Test rounding: 5 dp for compensation/factor, 4 dp for final percentage.
+- [x] T07.3 Test measurement validation boundaries (134.99, 135, 142, 142.01, 0, negative, NaN, empty).
+- [x] T07.4 Test name uniqueness (case-insensitive, self-exclusion) and factor warning bounds.
+- [x] T07.5 Test storage load with valid, corrupt, and missing data; test import parse with duplicate/skipped/invalid entries and unknown version.
 
 ---
 
@@ -148,11 +148,11 @@ UI depends on them (PRD §20.4). These are the highest-value tests in the app.
 **Depends on:** T03
 **Size:** M
 
-- [ ] T08.1 Create signals: current screen, saved printers, prefs, in-progress measurements, storage-unavailable/corrupt notices.
-- [ ] T08.2 On mount, load printers and prefs; surface corrupt-storage and unavailable-storage notices.
-- [ ] T08.3 Provide mutation helpers (`addPrinter`, `updatePrinter`, `deletePrinter`, `setPrintersFromImport`) that persist immediately and handle write failures.
-- [ ] T08.4 Provide `resetMeasurements()` and measurement setters used by flow screens.
-- [ ] T08.5 Render the active screen by `ScreenId` (switch/map), passing only the state a screen needs.
+- [x] T08.1 Create signals: current screen, saved printers, prefs, in-progress measurements, storage-unavailable/corrupt notices.
+- [x] T08.2 On mount, load printers and prefs; surface corrupt-storage and unavailable-storage notices.
+- [x] T08.3 Provide mutation helpers (`addPrinter`, `updatePrinter`, `deletePrinter`, `setPrintersFromImport`) that persist immediately and handle write failures.
+- [x] T08.4 Provide `resetMeasurements()` and measurement setters used by flow screens.
+- [x] T08.5 Render the active screen by `ScreenId` (switch/map), passing only the state a screen needs.
 
 ### T09 — Shared UI primitives
 
@@ -162,14 +162,14 @@ introducing a design system (PRD §17). Build only what the screens need.
 **Depends on:** T01
 **Size:** M
 
-- [ ] T09.1 `Button` (primary/secondary, disabled state) with correct `type` and focus styles.
-- [ ] T09.2 `TextField` and `NumberField` with `<label for>`, `inputmode="decimal"`, unit suffix, and inline warning/error slot.
-- [ ] T09.3 `Checkbox` with label association and required/disabled behavior.
-- [ ] T09.4 `Modal` with focus trap, Esc-to-close, backdrop handling, and `aria-modal`/labelled title.
-- [ ] T09.5 `StepIndicator` ("Step N of M") + progress bar.
-- [ ] T09.6 `Lightbox` for tap-to-zoom images with keyboard close.
-- [ ] T09.7 `CopyButton` with "Copied" feedback.
-- [ ] T09.8 `Notice`/`Banner` (info/warning) and `WarningText` (amber, non-blocking).
+- [x] T09.1 `Button` (primary/secondary, disabled state) with correct `type` and focus styles.
+- [x] T09.2 `TextField` and `NumberField` with `<label for>`, `inputmode="decimal"`, unit suffix, and inline warning/error slot.
+- [x] T09.3 `Checkbox` with label association and required/disabled behavior.
+- [x] T09.4 `Modal` with focus trap, Esc-to-close, backdrop handling, and `aria-modal`/labelled title.
+- [x] T09.5 `StepIndicator` ("Step N of M") + progress bar.
+- [x] T09.6 `Lightbox` for tap-to-zoom images with keyboard close.
+- [x] T09.7 `CopyButton` with "Copied" feedback.
+- [x] T09.8 `Notice`/`Banner` (info/warning) and `WarningText` (amber, non-blocking).
 
 ### T10 — App shell & styling
 
@@ -179,10 +179,10 @@ introducing a design system (PRD §17). Build only what the screens need.
 **Depends on:** T09
 **Size:** S
 
-- [ ] T10.1 Add a shell wrapper with a main landmark and consistent max-width/padding.
-- [ ] T10.2 Create `local.css`; prefix every selector with `truss-` (PRD §19).
-- [ ] T10.3 Import `global.css` and `local.css` from the entry so the standalone build matches the parent site.
-- [ ] T10.4 Confirm no CSS reset is injected and that styles are scoped enough for embedding.
+- [x] T10.1 Add a shell wrapper with a main landmark and consistent max-width/padding.
+- [x] T10.2 Create `local.css`; prefix every selector with `truss-` (PRD §19).
+- [x] T10.3 Import `global.css` and `local.css` from the entry so the standalone build matches the parent site.
+- [x] T10.4 Confirm no CSS reset is injected and that styles are scoped enough for embedding.
 
 ### T11 — Home screen
 
@@ -193,11 +193,11 @@ state.
 **Depends on:** T08, T10, T03, T06
 **Size:** S
 
-- [ ] T11.1 Render title, one-line explanation.
-- [ ] T11.2 Render "Quad-Beam Calibration" and "Single-Beam Calibration" option cards with the exact approved subtext (PRD §11).
-- [ ] T11.3 Disable Single when `printers.length === 0` and show the exact zero-printer message.
-- [ ] T11.4 Render "Manage saved printers" button always.
-- [ ] T11.5 Render GitHub and documentation icon buttons linking to the two configured URLs at the bottom.
+- [x] T11.1 Render title, one-line explanation.
+- [x] T11.2 Render "Quad-Beam Calibration" and "Single-Beam Calibration" option cards with the exact approved subtext (PRD §11).
+- [x] T11.3 Disable Single when `printers.length === 0` and show the exact zero-printer message.
+- [x] T11.4 Render "Manage saved printers" button always.
+- [x] T11.5 Render GitHub and documentation icon buttons linking to the two configured URLs at the bottom.
 
 ### T12 — Navigation & exit-confirmation framework
 
@@ -208,10 +208,10 @@ only; any other mid-flow exit confirms.
 **Depends on:** T08, T09
 **Size:** M
 
-- [ ] T12.1 Implement `go(screenId)` and `back()` over the root screen signal.
-- [ ] T12.2 Implement `requestExit()` that opens the exit-confirmation modal and discards progress on confirm.
-- [ ] T12.3 Wire the exit modal through `Modal` with the "progress will be lost" copy; show it even when no data was entered.
-- [ ] T12.4 Expose a `blocked` flag for final result screens (no Back, Finish only).
+- [x] T12.1 Implement `go(screenId)` and `back()` over the root screen signal.
+- [x] T12.2 Implement `requestExit()` that opens the exit-confirmation modal and discards progress on confirm.
+- [x] T12.3 Wire the exit modal through `Modal` with the "progress will be lost" copy; show it even when no data was entered.
+- [x] T12.4 Expose a `blocked` flag for final result screens (no Back, Finish only).
 
 ---
 
@@ -225,11 +225,11 @@ layout, alphabetical ordering, empty state.
 **Depends on:** T08, T10
 **Size:** M
 
-- [ ] T13.1 Render printer cards: name, factor (5 dp), Edit, Delete.
-- [ ] T13.2 Sort alphabetically by name (case-insensitive).
-- [ ] T13.3 Implement the empty state message with a hint, keeping Add/Import visible.
-- [ ] T13.4 Layout as single column narrow, grid when wide (responsive, PRD §18).
-- [ ] T13.5 Render Add, Import, Export (conditional), and Back-to-home controls (Export visibility completed in T16).
+- [x] T13.1 Render printer cards: name, factor (5 dp), Edit, Delete.
+- [x] T13.2 Sort alphabetically by name (case-insensitive).
+- [x] T13.3 Implement the empty state message with a hint, keeping Add/Import visible.
+- [x] T13.4 Layout as single column narrow, grid when wide (responsive, PRD §18).
+- [x] T13.5 Render Add, Import, Export (conditional), and Back-to-home controls (Export visibility completed in T16).
 
 ### T14 — Add / Edit printer modal
 
@@ -238,10 +238,10 @@ layout, alphabetical ordering, empty state.
 **Depends on:** T13, T05, T03
 **Size:** M
 
-- [ ] T14.1 Fields: name text, factor number (required, no default); Cancel/Save.
-- [ ] T14.2 Disable Save until both fields are valid; show factor warning inline (non-blocking).
-- [ ] T14.3 Enforce case-insensitive duplicate blocking, excluding the record being edited.
-- [ ] T14.4 On save, call `addPrinter`/`updatePrinter` so localStorage updates immediately.
+- [x] T14.1 Fields: name text, factor number (required, no default); Cancel/Save.
+- [x] T14.2 Disable Save until both fields are valid; show factor warning inline (non-blocking).
+- [x] T14.3 Enforce case-insensitive duplicate blocking, excluding the record being edited.
+- [x] T14.4 On save, call `addPrinter`/`updatePrinter` so localStorage updates immediately.
 
 ### T15 — Delete confirmation
 
@@ -250,9 +250,9 @@ layout, alphabetical ordering, empty state.
 **Depends on:** T13
 **Size:** S
 
-- [ ] T15.1 Open a confirmation modal naming the printer.
-- [ ] T15.2 Confirm ⇒ `deletePrinter` and re-persist; Cancel ⇒ no change.
-- [ ] T15.3 Return focus to a sensible element after close (a11y).
+- [x] T15.1 Open a confirmation modal naming the printer.
+- [x] T15.2 Confirm ⇒ `deletePrinter` and re-persist; Cancel ⇒ no change.
+- [x] T15.3 Return focus to a sensible element after close (a11y).
 
 ### T16 — Export
 
@@ -261,9 +261,9 @@ layout, alphabetical ordering, empty state.
 **Depends on:** T13, T03
 **Size:** S
 
-- [ ] T16.1 Build `{ version, printers }` from current state.
-- [ ] T16.2 Serialize to a Blob and download as `truss-printers-YYYYMMDD-HHmmss.json`.
-- [ ] T16.3 Hide the Export control entirely when the list is empty.
+- [x] T16.1 Build `{ version, printers }` from current state.
+- [x] T16.2 Serialize to a Blob and download as `truss-printers-YYYYMMDD-HHmmss.json`.
+- [x] T16.3 Hide the Export control entirely when the list is empty.
 
 ### T17 — Import
 
@@ -272,10 +272,10 @@ layout, alphabetical ordering, empty state.
 **Depends on:** T13, T03, T05
 **Size:** M
 
-- [ ] T17.1 File picker restricted to `.json`.
-- [ ] T17.2 Parse via `parseImportedPrinters`; reject unknown versions and malformed files with an inline error and no state change.
-- [ ] T17.3 On success, merge keeping existing entries on case-insensitive name conflict; skip invalid entries.
-- [ ] T17.4 Persist the merged list and show the summary ("Imported N, skipped N duplicate, N invalid").
+- [x] T17.1 File picker restricted to `.json`.
+- [x] T17.2 Parse via `parseImportedPrinters`; reject unknown versions and malformed files with an inline error and no state change.
+- [x] T17.3 On success, merge keeping existing entries on case-insensitive name conflict; skip invalid entries.
+- [x] T17.4 Persist the merged list and show the summary ("Imported N, skipped N duplicate, N invalid").
 
 ### T18 — Printer management integration tests
 
@@ -285,10 +285,10 @@ level before flows reuse the same storage API.
 **Depends on:** T07, T14, T15, T16, T17
 **Size:** M
 
-- [ ] T18.1 Test add/edit/delete update the visible list and storage.
-- [ ] T18.2 Test duplicate-name blocking across cases.
-- [ ] T18.3 Test export shape, filename pattern, and empty-list hiding.
-- [ ] T18.4 Test import merge/conflict/invalid/version-rejection paths and summary counts.
+- [x] T18.1 Test add/edit/delete update the visible list and storage.
+- [x] T18.2 Test duplicate-name blocking across cases.
+- [x] T18.3 Test export shape, filename pattern, and empty-list hiding.
+- [x] T18.4 Test import merge/conflict/invalid/version-rejection paths and summary counts.
 
 ---
 
@@ -304,11 +304,11 @@ non-content scaffolding.
 **Depends on:** T12, T08
 **Size:** M
 
-- [ ] T19.1 Define the ordered Quad step list and compute N/M dynamically so skipping Q1 recalculates the count (PRD §10).
-- [ ] T19.2 Render `StepIndicator` + progress bar on every step.
-- [ ] T19.3 Render the printer context header (hidden until the printer is named).
-- [ ] T19.4 Wire Back/Continue through the T12 controller, respecting first-step and final-screen rules.
-- [ ] T19.5 Start the flow by calling `resetMeasurements()`.
+- [x] T19.1 Define the ordered Quad step list and compute N/M dynamically so skipping Q1 recalculates the count (PRD §10).
+- [x] T19.2 Render `StepIndicator` + progress bar on every step.
+- [x] T19.3 Render the printer context header (hidden until the printer is named).
+- [x] T19.4 Wire Back/Continue through the T12 controller, respecting first-step and final-screen rules.
+- [x] T19.5 Start the flow by calling `resetMeasurements()`.
 
 ### T20 — Q1 Prerequisites
 
@@ -317,10 +317,10 @@ non-content scaffolding.
 **Depends on:** T19, T03
 **Size:** S
 
-- [ ] T20.1 Three checkboxes with labels from `0-Start-Here.md`.
-- [ ] T20.2 "Don't ask again" checkbox enabled only once all three are checked.
-- [ ] T20.3 Continue disabled until all three are checked; on Continue, persist `skipPrerequisiteCheck` if chosen.
-- [ ] T20.4 Skip this screen automatically when the flag is set (and recount steps).
+- [x] T20.1 Three checkboxes with labels from `0-Start-Here.md`.
+- [x] T20.2 "Don't ask again" checkbox enabled only once all three are checked.
+- [x] T20.3 Continue disabled until all three are checked; on Continue, persist `skipPrerequisiteCheck` if chosen.
+- [x] T20.4 Skip this screen automatically when the flag is set (and recount steps).
 
 ### T21 — Q2 Filament tuning
 
@@ -329,8 +329,8 @@ non-content scaffolding.
 **Depends on:** T19
 **Size:** S
 
-- [ ] T21.1 Three checkboxes (temperature / pressure advance / flow rate) with docs copy.
-- [ ] T21.2 Continue disabled until all three are checked.
+- [x] T21.1 Three checkboxes (temperature / pressure advance / flow rate) with docs copy.
+- [x] T21.2 Continue disabled until all three are checked.
 
 ### T22 — Q3 Slice Quad file
 
@@ -339,9 +339,9 @@ non-content scaffolding.
 **Depends on:** T19, T06
 **Size:** M
 
-- [ ] T22.1 STL download button/link for the Quad file.
-- [ ] T22.2 Render steps 3–5 copy and all referenced images inline (lightbox-enabled).
-- [ ] T22.3 Continue button.
+- [x] T22.1 STL download button/link for the Quad file.
+- [x] T22.2 Render steps 3–5 copy and all referenced images inline (lightbox-enabled).
+- [x] T22.3 Continue button.
 
 ### T23 — Q4 Print
 
@@ -350,8 +350,8 @@ non-content scaffolding.
 **Depends on:** T19, T06
 **Size:** S
 
-- [ ] T23.1 Render steps 6–7 copy and images.
-- [ ] T23.2 Continue button.
+- [x] T23.1 Render steps 6–7 copy and images.
+- [x] T23.2 Continue button.
 
 ### T24 — Q5 Locate X-beam
 
@@ -360,8 +360,8 @@ non-content scaffolding.
 **Depends on:** T19, T06
 **Size:** S
 
-- [ ] T24.1 Render step 8 copy and image.
-- [ ] T24.2 Continue button.
+- [x] T24.1 Render step 8 copy and image.
+- [x] T24.2 Continue button.
 
 ### T25 — Q6 Measure X
 
@@ -371,11 +371,11 @@ non-content scaffolding.
 **Depends on:** T19, T05, T04
 **Size:** M
 
-- [ ] T25.1 Two labeled inputs: "X — Outer", "X — Inner", both in mm.
-- [ ] T25.2 Inline amber warning using the exact string when out of range; warning never blocks.
-- [ ] T25.3 Continue disabled until both inputs are valid.
-- [ ] T25.4 On Continue, store the two values in root measurement state.
-- [ ] T25.5 Render the measurement warnings/examples from step 9.
+- [x] T25.1 Two labeled inputs: "X — Outer", "X — Inner", both in mm.
+- [x] T25.2 Inline amber warning using the exact string when out of range; warning never blocks.
+- [x] T25.3 Continue disabled until both inputs are valid.
+- [x] T25.4 On Continue, store the two values in root measurement state.
+- [x] T25.5 Render the measurement warnings/examples from step 9.
 
 ### T26 — Q7 Measure Y, A, B
 
@@ -384,9 +384,9 @@ non-content scaffolding.
 **Depends on:** T25
 **Size:** M
 
-- [ ] T26.1 Six inputs grouped under Y / A / B headings, reusing the T25 input pattern.
-- [ ] T26.2 Per-field out-of-range warnings; Continue disabled until all six valid.
-- [ ] T26.3 On Continue, store all six values in root measurement state.
+- [x] T26.1 Six inputs grouped under Y / A / B headings, reusing the T25 input pattern.
+- [x] T26.2 Per-field out-of-range warnings; Continue disabled until all six valid.
+- [x] T26.3 On Continue, store all six values in root measurement state.
 
 ### T27 — Q8 Extrapolation factor + save printer
 
@@ -396,11 +396,11 @@ non-content scaffolding.
 **Depends on:** T26, T04, T03, T05
 **Size:** M
 
-- [ ] T27.1 Compute and display the factor rounded to 5 dp.
-- [ ] T27.2 Include the note that this is not the filament shrinkage value and must not be entered into the slicer.
-- [ ] T27.3 Name input with case-insensitive duplicate blocking (excluding none).
-- [ ] T27.4 Save & Continue disabled until a valid, unique name is entered.
-- [ ] T27.5 On save, persist the printer via root state; update the context header.
+- [x] T27.1 Compute and display the factor rounded to 5 dp.
+- [x] T27.2 Include the note that this is not the filament shrinkage value and must not be entered into the slicer.
+- [x] T27.3 Name input with case-insensitive duplicate blocking (excluding none).
+- [x] T27.4 Save & Continue disabled until a valid, unique name is entered.
+- [x] T27.5 On save, persist the printer via root state; update the context header.
 
 ### T28 — Q9 Compensation + final result
 
@@ -410,11 +410,11 @@ the compensation ratio for the final value (PRD §13.2).
 **Depends on:** T27, T04, T09
 **Size:** M
 
-- [ ] T28.1 Instructions + `shrinkage-adjust-1.png` / `shrinkage-adjust-2.png` with lightbox.
-- [ ] T28.2 "Current XY shrinkage %" input, default `100`, note to copy from the slicer.
-- [ ] T28.3 Plain, non-emphasized sentence including the 5 dp compensation ratio.
-- [ ] T28.4 Prominent live-computed final value at 4 dp, plus `CopyButton`.
-- [ ] T28.5 Finish-only action (no Back); Finish returns Home.
+- [x] T28.1 Instructions + `shrinkage-adjust-1.png` / `shrinkage-adjust-2.png` with lightbox.
+- [x] T28.2 "Current XY shrinkage %" input, default `100`, note to copy from the slicer.
+- [x] T28.3 Plain, non-emphasized sentence including the 5 dp compensation ratio.
+- [x] T28.4 Prominent live-computed final value at 4 dp, plus `CopyButton`.
+- [x] T28.5 Finish-only action (no Back); Finish returns Home.
 
 ### T29 — Quad flow integration
 
@@ -424,11 +424,11 @@ the compensation ratio for the final value (PRD §13.2).
 **Depends on:** T20, T21, T22, T23, T24, T25, T26, T27, T28
 **Size:** M
 
-- [ ] T29.1 Walk the full flow manually and confirm calculations against PRD §13.
-- [ ] T29.2 Verify Q1 skip/recount behavior and persistence of the flag.
-- [ ] T29.3 Verify no Back on Q9 and exit-confirmation on every other step.
-- [ ] T29.4 Verify refresh mid-flow returns Home and discards measurements.
-- [ ] T29.5 Add a component test for the measurement-to-result calculation path.
+- [x] T29.1 Walk the full flow manually and confirm calculations against PRD §13.
+- [x] T29.2 Verify Q1 skip/recount behavior and persistence of the flag.
+- [x] T29.3 Verify no Back on Q9 and exit-confirmation on every other step.
+- [x] T29.4 Verify refresh mid-flow returns Home and discards measurements.
+- [x] T29.5 Add a component test for the measurement-to-result calculation path.
 
 ---
 
@@ -442,9 +442,9 @@ selected-printer context (PRD §9, §10, §17).
 **Depends on:** T19
 **Size:** S
 
-- [ ] T30.1 Define the ordered Single step list (6 steps) and indicator.
-- [ ] T30.2 Carry the selected printer through the flow and render "Calibrating on {name}".
-- [ ] T30.3 Reset measurements at flow start; wire Back/Finish rules.
+- [x] T30.1 Define the ordered Single step list (6 steps) and indicator.
+- [x] T30.2 Carry the selected printer through the flow and render "Calibrating on {name}".
+- [x] T30.3 Reset measurements at flow start; wire Back/Finish rules.
 
 ### T31 — S1 Select printer
 
@@ -453,9 +453,9 @@ selected-printer context (PRD §9, §10, §17).
 **Depends on:** T30, T03
 **Size:** S
 
-- [ ] T31.1 Radio list of saved printers showing names only; scrollable if long.
-- [ ] T31.2 Continue disabled until one is selected.
-- [ ] T31.3 Store the selected printer in flow state for calculations and header.
+- [x] T31.1 Radio list of saved printers showing names only; scrollable if long.
+- [x] T31.2 Continue disabled until one is selected.
+- [x] T31.3 Store the selected printer in flow state for calculations and header.
 
 ### T32 — S2 Filament tuning
 
@@ -464,8 +464,8 @@ selected-printer context (PRD §9, §10, §17).
 **Depends on:** T30
 **Size:** S
 
-- [ ] T32.1 Three checkboxes with docs copy.
-- [ ] T32.2 Continue disabled until all checked.
+- [x] T32.1 Three checkboxes with docs copy.
+- [x] T32.2 Continue disabled until all checked.
 
 ### T33 — S3 Slice Single file
 
@@ -474,9 +474,9 @@ selected-printer context (PRD §9, §10, §17).
 **Depends on:** T30, T06
 **Size:** S
 
-- [ ] T33.1 STL download for the Single file.
-- [ ] T33.2 Render step 3 copy and images.
-- [ ] T33.3 Continue button.
+- [x] T33.1 STL download for the Single file.
+- [x] T33.2 Render step 3 copy and images.
+- [x] T33.3 Continue button.
 
 ### T34 — S4 Print
 
@@ -485,8 +485,8 @@ selected-printer context (PRD §9, §10, §17).
 **Depends on:** T30, T06
 **Size:** S
 
-- [ ] T34.1 Render steps 4–5 copy and images.
-- [ ] T34.2 Continue button.
+- [x] T34.1 Render steps 4–5 copy and images.
+- [x] T34.2 Continue button.
 
 ### T35 — S5 Measure beam
 
@@ -496,8 +496,8 @@ selected-printer context (PRD §9, §10, §17).
 **Depends on:** T30, T05, T04
 **Size:** S
 
-- [ ] T35.1 Two labeled inputs (Outer/Inner) with warnings and gated Continue.
-- [ ] T35.2 Store values in root measurement state.
+- [x] T35.1 Two labeled inputs (Outer/Inner) with warnings and gated Continue.
+- [x] T35.2 Store values in root measurement state.
 
 ### T36 — S6 Extrapolated result
 
@@ -507,10 +507,10 @@ then show the final value using the Q9 layout (PRD §13.2, §13.3).
 **Depends on:** T31, T35, T04
 **Size:** M
 
-- [ ] T36.1 Compute extrapolated ratio (5 dp) using the selected printer's stored factor.
-- [ ] T36.2 Reuse the Q9 layout: instructions/images, current-XY input, non-emphasized ratio sentence.
-- [ ] T36.3 Prominent live-computed final value (4 dp) + `CopyButton`.
-- [ ] T36.4 Finish-only action returning Home.
+- [x] T36.1 Compute extrapolated ratio (5 dp) using the selected printer's stored factor.
+- [x] T36.2 Reuse the Q9 layout: instructions/images, current-XY input, non-emphasized ratio sentence.
+- [x] T36.3 Prominent live-computed final value (4 dp) + `CopyButton`.
+- [x] T36.4 Finish-only action returning Home.
 
 ### T37 — Single flow integration
 
@@ -520,10 +520,10 @@ then show the final value using the Q9 layout (PRD §13.2, §13.3).
 **Depends on:** T31, T32, T33, T34, T35, T36
 **Size:** M
 
-- [ ] T37.1 Walk the full flow with a seeded printer and confirm the extrapolated value.
-- [ ] T37.2 Verify header shows the selected printer and Finish returns Home.
-- [ ] T37.3 Verify exit confirmation and measurement reset behavior.
-- [ ] T37.4 Add a component test for single-measurement → extrapolated result.
+- [x] T37.1 Walk the full flow with a seeded printer and confirm the extrapolated value.
+- [x] T37.2 Verify header shows the selected printer and Finish returns Home.
+- [x] T37.3 Verify exit confirmation and measurement reset behavior.
+- [x] T37.4 Add a component test for single-measurement → extrapolated result.
 
 ---
 
@@ -536,11 +536,11 @@ then show the final value using the Q9 layout (PRD §13.2, §13.3).
 **Depends on:** T11, T13, T18, T29, T37
 **Size:** M
 
-- [ ] T38.1 Audit labels/`for` associations, headings order, and landmark structure.
-- [ ] T38.2 Verify modal focus trap, Esc close, and focus restoration.
-- [ ] T38.3 Verify keyboard-only operation of every flow and the management screen.
-- [ ] T38.4 Verify lightbox keyboard close and alt text presence on all images.
-- [ ] T38.5 Check color contrast against `global.css` tokens.
+- [x] T38.1 Audit labels/`for` associations, headings order, and landmark structure.
+- [x] T38.2 Verify modal focus trap, Esc close, and focus restoration.
+- [x] T38.3 Verify keyboard-only operation of every flow and the management screen.
+- [x] T38.4 Verify lightbox keyboard close and alt text presence on all images.
+- [x] T38.5 Check color contrast against `global.css` tokens.
 
 ### T39 — Responsive / mobile pass
 
@@ -549,10 +549,10 @@ then show the final value using the Q9 layout (PRD §13.2, §13.3).
 **Depends on:** T11, T13, T18, T29, T37
 **Size:** M
 
-- [ ] T39.1 Verify all flow screens at 360px, 768px, and desktop widths; fix overflow/clipping.
-- [ ] T39.2 Verify printer cards single-column → grid behavior.
-- [ ] T39.3 Verify measurement input grouping remains readable on mobile.
-- [ ] T39.4 Verify tap targets and the image lightbox on touch.
+- [x] T39.1 Verify all flow screens at 360px, 768px, and desktop widths; fix overflow/clipping.
+- [x] T39.2 Verify printer cards single-column → grid behavior.
+- [x] T39.3 Verify measurement input grouping remains readable on mobile.
+- [x] T39.4 Verify tap targets and the image lightbox on touch.
 
 ### T40 — End-to-end acceptance verification
 
@@ -562,10 +562,10 @@ PRD §20 (and unit coverage from T07).
 **Depends on:** T07, T18, T29, T37, T38, T39
 **Size:** M
 
-- [ ] T40.1 Verify AC1–AC4 (zero-printer home, full Quad, persistence, formula correctness).
-- [ ] T40.2 Verify AC5–AC8 (warnings, duplicate rejection, export, import).
-- [ ] T40.3 Verify AC9–AC11 (corrupt/unavailable storage, keyboard/mobile, exit confirmation).
-- [ ] T40.4 Record any deviations and open follow-up tasks if needed.
+- [x] T40.1 Verify AC1–AC4 (zero-printer home, full Quad, persistence, formula correctness).
+- [x] T40.2 Verify AC5–AC8 (warnings, duplicate rejection, export, import).
+- [x] T40.3 Verify AC9–AC11 (corrupt/unavailable storage, keyboard/mobile, exit confirmation).
+- [x] T40.4 Record any deviations and open follow-up tasks if needed.
 
 ### T41 — Build & deployment configuration
 
@@ -575,10 +575,10 @@ embeddable-safe.
 **Depends on:** T01, T40
 **Size:** S
 
-- [ ] T41.1 Confirm `base: '/'`, single-bundle output, and that `global.css` is loaded in the standalone `index.html`.
-- [ ] T41.2 Run `pnpm build` and `pnpm preview`; verify assets, STL downloads, and routing (refresh → Home) in the built app.
-- [ ] T41.3 Confirm no runtime network requests and no CSS reset output.
-- [ ] T41.4 Document the deploy target (static host at subdomain root).
+- [x] T41.1 Confirm `base: '/'`, single-bundle output, and that `global.css` is loaded in the standalone `index.html`.
+- [x] T41.2 Run `pnpm build` and `pnpm preview`; verify assets, STL downloads, and routing (refresh → Home) in the built app.
+- [x] T41.3 Confirm no runtime network requests and no CSS reset output.
+- [x] T41.4 Document the deploy target (static host at subdomain root).
 
 ### T42 — Release v1 & handoff docs
 
@@ -588,9 +588,9 @@ check.
 **Depends on:** T41
 **Size:** S
 
-- [ ] T42.1 Document install/dev/build/preview commands and the storage keys/export format.
-- [ ] T42.2 Confirm all tasks above are checked, every dependency satisfied, and no orphan tasks remain.
-- [ ] T42.3 Tag/record v1 against `ai-context/PRD.md` and `ai-context/implementation-plan.md`.
+- [x] T42.1 Document install/dev/build/preview commands and the storage keys/export format.
+- [x] T42.2 Confirm all tasks above are checked, every dependency satisfied, and no orphan tasks remain.
+- [x] T42.3 Tag/record v1 against `ai-context/PRD.md` and `ai-context/implementation-plan.md`.
 
 ---
 
