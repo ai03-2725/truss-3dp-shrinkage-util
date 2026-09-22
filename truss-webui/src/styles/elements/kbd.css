@@ -1,0 +1,11 @@
+/* Keyboard KBD tag */
+
+kbd {
+  font-family: "Chivo Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 175;
+  vertical-align: bottom;
+  padding: 0.375rem 0.5rem 0.375rem 0.5rem;
+  background-color: #e0e0e0;
+  border-radius: var(--radius-medium);
+}
