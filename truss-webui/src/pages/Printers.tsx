@@ -243,43 +243,37 @@ export function Printers(props: { app: AppApi }) {
         />
       </Show>
 
-      <Show when={editingIndex()} keyed>
-        {(index) => {
-          const printer = props.app.printers()[index]
-          return (
-            <PrinterFormDialog
-              title="Edit printer"
-              initialName={printer.name}
-              initialFactor={String(printer.extrapolationFactor)}
-              onClose={() => setEditingIndex(null)}
-              onSubmit={(name, factor) => {
-                const result = editPrinter(props.app.printers(), index, name, factor)
-                if (!result.ok) return result.error
-                props.app.replacePrinters(result.printers)
-                setEditingIndex(null)
-                return null
-              }}
-            />
-          )
-        }}
+      <Show when={editingIndex() !== null}>
+        <PrinterFormDialog
+          title="Edit printer"
+          initialName={props.app.printers()[editingIndex()!].name}
+          initialFactor={String(props.app.printers()[editingIndex()!].extrapolationFactor)}
+          onClose={() => setEditingIndex(null)}
+          onSubmit={(name, factor) => {
+            const index = editingIndex()
+            if (index === null) return null
+            const result = editPrinter(props.app.printers(), index, name, factor)
+            if (!result.ok) return result.error
+            props.app.replacePrinters(result.printers)
+            setEditingIndex(null)
+            return null
+          }}
+        />
       </Show>
 
-      <Show when={deletingIndex()} keyed>
-        {(index) => {
-          const printer = props.app.printers()[index]
-          return (
-            <ConfirmDialog
-              title="Delete printer?"
-              message={`Delete “${printer.name}”? This cannot be undone.`}
-              confirmLabel="Delete"
-              onConfirm={() => {
-                props.app.replacePrinters(deletePrinter(props.app.printers(), index))
-                setDeletingIndex(null)
-              }}
-              onCancel={() => setDeletingIndex(null)}
-            />
-          )
-        }}
+      <Show when={deletingIndex() !== null}>
+        <ConfirmDialog
+          title="Delete printer?"
+          message={`Delete “${props.app.printers()[deletingIndex()!].name}”? This cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={() => {
+            const index = deletingIndex()
+            if (index === null) return
+            props.app.replacePrinters(deletePrinter(props.app.printers(), index))
+            setDeletingIndex(null)
+          }}
+          onCancel={() => setDeletingIndex(null)}
+        />
       </Show>
     </main>
   )

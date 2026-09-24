@@ -14,6 +14,13 @@
   --text-color-deemphasized: #6a6a6a;
 
   --button-padding: 0.6875rem 1.0625rem 0.6875rem 1.0625rem;
+  --button-border-width-secondary: 2px;
+
+  /* Warning / attention palette (shared by warning messages and callouts) */
+  --warning-background: #fff4d6;
+  --warning-border: #e6c35c;
+  --warning-accent: #e6a700;
+  --warning-text: #7a5200;
   /* --button-bg-primary: #535353; */
   --button-bg-primary: #414141;
   --button-bg-disabled: #6a6a6a;

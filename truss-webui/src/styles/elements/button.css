@@ -18,6 +18,12 @@ button, .button {
   cursor: pointer;
 }
 
+/* Anchors styled as buttons must not inherit the dark link/visited colors */
+a.button:link,
+a.button:visited {
+  color: var(--button-text-primary);
+}
+
 input::file-selector-button {
   display: block;
   font-size: 1rem;
@@ -36,5 +42,20 @@ button:disabled, .button:disabled {
   cursor: unset;
   background-color: var(--button-bg-disabled) !important;
   color: var(--button-text-disabled) !important;
+}
+
+/* Secondary (outline) buttons - reusable anywhere alongside the base button */
+.truss-button-secondary,
+.button-secondary {
+  background-color: transparent;
+  color: var(--text-color-emphasis);
+  border: var(--button-border-width-secondary) solid var(--button-bg-primary);
+  /* Inherits border-radius from the base button rule above */
+}
+
+.truss-button-secondary:hover:not(:disabled),
+.button-secondary:hover:not(:disabled) {
+  background-color: var(--button-bg-primary);
+  color: var(--button-text-primary);
 }
 
