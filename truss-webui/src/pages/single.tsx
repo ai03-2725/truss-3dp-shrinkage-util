@@ -3,6 +3,8 @@ import type { AppApi } from '../lib/app-api.ts'
 import { FlowFrame } from '../components/FlowFrame.tsx'
 import { BeamFields } from '../components/BeamFields.tsx'
 import { Figure, InnerJawGuidance, MeasurementWarnings } from '../components/Guide.tsx'
+import { Icon } from '../components/Icon.tsx'
+import { icons } from '../lib/icons.ts'
 import { ResultPercent } from '../components/ResultPercent.tsx'
 import {
   calcRecommendedXYPercent,
@@ -123,7 +125,8 @@ export function SingleSlice(props: { app: AppApi }) {
       </p>
 
       <p>
-        <a class="button" href={stl.single} download="Truss Calibration Beam Single.stl">
+        <a class="button truss-icon-label" href={stl.single} download="Truss Calibration Beam Single.stl">
+          <Icon svg={icons.downloadSimple} />
           Download the Single calibration beam (STL)
         </a>
       </p>

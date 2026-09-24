@@ -1,4 +1,6 @@
 import { Show, createSignal, onCleanup } from 'solid-js'
+import { Icon } from './Icon.tsx'
+import { icons } from '../lib/icons.ts'
 
 // Copy with the Clipboard API, falling back to a hidden textarea for
 // non-secure-context deployments where the API is unavailable.
@@ -50,10 +52,11 @@ export function ResultPercent(props: { percent: string | null }) {
         </output>
         <button
           type="button"
-          class="truss-button-secondary"
+          class="truss-button-secondary truss-icon-label"
           onClick={copy}
           disabled={props.percent === null}
         >
+          <Icon svg={icons.copySimple} />
           {status() === 'copied' ? 'Copied!' : 'Copy'}
         </button>
         <span class="truss-visually-hidden" role="status">

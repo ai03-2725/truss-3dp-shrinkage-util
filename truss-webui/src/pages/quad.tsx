@@ -4,6 +4,8 @@ import type { QuadInput } from '../lib/types.ts'
 import { FlowFrame } from '../components/FlowFrame.tsx'
 import { BeamFields } from '../components/BeamFields.tsx'
 import { Figure, InnerJawGuidance, MeasurementWarnings } from '../components/Guide.tsx'
+import { Icon } from '../components/Icon.tsx'
+import { icons } from '../lib/icons.ts'
 import { ConfirmDialog } from '../components/ConfirmDialog.tsx'
 import { ResultPercent } from '../components/ResultPercent.tsx'
 import {
@@ -181,7 +183,8 @@ export function QuadSlice(props: { app: AppApi }) {
       </p>
 
       <p>
-        <a class="button" href={stl.quad} download="Truss Calibration Beam Quad.stl">
+        <a class="button truss-icon-label" href={stl.quad} download="Truss Calibration Beam Quad.stl">
+          <Icon svg={icons.downloadSimple} />
           Download the Quad calibration beam (STL)
         </a>
       </p>

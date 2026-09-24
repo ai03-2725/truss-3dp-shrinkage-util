@@ -32,6 +32,14 @@
   fill: currentColor;
 }
 
+/* Button/link label with a leading icon, centred as a group. */
+.truss-icon-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 /* Circular icon-only button (e.g. the Home control on Manage printers). */
 .truss-icon-button {
   display: inline-flex;
