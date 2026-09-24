@@ -1,5 +1,7 @@
 import type { JSX } from 'solid-js'
 import type { AppApi } from '../lib/app-api.ts'
+import { Icon } from './Icon.tsx'
+import { icons } from '../lib/icons.ts'
 
 // Consistent step chrome: Exit is always available, Back only before results,
 // and a single primary action gated by each screen.
@@ -16,8 +18,13 @@ export function FlowFrame(props: {
   return (
     <main class="container truss-flow" aria-labelledby="truss-step-title">
       <div class="truss-flow-topbar">
-        <button type="button" class="truss-button-secondary truss-exit" onClick={props.app.requestExit}>
-          Exit
+        <button
+          type="button"
+          class="truss-icon-button"
+          aria-label="Exit calibration"
+          onClick={props.app.requestExit}
+        >
+          <Icon svg={icons.x} />
         </button>
       </div>
       <h1 id="truss-step-title" class="truss-step-title">
@@ -33,7 +40,7 @@ export function FlowFrame(props: {
         {props.onNext && (
           <button
             type="button"
-            class={props.nextClass}
+            class={['truss-step-next', props.nextClass].filter(Boolean).join(' ')}
             onClick={props.onNext}
             disabled={props.nextDisabled}
           >

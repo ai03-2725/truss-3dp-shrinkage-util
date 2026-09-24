@@ -3,6 +3,8 @@ import type { AppApi } from '../lib/app-api.ts'
 import { addPrinter, deletePrinter, editPrinter, exportJSON, importJSON } from '../lib/printers.ts'
 import { isFactorOutOfRange, parsePositiveDecimal } from '../lib/calc.ts'
 import { ConfirmDialog } from '../components/ConfirmDialog.tsx'
+import { Icon } from '../components/Icon.tsx'
+import { icons } from '../lib/icons.ts'
 
 function PrinterFormDialog(props: {
   title: string
@@ -130,8 +132,13 @@ export function Printers(props: { app: AppApi }) {
   return (
     <main class="container truss-printers">
       <div class="truss-flow-topbar">
-        <button type="button" class="truss-button-secondary truss-exit" onClick={() => props.app.finish()}>
-          Home
+        <button
+          type="button"
+          class="truss-icon-button"
+          aria-label="Home"
+          onClick={() => props.app.finish()}
+        >
+          <Icon svg={icons.house} />
         </button>
       </div>
 

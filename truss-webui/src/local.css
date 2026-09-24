@@ -19,6 +19,39 @@
   text-align: center;
 }
 
+/* ---- Icons ---- */
+.truss-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.truss-icon > svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+
+/* Circular icon-only button (e.g. the Home control on Manage printers). */
+.truss-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  /* Matches the grey shell of the home-screen cards. */
+  background: #ececec;
+  color: var(--text-color-default, #414141);
+  font-size: 1.35rem;
+}
+
+.truss-icon-button:hover:not(:disabled) {
+  background: #e4e4e4;
+}
+
 /* ---- Home ---- */
 .truss-home {
   padding-block: 1.5rem 3rem;
@@ -169,18 +202,17 @@
 @media (min-width: 600px) {
   .truss-step-actions {
     flex-direction: row;
-    justify-content: space-between;
   }
 
   .truss-step-actions > button {
     width: auto;
     min-width: 10rem;
   }
-}
 
-.truss-exit {
-  width: auto !important;
-  min-width: 5rem;
+  /* Keep the primary action on the right whether or not Back is shown. */
+  .truss-step-next {
+    margin-left: auto;
+  }
 }
 
 /* ---- Fields and messages ---- */
