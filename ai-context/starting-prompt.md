@@ -14,3 +14,4 @@ Please see `./project-structure.md` for details on implementation.
 
 The `/Documentation` folder contains the current usage instructions for the calibrator tool for using manually without a webapp.  
 
+Please do not look at git history or other git branches within this repository.
