@@ -3,6 +3,7 @@ import type { AppApi } from '../lib/app-api.ts'
 import { FlowFrame } from '../components/FlowFrame.tsx'
 import { BeamFields } from '../components/BeamFields.tsx'
 import { Figure, InnerJawGuidance, MeasurementWarnings } from '../components/Guide.tsx'
+import { ResultPercent } from '../components/ResultPercent.tsx'
 import {
   calcRecommendedXYPercent,
   calcSingleShrinkage,
@@ -228,6 +229,7 @@ export function SingleResult(props: { app: AppApi }) {
       title="Single calibration result"
       onNext={props.app.finish}
       nextLabel="Finish"
+      nextClass="truss-button-secondary"
       nextDisabled={!currentValid()}
     >
       {!printer() || shrinkage() === null ? (
@@ -271,10 +273,7 @@ export function SingleResult(props: { app: AppApi }) {
         )}
       </div>
 
-      <p>
-        Updated XY shrinkage percentage to enter:{' '}
-        <strong>{recommended() === null ? '—' : formatPercent(recommended()!)}%</strong>
-      </p>
+      <ResultPercent percent={recommended() === null ? null : formatPercent(recommended()!)} />
 
       <h3>Applying the result (OrcaSlicer / Bambu Studio)</h3>
       <p>

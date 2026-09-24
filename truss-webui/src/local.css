@@ -132,6 +132,32 @@
   overflow-wrap: anywhere;
 }
 
+/* Emphasized final XY percentage with a copy-to-clipboard control. */
+.truss-result-percent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0 1rem;
+  background: #f0f0f0;
+  border-radius: var(--radius-large, 4px);
+}
+
+.truss-result-percent-value {
+  font-family: "Chivo Mono", monospace;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-color-emphasis, #151515);
+  overflow-wrap: anywhere;
+}
+
+.truss-result-percent > button {
+  width: auto;
+  min-width: 5rem;
+  margin-left: auto;
+}
+
 .truss-beam {
   border: 1px solid var(--form-input-border, #c3c3c3);
   border-radius: var(--radius-large, 4px);

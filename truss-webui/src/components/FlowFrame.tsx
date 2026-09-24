@@ -10,6 +10,7 @@ export function FlowFrame(props: {
   onNext?: () => void
   nextLabel?: string
   nextDisabled?: boolean
+  nextClass?: string
   children: JSX.Element
 }) {
   return (
@@ -30,7 +31,12 @@ export function FlowFrame(props: {
           </button>
         )}
         {props.onNext && (
-          <button type="button" onClick={props.onNext} disabled={props.nextDisabled}>
+          <button
+            type="button"
+            class={props.nextClass}
+            onClick={props.onNext}
+            disabled={props.nextDisabled}
+          >
             {props.nextLabel ?? 'Next'}
           </button>
         )}

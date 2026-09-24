@@ -64,6 +64,13 @@ function App() {
 
   const screen = () => active()?.step ?? view()
 
+  // Start each screen at the top; otherwise a long page's scroll position
+  // carries over to the next step.
+  createEffect(() => {
+    screen()
+    window.scrollTo(0, 0)
+  })
+
   const setStep = (step: string) => setActive((current) => (current ? { ...current, step } : current))
 
   const mutateActive = (fn: (current: ActiveCalibration) => ActiveCalibration) =>

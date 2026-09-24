@@ -5,6 +5,7 @@ import { FlowFrame } from '../components/FlowFrame.tsx'
 import { BeamFields } from '../components/BeamFields.tsx'
 import { Figure, InnerJawGuidance, MeasurementWarnings } from '../components/Guide.tsx'
 import { ConfirmDialog } from '../components/ConfirmDialog.tsx'
+import { ResultPercent } from '../components/ResultPercent.tsx'
 import {
   calcPrinterFactor,
   calcQuadShrinkage,
@@ -421,6 +422,7 @@ export function QuadResult(props: { app: AppApi }) {
       title="Quad calibration result"
       onNext={props.app.finish}
       nextLabel="Finish"
+      nextClass="truss-button-secondary"
       nextDisabled={!currentValid()}
     >
       <p>
@@ -467,10 +469,7 @@ export function QuadResult(props: { app: AppApi }) {
         )}
       </div>
 
-      <p>
-        Updated XY shrinkage percentage to enter:{' '}
-        <strong>{recommended() === null ? '—' : formatPercent(recommended()!)}%</strong>
-      </p>
+      <ResultPercent percent={recommended() === null ? null : formatPercent(recommended()!)} />
 
       <h3>Applying the result (OrcaSlicer / Bambu Studio)</h3>
       <p>
