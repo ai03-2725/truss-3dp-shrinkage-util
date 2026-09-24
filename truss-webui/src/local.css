@@ -29,23 +29,120 @@
   gap: 1rem;
   margin-top: 2rem;
   grid-template-columns: 1fr;
+  max-width: 46rem;
+  margin-inline: auto;
 }
 
+/* The whole card is one button. A grey shell holds a white content panel and a
+   separate action area that shows the arrow (plus a label on narrow screens). */
+.truss-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0.625rem;
+  border: none;
+  border-radius: 10px;
+  background: #e4e4e4;
+  color: var(--text-color-default, #414141);
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.truss-card:hover:not(:disabled) {
+  background: #d8d8d8;
+}
+
+/* The global :disabled rule would darken the whole shell; keep the palette. */
+.truss-card:disabled {
+  background: #e4e4e4 !important;
+  color: var(--text-color-default, #414141) !important;
+  cursor: not-allowed;
+}
+
+.truss-card-content {
+  display: block;
+  flex: 1;
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.truss-card:disabled .truss-card-content,
+.truss-card:disabled .truss-card-action {
+  opacity: 0.6;
+}
+
+.truss-card-title {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-headings);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color-emphasis, #151515);
+}
+
+.truss-card-body {
+  display: block;
+}
+
+.truss-card-note {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-color-deemphasized, #6a6a6a);
+}
+
+.truss-card-action {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0.5rem 0.25rem;
+}
+
+.truss-card-arrow {
+  margin-left: auto;
+  font-size: 1.75rem;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.truss-card:hover:not(:disabled) .truss-card-arrow {
+  transform: translateX(4px);
+}
+
+/* Wide screens: content panel left, arrow-only action column on the right. */
 @media (min-width: 768px) {
-  .truss-card-list {
-    grid-template-columns: repeat(3, 1fr);
-    align-items: start;
+  .truss-card {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .truss-card-action {
+    flex: 0 0 6rem;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .truss-card-action-label {
+    display: none;
+  }
+
+  .truss-card-arrow {
+    margin-left: 0;
   }
 }
 
-.truss-card {
-  border: 1px solid var(--form-input-border, #c3c3c3);
-  border-radius: var(--radius-large, 4px);
-  padding: 1rem;
-}
+@media (prefers-reduced-motion: reduce) {
+  .truss-card,
+  .truss-card-arrow {
+    transition: none;
+  }
 
-.truss-card h2 {
-  margin-top: 0;
+  .truss-card:hover:not(:disabled) .truss-card-arrow {
+    transform: none;
+  }
 }
 
 /* ---- Flow shell ---- */
