@@ -1,11 +1,28 @@
-import type { JSX } from 'solid-js'
+import { Show, createSignal, type JSX } from 'solid-js'
 import { img } from '../lib/assets.ts'
+import { Lightbox } from './Lightbox.tsx'
 
 export function Figure(props: { src: string; alt: string; caption?: string; class?: string }) {
+  const [open, setOpen] = createSignal(false)
   return (
     <figure class={props.class ?? 'truss-figure'}>
-      <img src={props.src} alt={props.alt} />
+      <button
+        type="button"
+        class="truss-figure-zoom"
+        aria-label={`Enlarge image: ${props.alt}`}
+        onClick={() => setOpen(true)}
+      >
+        <img src={props.src} alt={props.alt} />
+      </button>
       {props.caption && <figcaption>{props.caption}</figcaption>}
+      <Show when={open()}>
+        <Lightbox
+          src={props.src}
+          alt={props.alt}
+          caption={props.caption}
+          onClose={() => setOpen(false)}
+        />
+      </Show>
     </figure>
   )
 }

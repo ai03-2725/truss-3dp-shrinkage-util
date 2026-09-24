@@ -5,7 +5,8 @@
 .truss-flow :focus-visible,
 .truss-home :focus-visible,
 .truss-printers :focus-visible,
-.truss-modal :focus-visible {
+.truss-modal :focus-visible,
+.truss-lightbox :focus-visible {
   outline: 3px solid #1a5fb4;
   outline-offset: 2px;
 }
@@ -292,6 +293,89 @@
 .truss-figure {
   margin: 1rem auto;
   max-width: 30rem;
+}
+
+/* Thumbnail button: strip the global button styling so only the image shows. */
+.truss-figure-zoom {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+}
+
+.truss-figure-zoom:hover img {
+  opacity: 0.9;
+}
+
+/* ---- Lightbox ---- */
+.truss-lightbox {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.94);
+  overflow: hidden;
+  color: #fafafa;
+}
+
+.truss-lightbox::backdrop {
+  background: rgba(0, 0, 0, 0.94);
+}
+
+.truss-lightbox-viewport {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.truss-lightbox-viewport img {
+  max-width: 94vw;
+  max-height: 94vh;
+  width: auto;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform;
+}
+
+.truss-lightbox-controls {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.truss-lightbox-controls > button {
+  width: auto;
+  min-width: 2.75rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fafafa;
+}
+
+.truss-lightbox-controls > button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.truss-lightbox-caption {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  margin: 0 auto;
+  max-width: 40rem;
+  text-align: center;
+  color: #fafafa;
+  font-size: 0.9rem;
 }
 
 .truss-figure img,
