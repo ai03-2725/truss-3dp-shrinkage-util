@@ -4,7 +4,8 @@ Extremely rapid filament shrinkage calibration for 3D printer filaments
 ![Cover image](./Documentation/Images/truss-single.png)
 
 ## Use it now
-[Start here](./Documentation/0-Start-Here.md)
+<!-- [Start here](./Documentation/0-Start-Here.md) -->
+[truss.ai03.com](https://truss.ai03.com/) 
 
 ## About
 The Truss shrinkage calibrator is a utility designed to calibrate shrinkage ratios for untested 3D printer filaments as quickly and efficiently as possible.  
@@ -18,8 +19,7 @@ The Truss calibrator achieves the above using the following:
 - A truss-structure beam (the namesake of the project) maximizes print rigidity over long measurement distances, allowing for accurate shrinkage measurements while minimizing filament use and print times.  
 - Both inner-teeth and outer-teeth measurement points are carefully embedded into the structure to minimize measurement errors.  
 - The truss focuses solely on shrinkage, optimizing for its speed while leaving other calibration to other tools.  
-- A webapp is planned for giving immediate results based on measurements without needing to rely on manual math.  
-- The above webapp will be focused on simplicity and ease of use.  
+- A webapp is available at [truss.ai03.com](https://truss.ai03.com/) - this app does all the math on your behalf, and also saves each printer's information for subsequent runs.
 
 ## Subsequent Extrapolation
 The recommended first print is the Quad variant - this design has measurement points in 4 axies (X, Y, and two diagonals).  
