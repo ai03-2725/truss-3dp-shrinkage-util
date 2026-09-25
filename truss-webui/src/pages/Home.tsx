@@ -70,6 +70,19 @@ export function Home(props: { app: AppApi }) {
             </span>
           </span>
         </button>
+
+        <button type="button" class="truss-card" onClick={props.app.openAbout}>
+          <span class="truss-card-content">
+            <span class="truss-card-title">About</span>
+            <span class="truss-card-body">About the Truss Calibrator tool.</span>
+          </span>
+          <span class="truss-card-action">
+            <span class="truss-card-action-label">About</span>
+            <span class="truss-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </span>
+        </button>
       </div>
 
       <div class="truss-home-links">

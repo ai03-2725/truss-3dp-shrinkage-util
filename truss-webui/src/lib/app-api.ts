@@ -24,6 +24,7 @@ export interface AppApi {
   startQuad: () => void
   startSingle: () => void
   openPrinters: () => void
+  openAbout: () => void
   back: () => void
   requestExit: () => void
   finish: () => void
