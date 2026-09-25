@@ -108,7 +108,7 @@ const EN: Messages = {
   cancel: 'Cancel',
   exitTitle: 'Exit calibration?',
   exitMessage:
-    "Leaving now clears this calibration's measurements, checkboxes, and progress. Saved printer profiles are kept.",
+    "Leaving now discards currently entered measurement values.",
   exitConfirm: 'Exit and clear progress',
 
   outerMeasurement: 'Outer measurement',
@@ -124,7 +124,7 @@ const EN: Messages = {
   copiedAnnounce: 'Value copied to clipboard',
   copyFailedAnnounce: 'Could not copy the value',
   percentRangeWarning:
-    'This percentage is outside the usual 90–110% range. Double-check the value your slicer shows.',
+    'This percentage is outside the usual 90–110% range. Double-check that you are entering the correct value from your slicer.',
 
   quadEquipmentTitle: 'Equipment check',
   quadFilamentTitle: 'Filament tuning',
@@ -180,7 +180,89 @@ const EN: Messages = {
 
 // PLACEHOLDER: Japanese still uses the English wording throughout. Replace via
 // implementation-plan task 9 before public release.
-const JA: Messages = { ...EN }
+const JA: Messages = {
+    language: '言語',
+  chooseLanguage: '言語を選択してください',
+
+  stepOf: (current, total) => `ステップ ${current} / ${total}`,
+  progressLabel: '進捗状況',
+  exitCalibration: '補正を中止する',
+  back: '戻る',
+  next: '次へ',
+  finish: '終了',
+
+  cancel: '戻る',
+  exitTitle: '補正を中止しますか？',
+  exitMessage:
+    "中止した場合、現在入力した数値は破棄されます。",
+  exitConfirm: '中止する',
+
+  outerMeasurement: '外側の測定',
+  innerMeasurement: '内側の測定',
+  invalidNumber: '正の数値を入力してください。',
+  lengthRange: '想定される135〜142mmの範囲外です。測定値をもう一度確認することを推奨します。',
+  gapWarning:
+    '内側と外側の測定値が0.4mmを超えています。フィラメントの事前調整や印刷設定をもう一度確認することを推奨します。',
+
+  resultHeading: '新たに計算されたXY収縮設定:',
+  copy: 'コピー',
+  copied: 'コピーされました',
+  copiedAnnounce: '数値がコピーされました',
+  copyFailedAnnounce: 'コピーできませんでした',
+  percentRangeWarning:
+    '入力された数値は90〜110%の想定範囲外です。もう一度ご確認ください。',
+
+  quadEquipmentTitle: '機材の事前確認',
+  quadFilamentTitle: 'フィラメントの事前確認',
+  quadSliceTitle: '補正用モデルの読み込み',
+  quadPrintTitle: 'プリントと取り外し',
+  quadLocateTitle: 'X梁の確認',
+  quadXTitle: 'X梁の測定',
+  quadYabTitle: 'Y/A/B梁の測定',
+  quadNameTitle: 'プリンターの保存',
+  quadResultTitle: '収縮率の計算',
+  singlePrinterTitle: 'プリンターの選択',
+  singleFilamentTitle: 'フィラメントの事前確認',
+  singleSliceTitle: '補正用モデルの読み込み',
+  singlePrintTitle: 'プリントと取り外し',
+  singleMeasureTitle: '梁の測定',
+  singleResultTitle: '収縮率の計算',
+  overwriteTitle: '上書き保存しますか?',
+  overwriteMessage: (name) =>
+    `「${name}」という名前のプリンターはすでに保存されています。上書き保存する場合、現在保存されている外挿係数は破棄されます。`,
+  overwriteConfirm: '上書き保存',
+
+  enlargeImage: (alt) => `画像「${alt}」を拡大する`,
+  zoomIn: '拡大',
+  zoomOut: '縮小',
+  reset: '初期化',
+  resetZoom: '初期化',
+  close: '閉じる',
+  closeEnlarged: '画像を閉じる',
+
+  storageUnavailable:
+    'ブラウザのストレージを利用できません。プリンターの係数情報などは保存されません。',
+  storageUnreadable: '保存されていたプリンター情報を読み込めなかったため、リセットしました。',
+  storageMalformed: '保存されていたプリンター情報が破損していたため、リセットされました。',
+
+  printerNameRequired: '名前が必要です',
+  printerNameDuplicate: (name) => `「${name}」という名前のプリンターはすでに存在します`,
+  printerFactorInvalid: '正の数値を入力してください',
+  printerNotFound: 'プリンターが見つかりませんでした',
+  printerNameLabel: 'プリンター名',
+  extrapolationFactorLabel: '外挿係数',
+  factorRangeWarning:
+    '外挿係数が0.9〜1.1の想定範囲外です。もう一度ご確認ください。',
+  save: '保存',
+  importInvalidJson: '読み込んだファイルのJSON構造が正しくありません。',
+  importNotExportObject: '読み込んだファイルにプリンター情報が含まれていません。',
+  importUnsupportedVersion: (expected) => `読み込んだファイルのバージョンに対応していません。現在はバージョン「${expected}」を想定しています。`,
+  importPrintersList: 'ファイルはプリンターリストを含んでいる必要があります。',
+  importEntryNotObject: 'プリンターリストの各プリンターは正しい構造のJSONオブジェクトである必要があります。',
+  importEntryNameEmpty: 'プリンターリストの各プリンターに名前が必要です。',
+  importEntryFactorInvalid: (name) => `読み込んだプリンター「${name}」に不正な外挿係数が設定されています。`,
+  importDuplicateInFile: (name) => `読み込んだファイル内に名前「${name}」のプリンターが重複しています。`,
+}
 
 const MESSAGES: Record<LocaleId, Messages> = { en: EN, ja: JA }
 
