@@ -34,9 +34,9 @@ export function MeasurementWarnings() {
       <h3>Before measuring</h3>
       <ol>
         <li>
-          <strong>Do not apply excess force to the print with your calipers.</strong> The Truss
-          resists abuse as much as possible, but 3D printed plastics are elastic. Applying excess
-          force deforms the print and yields dimensions larger or smaller than actually printed.
+          <strong>Do not apply excess force with your calipers.</strong> The Truss Calibrator is designed to 
+          resist abuse as much as possible, but all 3D printed plastics are elastic. Applying excess
+          force deforms the print and yields dimensions larger or smaller than actually printed. <br/>
           Ideally the calipers should exert no force at all - let go of the clamping side and let the
           print push the calipers back if necessary. If your calipers have thumb-wheel rollers, do
           not use them to exert excess force.
@@ -55,21 +55,20 @@ export function MeasurementWarnings() {
 export function InnerJawGuidance(props: { note?: JSX.Element }) {
   return (
     <div class="truss-guidance">
-      <h3>Positioning the inner jaws</h3>
+      <h3>Measuring the inner dimension</h3>
       <p>
-        The file guides your calipers' inner teeth as accurately as possible, but only when oriented
-        correctly. <strong>Measuring incorrectly will yield incorrect, meaningless values.</strong>
+        Please ensure that your calipers are positioned properly as described below.
       </p>
       {props.note}
 
       <h4>Correct</h4>
       <ul>
         <li>
-          The caliper enters from the top of the print.
+          The calipers enter from the <strong>top of the print</strong>.
           <Figure src={img.caliperEnterTop} alt="Caliper entering the print from the top" />
         </li>
         <li>
-          The flat inner sides of the caliper are flush against the supportive walls located halfway
+          The <strong>flat inner sides of the caliper are flush</strong> against the supportive walls located halfway
           across the beam.
           <Figure
             src={img.innerCorrect1}
@@ -77,7 +76,7 @@ export function InnerJawGuidance(props: { note?: JSX.Element }) {
           />
         </li>
         <li>
-          The same is true for both ends of the caliper.
+          The same is true for <strong>both ends</strong> of the caliper (watch out for one side slipping out of position while positioning the other).
           <Figure
             src={img.innerCorrect2}
             alt="Inner caliper jaws flush against the supportive wall on the other end"
@@ -88,7 +87,7 @@ export function InnerJawGuidance(props: { note?: JSX.Element }) {
       <h4>Incorrect</h4>
       <ul>
         <li>
-          The calipers' inner flat sides are not making contact against the supportive walls. This
+          Incorrect: The calipers' inner flat sides are not making contact against the supportive walls. This
           yields a diagonal measurement longer than what is printed.
           <Figure
             src={img.calipersIncorrectGap}
@@ -96,7 +95,7 @@ export function InnerJawGuidance(props: { note?: JSX.Element }) {
           />
         </li>
         <li>
-          The calipers are being used from the bottom of the print. The slanted sides of the caliper
+          Incorrect: The calipers are being used from the bottom of the print. The slanted sides of the caliper
           teeth should never face the supportive walls in the middle.
           <Figure
             src={img.calipersIncorrectSide}

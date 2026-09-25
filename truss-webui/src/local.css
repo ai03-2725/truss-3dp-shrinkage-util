@@ -206,6 +206,10 @@
   margin-top: 1rem;
 }
 
+.truss-step-body :is(h1, h2, h3, h4, h5, h6) {
+  margin-top: 2rem;
+}
+
 .truss-step-actions {
   display: flex;
   flex-direction: column;
@@ -571,6 +575,7 @@
 .truss-step-body figcaption {
   font-size: 0.9rem;
   color: var(--text-color-deemphasized, #6a6a6a);
+  margin-top: 0.275rem;
 }
 
 /* ---- Dialog ---- */
