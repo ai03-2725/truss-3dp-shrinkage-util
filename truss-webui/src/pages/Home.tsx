@@ -1,4 +1,6 @@
 import type { AppApi } from '../lib/app-api.ts'
+import { Icon } from '../components/Icon.tsx'
+import { icons } from '../lib/icons.ts'
 
 export function Home(props: { app: AppApi }) {
   const hasPrinters = () => props.app.printers().length > 0
@@ -68,6 +70,29 @@ export function Home(props: { app: AppApi }) {
             </span>
           </span>
         </button>
+      </div>
+
+      <div class="truss-home-links">
+        <a
+          class="truss-icon-button"
+          href="https://github.com/ai03-2725/truss-3dp-shrinkage-util"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View the source on GitHub"
+          title="GitHub repository"
+        >
+          <Icon svg={icons.githubLogoLight} />
+        </a>
+        <a
+          class="truss-icon-button"
+          href="https://ai03.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="ai03.com"
+          title="ai03.com"
+        >
+          <Icon svg={icons.houseLineLight} />
+        </a>
       </div>
     </main>
   )

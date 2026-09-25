@@ -1,5 +1,6 @@
-import type { JSX } from 'solid-js'
+import { Show, type JSX } from 'solid-js'
 import type { AppApi } from '../lib/app-api.ts'
+import { flowProgress } from '../lib/flow.ts'
 import { Icon } from './Icon.tsx'
 import { icons } from '../lib/icons.ts'
 
@@ -15,9 +16,33 @@ export function FlowFrame(props: {
   nextClass?: string
   children: JSX.Element
 }) {
+  const progress = () => flowProgress(props.app.screen(), props.app.skipEquipment())
+
   return (
     <main class="container truss-flow" aria-labelledby="truss-step-title">
       <div class="truss-flow-topbar">
+        <Show when={progress()}>
+          {(value) => (
+            <div class="truss-progress">
+              <span class="truss-progress-label">
+                Step {value().current} of {value().total}
+              </span>
+              <div
+                class="truss-progress-track"
+                role="progressbar"
+                aria-valuemin={1}
+                aria-valuemax={value().total}
+                aria-valuenow={value().current}
+                aria-label="Calibration progress"
+              >
+                <div
+                  class="truss-progress-fill"
+                  style={{ width: `${(value().current / value().total) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </Show>
         <button
           type="button"
           class="truss-icon-button"

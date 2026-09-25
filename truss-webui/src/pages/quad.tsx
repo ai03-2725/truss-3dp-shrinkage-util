@@ -115,7 +115,7 @@ export function QuadFilament(props: { app: AppApi }) {
     <FlowFrame
       app={props.app}
       title="Filament tuning"
-      onBack={props.app.back}
+      onBack={props.app.skipEquipment() ? undefined : props.app.back}
       onNext={() => props.app.setStep('quad-slice')}
       nextDisabled={!complete()}
     >

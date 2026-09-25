@@ -74,6 +74,14 @@
   margin-inline: auto;
 }
 
+/* Row of external links (GitHub, ai03.com) centred below the menu cards. */
+.truss-home-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
 /* The whole card is one button. A grey shell holds a white content panel and a
    separate action area that shows the arrow (plus a label on narrow screens). */
 .truss-card {
@@ -199,7 +207,43 @@
 
 .truss-flow-topbar {
   display: flex;
+  align-items: center;
+  gap: 1rem;
+  /* Right-align a lone action (e.g. Manage printers) so it keeps the X on the
+     right; the progress element pushes itself left with margin-right: auto. */
   justify-content: flex-end;
+}
+
+/* Step indicator with a progress bar to its right. */
+.truss-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.truss-progress-label {
+  font-family: var(--font-body);
+  color: var(--text-color-deemphasized, #6a6a6a);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.truss-progress-track {
+  width: clamp(6rem, 24vw, 14rem);
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #e4e4e4;
+  overflow: hidden;
+}
+
+.truss-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--button-bg-primary, #414141);
+  transition: width 200ms ease;
 }
 
 .truss-step-body {
