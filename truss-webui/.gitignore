@@ -13,9 +13,9 @@ dist-ssr
 *.local
 
 # Generated guide images (see scripts/generate-images.ts). Run
-# `pnpm generate:images` to (re)create missing AVIFs; sources stay in
+# `pnpm generate:images` to (re)create missing JPEGs; sources stay in
 # Documentation/Images/.
-src/assets/images/*.avif
+src/assets/images/*.jpg
 src/assets/images/.*.tmp-*
 
 # Editor directories and files
