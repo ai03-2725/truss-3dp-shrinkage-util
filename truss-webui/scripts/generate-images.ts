@@ -1,4 +1,4 @@
-// Generates the AVIF copies of the guide images used by the web app.
+// Generates the JPEG copies of the guide images used by the web app.
 //
 // Source of truth: Documentation/Images/. Outputs are written next to the
 // existing Vite asset imports under src/assets/images/ and are intentionally
@@ -24,7 +24,7 @@ export const DEFAULT_SOURCE_DIR = resolve(SCRIPT_DIR, '..', '..', 'Documentation
 export const DEFAULT_OUTPUT_DIR = resolve(SCRIPT_DIR, '..', 'src', 'assets', 'images')
 
 export const MAX_DIMENSION = 2560
-export const AVIF_QUALITY = 60
+export const JPEG_QUALITY = 90
 
 // The 30 images imported by src/lib/assets.ts. `truss-dual.png` is deliberately
 // absent: the app does not use it.
@@ -62,7 +62,7 @@ export const SOURCE_FILENAMES = [
 ]
 
 export function outputName(source: string): string {
-  return basename(source, extname(source)) + '.avif'
+  return basename(source, extname(source)) + '.jpg'
 }
 
 export function assertUniqueOutputNames(files: string[]): void {
@@ -140,7 +140,7 @@ export async function generateImages(options: GenerateOptions = {}): Promise<Gen
           fit: 'inside',
           withoutEnlargement: true,
         })
-        .avif({ quality: AVIF_QUALITY })
+        .jpeg({ quality: JPEG_QUALITY })
         .toFile(temporary)
       renameSync(temporary, destination)
     } catch (error) {

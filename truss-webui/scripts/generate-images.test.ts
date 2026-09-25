@@ -1,4 +1,4 @@
-// Focused checks for the AVIF generator. These run under `node --test` with
+// Focused checks for the JPEG generator. These run under `node --test` with
 // Node's TypeScript type stripping, so they rely only on the standard library,
 // `sharp` (already a dev dependency), and the real repository sources.
 import { test } from 'node:test'
@@ -18,7 +18,7 @@ import { join } from 'node:path'
 import sharp from 'sharp'
 
 import {
-  AVIF_QUALITY,
+  JPEG_QUALITY,
   DEFAULT_SOURCE_DIR,
   MAX_DIMENSION,
   assertUniqueOutputNames,
@@ -36,19 +36,19 @@ function silent(): (message: string) => void {
   return () => {}
 }
 
-test('outputName maps each source to a same-basename .avif', () => {
-  assert.equal(outputName('caliper-enter-top.jpg'), 'caliper-enter-top.avif')
-  assert.equal(outputName('inner-measurement-walls.png'), 'inner-measurement-walls.avif')
+test('outputName maps each source to a same-basename .jpg', () => {
+  assert.equal(outputName('caliper-enter-top.jpg'), 'caliper-enter-top.jpg')
+  assert.equal(outputName('inner-measurement-walls.png'), 'inner-measurement-walls.jpg')
 })
 
 test('duplicate output basenames are rejected', () => {
   assert.throws(
     () => assertUniqueOutputNames(['photo.jpg', 'photo.png']),
-    /Duplicate output name "photo\.avif"/,
+    /Duplicate output name "photo\.jpg"/,
   )
 })
 
-test('outputs are AVIF, quality 60, aspect-preserving, and capped at 2560px', async (t) => {
+test('outputs are JPEG, quality 90, aspect-preserving, and capped at 2560px', async (t) => {
   const outputDir = tempDir(t)
   const files = [
     'caliper-enter-top.jpg', // 4080x3072, must shrink
@@ -64,7 +64,7 @@ test('outputs are AVIF, quality 60, aspect-preserving, and capped at 2560px', as
 
   assert.equal(generated.length, 2)
   assert.equal(skipped.length, 0)
-  assert.equal(AVIF_QUALITY, 60)
+  assert.equal(JPEG_QUALITY, 90)
 
   for (const file of files) {
     const destination = join(outputDir, outputName(file))
@@ -73,8 +73,8 @@ test('outputs are AVIF, quality 60, aspect-preserving, and capped at 2560px', as
     const sourceMeta = await sharp(join(DEFAULT_SOURCE_DIR, file)).metadata()
     const outputMeta = await sharp(destination).metadata()
 
-    assert.equal(outputMeta.mediaType, 'image/avif')
-    assert.equal(outputMeta.compression, 'av1')
+    assert.equal(outputMeta.mediaType, 'image/jpeg')
+    assert.equal(outputMeta.format, 'jpeg')
     assert.ok(outputMeta.width && outputMeta.height)
     assert.ok(
       Math.max(outputMeta.width, outputMeta.height) <= MAX_DIMENSION,
@@ -138,7 +138,7 @@ test('a missing source fails with its path and creates no output', async (t) => 
     /missing or unreadable.*does-not-exist\.jpg/,
   )
 
-  assert.equal(existsSync(join(outputDir, 'does-not-exist.avif')), false)
+  assert.equal(existsSync(join(outputDir, 'does-not-exist.jpg')), false)
 })
 
 test('an encode failure leaves no destination or temp file', async (t) => {
@@ -153,9 +153,9 @@ test('an encode failure leaves no destination or temp file', async (t) => {
       files: ['bogus.jpg'],
       log: silent(),
     }),
-    /Failed to generate .*bogus\.avif/,
+    /Failed to generate .*bogus\.jpg/,
   )
 
-  assert.equal(existsSync(join(outputDir, 'bogus.avif')), false)
+  assert.equal(existsSync(join(outputDir, 'bogus.jpg')), false)
   assert.deepEqual(readdirSync(outputDir), [])
 })

@@ -36,25 +36,25 @@ and `formatPercent`.
 
 ## Guide images
 
-The app's guide images are generated as AVIF from the documentation originals in
+The app's guide images are generated as JPEG from the documentation originals in
 `../Documentation/Images/`. Those originals are the single source of truth and are never
 modified. Generated files live in `src/assets/images/` and are git-ignored, so a fresh
 clone has none until you generate them.
 
 ```bash
-pnpm generate:images   # create any missing AVIF outputs
+pnpm generate:images   # create any missing JPEG outputs
 ```
 
 `pnpm dev`, `pnpm build`, and `pnpm test` run this step automatically before they start,
 so a clean checkout can run any of them without a separate manual step. Existing outputs
 are always skipped and never re-encoded, and the source files are assumed immutable: to
-change the conversion settings or a source image, delete the affected `.avif` outputs and
+change the conversion settings or a source image, delete the affected `.jpg` outputs and
 regenerate. A missing or unreadable source, or a failed encode, aborts with a nonzero exit
 and a message naming the affected path.
 
 An embedding host that imports the app must run `pnpm generate:images` in this directory
 **before** its own build, since only the app's own `dev`/`build`/`test` scripts trigger
-generation. The deployed `dist/` bundles the AVIF files and does not need access to
+generation. The deployed `dist/` bundles the JPEG files and does not need access to
 `Documentation/Images/` at runtime.
 
 ## Architecture
@@ -94,7 +94,7 @@ Requirements:
   consistent typography, forms, and buttons. App-specific styles are already bundled from
   `src/local.css` and are all `truss-`-prefixed, so they will not collide with host CSS.
 - Run `pnpm generate:images` in `truss-webui/` before the host's build so the imported
-  AVIF guide images exist; the host's build is not one of the scripts that generates them.
+  JPEG guide images exist; the host's build is not one of the scripts that generates them.
 - No path-based routing is used, and the app never reads or writes the URL.
 - Assets (images and the Quad/Single STLs) are bundled by Vite, so the host's URL path and
   root-relative asset assumptions do not matter.
@@ -136,7 +136,7 @@ focus trapping/return.
 ## Manual verification still required
 
 Automated tests cover the formulas, input validation and warning boundaries, JSON
-import/export, and persistence/resume/clear behavior, plus image generation (AVIF format,
+import/export, and persistence/resume/clear behavior, plus image generation (JPEG format,
 sizing, skip/rerun, and failure handling). These were not run in a real browser
 in the implementation environment and should be confirmed before release:
 
