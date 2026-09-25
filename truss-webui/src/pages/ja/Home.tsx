@@ -8,22 +8,22 @@ import { icons } from '../../lib/icons.ts'
 export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
   return (
     <main class="container truss-home">
-      <h1 class="text-center">Trussキャリブレーター</h1>
+      <h1 class="text-center">Truss Calibrator</h1>
       <p class="text-center">
-        フィラメントのXY収縮を素早く正確に校正し、時間とフィラメントの無駄を最小限に抑えます。
+        3Dプリンター用フィラメントの熱収縮率を測定・補正するツール
       </p>
 
       <div class="truss-card-list">
         <button type="button" class="truss-card" onClick={props.app.startQuad}>
           <span class="truss-card-content">
-            <span class="truss-card-title">クアッドビーム校正</span>
+            <span class="truss-card-title">４軸補正</span>
             <span class="truss-card-body">
-              本格的な校正を実行します。 <br/>
-              使用するプリンターでTrussキャリブレーターを初めて使う場合はここから始めてください。
+              4つの軸（X/Y/斜め2つ）を測定し補正を行います。 <br/>
+              使用するプリンターでTrussを初めて使う場合はここから始めてください。
             </span>
           </span>
           <span class="truss-card-action">
-            <span class="truss-card-action-label">本校正を開始</span>
+            <span class="truss-card-action-label">Start</span>
             <span class="truss-card-arrow" aria-hidden="true">
               →
             </span>
@@ -37,10 +37,10 @@ export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
           disabled={!props.hasPrinters}
         >
           <span class="truss-card-content">
-            <span class="truss-card-title">シングルビーム校正</span>
+            <span class="truss-card-title">１軸補正</span>
             <span class="truss-card-body">
-              迅速な校正を実行します。 <br/>
-              使用するプリンターでクアッドビーム校正をすでに実行済みの場合に使用します。
+              1軸（X軸）のみの測定から4軸の数値を外挿することで、素早く収縮補正を行います。 <br/>
+              過去に4軸補正で利用したプリンターを再度使う際にはこちらをご利用ください。
             </span>
             {!props.hasPrinters && (
               <span class="truss-card-note">
@@ -50,7 +50,7 @@ export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
             )}
           </span>
           <span class="truss-card-action">
-            <span class="truss-card-action-label">簡易校正を開始</span>
+            <span class="truss-card-action-label">Start</span>
             <span class="truss-card-arrow" aria-hidden="true">
               →
             </span>
@@ -61,7 +61,7 @@ export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
           <span class="truss-card-content">
             <span class="truss-card-title">プリンター管理</span>
             <span class="truss-card-body">
-              保存済みプリンタープロファイルの編集とインポート/エクスポート。
+              保存済みのプリンターの編集、保存、読み込みなどを行えます。
             </span>
           </span>
           <span class="truss-card-action">
@@ -74,8 +74,8 @@ export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
 
         <button type="button" class="truss-card" onClick={props.app.openAbout}>
           <span class="truss-card-content">
-            <span class="truss-card-title">このツールについて</span>
-            <span class="truss-card-body">Trussキャリブレーターの概要。</span>
+            <span class="truss-card-title">概要</span>
+            <span class="truss-card-body">Truss Calibratorについての説明</span>
           </span>
           <span class="truss-card-action">
             <span class="truss-card-action-label">このツールについて</span>
