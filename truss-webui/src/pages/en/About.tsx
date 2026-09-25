@@ -11,6 +11,7 @@ export function AboutContent(props: { app: AppApi }) {
   return (
     <main class="container truss-about">
       <div class="truss-flow-topbar">
+        <LocaleSwitcher app={props.app} />
         <button
           type="button"
           class="truss-icon-button"
@@ -19,7 +20,6 @@ export function AboutContent(props: { app: AppApi }) {
         >
           <Icon svg={icons.house} />
         </button>
-        <LocaleSwitcher app={props.app} />
       </div>
 
       <h1>About</h1>

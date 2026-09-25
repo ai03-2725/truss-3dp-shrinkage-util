@@ -15,6 +15,7 @@ export function PrintersContent(props: PrintersContentProps) {
     <>
       <main class="container truss-printers">
         <div class="truss-flow-topbar">
+          <LocaleSwitcher app={props.app} />
           <button
             type="button"
             class="truss-icon-button"
@@ -23,7 +24,6 @@ export function PrintersContent(props: PrintersContentProps) {
           >
             <Icon svg={icons.house} />
           </button>
-          <LocaleSwitcher app={props.app} />
         </div>
 
         <h1>Manage printers</h1>
