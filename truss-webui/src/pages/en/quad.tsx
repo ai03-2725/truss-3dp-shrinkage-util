@@ -343,10 +343,11 @@ export function QuadResultContent(props: {
 
       <h3>Find your current filament XY shrinkage settings</h3>
       <p>
-        Edit the filament's settings and locate its current XY shrinkage value - this usually defaults to 100%. <br/>
+        Edit the filament's settings and locate its current XY shrinkage value ("XY Shrinakge" in OrcaSlicer, just "Shrinkage" in Bambu Studio) - this usually defaults to 100%. <br/>
         Please enter it below.  
       </p>
-      <Figure src={img.shrinkageAdjust1} alt="Locating the XY shrinkage setting in the filament settings" caption="XY shrinkage location in OrcaSlicer/Bambu Studio." />
+      <Figure src={img.shrinkageAdjust1Orca} alt="Locating the XY shrinkage setting in the filament settings in OrcaSlicer" caption="XY shrinkage location in OrcaSlicer." />
+      <Figure src={img.shrinkageAdjust1Bambu} alt="Locating the XY shrinkage setting in the filament settings in Bambu Studio" caption="Shrinkage location in Bambu Studio." />
 
       <div class="truss-field">
         <label for="quad-current-xy">Current XY shrinkage percentage in your slicer (%)</label>
@@ -379,9 +380,11 @@ export function QuadResultContent(props: {
 
       <h3>Applying the result</h3>
       <p>
-        Paste the updated shrinkage percentage from above into the same field you obtained the original shrinkage value from.
+        Paste the updated shrinkage percentage from above into the same field you obtained the original shrinkage value from. <br/>
+        Save the filament settings to apply.  
       </p>
-      <Figure src={img.shrinkageAdjust2} alt="The XY shrinkage value adjusted to the calculated percentage" caption="An example updated percentage." />
+      <Figure src={img.shrinkageAdjust2Orca} alt="The XY shrinkage value adjusted to the calculated percentage in OrcaSlicer" caption="Example updated percentage in OrcaSlicer." />
+      <Figure src={img.shrinkageAdjust2Bambu} alt="The XY shrinkage value adjusted to the calculated percentage in Bambu Studio" caption="Example updated percentage in Bambu Studio." />
 
       <p>
         For other slicers, adapt the steps as necessary.

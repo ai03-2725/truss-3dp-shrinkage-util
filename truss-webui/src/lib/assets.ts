@@ -22,10 +22,12 @@ import seamTool from '../assets/images/seam-tool.jpg'
 import seamToolJa from '../assets/images/seam-tool-ja.jpg'
 import seamVisibility from '../assets/images/seam-visibility.jpg'
 import seamVisibilityJa from '../assets/images/seam-visibility-ja.jpg'
-import shrinkageAdjust1 from '../assets/images/shrinkage-adjust-1.jpg'
+import shrinkageAdjust1Orca from '../assets/images/shrinkage-adjust-1-orca.jpg'
+import shrinkageAdjust1Bambu from '../assets/images/shrinkage-adjust-1-bambu.jpg'
 import shrinkageAdjust1JaOrca from '../assets/images/shrinkage-adjust-1-ja-orca.jpg'
 import shrinkageAdjust1JaBambu from '../assets/images/shrinkage-adjust-1-ja-bambu.jpg'
-import shrinkageAdjust2 from '../assets/images/shrinkage-adjust-2.jpg'
+import shrinkageAdjust2Orca from '../assets/images/shrinkage-adjust-2-orca.jpg'
+import shrinkageAdjust2Bambu from '../assets/images/shrinkage-adjust-2-bambu.jpg'
 import shrinkageAdjust2JaOrca from '../assets/images/shrinkage-adjust-2-ja-orca.jpg'
 import shrinkageAdjust2JaBambu from '../assets/images/shrinkage-adjust-2-ja-bambu.jpg'
 import singleMeasurementInner from '../assets/images/single-measurement-inner.jpg'
@@ -63,10 +65,12 @@ export const img = {
   seamToolJa,
   seamVisibility,
   seamVisibilityJa,
-  shrinkageAdjust1,
+  shrinkageAdjust1Orca,
+  shrinkageAdjust1Bambu,
   shrinkageAdjust1JaOrca,
   shrinkageAdjust1JaBambu,
-  shrinkageAdjust2,
+  shrinkageAdjust2Orca,
+  shrinkageAdjust2Bambu,
   shrinkageAdjust2JaOrca,
   shrinkageAdjust2JaBambu,
   singleMeasurementInner,
