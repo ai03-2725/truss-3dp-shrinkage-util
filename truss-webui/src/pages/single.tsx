@@ -29,12 +29,12 @@ export function SinglePrinter(props: { app: AppApi }) {
       onNext={() => props.app.setStep('single-filament')}
       nextDisabled={selected() === ''}
     >
-      <p>Select the saved printer you are calibrating. Its stored extrapolation factor is applied to your measurements.</p>
+      <p>Select the saved printer you are calibrating with.</p>
 
       {printers().length === 0 ? (
         <p class="truss-note">
-          No printers are saved. Run a Quad calibration first, or add or import a printer from Manage
-          printers.
+          No printers are saved. Run a Quad-Beam calibration first, or add or import a printer from Manage
+          printers menu.
         </p>
       ) : (
         <fieldset class="truss-printer-picker">
@@ -71,7 +71,7 @@ export function SingleFilament(props: { app: AppApi }) {
       onNext={() => props.app.setStep('single-slice')}
       nextDisabled={!complete()}
     >
-      <p>Make sure your filament has undergone prerequisite calibration.</p>
+      <p>Make sure your filament has completed all prerequisite tuning.</p>
       <ul class="truss-checklist">
         <li>
           <label class="truss-checkbox">
@@ -81,8 +81,9 @@ export function SingleFilament(props: { app: AppApi }) {
               onChange={(event) => props.app.updateTuning({ temperature: event.currentTarget.checked })}
             />
             <span>
-              <strong>Temperature settings.</strong> The manufacturer's recommended settings are
-              usually enough; any issues will usually become evident in the later calibrations.
+              <strong>Temperature settings.</strong><br/>
+              The manufacturer's recommended settings are usually enough. <br/>
+              If you are printing a temperature tower, breaking it to test layer adhesion is strongly recommended.
             </span>
           </label>
         </li>
@@ -94,8 +95,9 @@ export function SingleFilament(props: { app: AppApi }) {
               onChange={(event) => props.app.updateTuning({ pressure: event.currentTarget.checked })}
             />
             <span>
-              <strong>Pressure Advance / Flow Dynamics.</strong> Calibrate it and make sure the value is
-              actually applied to the printer before starting.
+              <strong>Pressure Advance / Flow Dynamics.</strong> <br/>
+              It is recommended to use OrcaSlicer's calibration utilities (top menu bar → calibration → Pressure Advance) or Bambu Studio's calibration page (Calibration tab → Flow dynamics). <br/> 
+              Make sure the chosen value is properly applied to the printer (Bambu may need the K value selected from Device → Filament; Klipper devices may need to receive the <code>pressure_advance[0]</code> value or similar via start gcode.).
             </span>
           </label>
         </li>
@@ -107,7 +109,10 @@ export function SingleFilament(props: { app: AppApi }) {
               onChange={(event) => props.app.updateTuning({ flow: event.currentTarget.checked })}
             />
             <span>
-              <strong>Flow rate.</strong> Calibrate it with your slicer's built-in tools before starting.
+              <strong>Flow Rate / Flow Ratio.</strong> <br/>
+              It is recommended to use OrcaSlicer's calibration utilities (top menu bar → calibration → Flow Ratio; "YOLO single-pass" method highly recommended) or Bambu Studio's calibration page (Calibration tab → Flow rate). <br/> 
+              If using Bambu Studio's built-in two-pass calibration, pick the higher value when torn between two chips on the first pass - the
+              second pass only tests values below the first.
             </span>
           </label>
         </li>
@@ -120,8 +125,8 @@ export function SingleSlice(props: { app: AppApi }) {
   return (
     <FlowFrame app={props.app} title="Slice the Single beam" onBack={props.app.back} onNext={() => props.app.setStep('single-print')}>
       <p>
-        Download the Single calibration beam and slice it as described in the Quad guide. Make sure no
-        seams exist on the measurement faces.
+        Download the single-beam calibration model and slice it in your slicer. <br/>
+        This guide covers OrcaSlicer / Bambu Studio; adapt the steps as necessary for other slicers.
       </p>
 
       <p>
@@ -131,8 +136,25 @@ export function SingleSlice(props: { app: AppApi }) {
         </a>
       </p>
 
-      <Figure src={img.trussSingle} alt="The Single Truss calibration beam design" caption="The Single design." />
+      <Figure src={img.trussSingle} alt="The Single Truss calibration beam design" caption="The Single-Beam design." />
       <Figure src={img.slicedSingle} alt="The Single beam sliced in a slicer" caption="Keep seams off the measurement faces." />
+
+      <h3>Ensure no seams on measurement surfaces</h3>
+      <p>
+        As per the quad-beam calibration flow, ensure that there are no seams placed on the walls used for measurement. <br/>
+        Enable seam visibility if needed; if any seams need to be moved, adjust seam placement settings or use a manual seam painting tool.
+      </p>
+      <p>
+        The locations of the measurement walls for the quad-beam design are shown below for reference; simply check the ends of the single beam for the single beam file.
+      </p>
+
+      <div class="truss-image-grid">
+        <Figure src={img.outerMeasurementWalls} alt="Walls used for outer measurements" caption="Walls for outer measurements." />
+        <Figure src={img.innerMeasurementWalls} alt="Walls used for inner measurements" caption="Walls for inner measurements." />
+        <Figure src={img.seamVisibility} alt="Enabling seam visibility in the slicer preview" caption="Enabling seam visibility." />
+        <Figure src={img.seamTool} alt="The slicer's seam painting tool" caption="The seam painting tool in OrcaSlicer/Bambu Studio." />
+      </div>
+      <Figure src={img.outerSeamExample} alt="A seam relocated away from the measurement face" caption="Specifying seam location away from measurement walls using the seam paint tool." />
     </FlowFrame>
   )
 }
@@ -145,9 +167,10 @@ export function SinglePrint(props: { app: AppApi }) {
       <div class="truss-callout">
         <h3>Removing the print</h3>
         <p>
-          <strong>Do not force the print off the build plate.</strong> This may warp the print and make
-          the measurements meaningless. Wait for the print to fully cool, then remove it. Do not
-          measure the print while it is still attached to a build plate.
+          <strong>Do not force the print off the build plate</strong> - this may warp the print and render
+          the measurements meaningless. <br/>
+          Wait for the print to fully cool, then remove it from the build plate. <br/>
+          <strong>Do not measure the print while it is still attached to the build plate.</strong>
         </p>
       </div>
       <Figure src={img.singlePrinted} alt="A finished, cooled Single beam print" />
@@ -170,7 +193,8 @@ export function SingleMeasure(props: { app: AppApi }) {
     >
       <MeasurementWarnings />
 
-      <p>Measure these two dimensions across the X beam.</p>
+      <p>Measure these two dimensions across the beam - the inner and outer.</p>
+      <p>Tap/click the images to enlarge them as necessary and to zoom further.</p>
       <div class="truss-image-grid">
         <Figure src={img.outerMeasurementSingle} alt="Diagram of the outer measurement on the Single beam" caption="Outer measurement." />
         <Figure src={img.singleMeasurementOuter} alt="Photo of the outer measurement with calipers" />
@@ -181,7 +205,7 @@ export function SingleMeasure(props: { app: AppApi }) {
       <InnerJawGuidance
         note={
           <p class="truss-note">
-            These positioning photos are from the Quad design, but apply to all variants equally.
+            These positioning photos are from the quad-beam design; the same warnings apply all variants.
           </p>
         }
       />

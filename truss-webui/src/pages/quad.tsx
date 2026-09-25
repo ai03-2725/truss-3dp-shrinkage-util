@@ -184,7 +184,7 @@ export function QuadSlice(props: { app: AppApi }) {
         </a>
       </p>
 
-      <Figure src={img.trussQuad} alt="The Quad Truss calibration beam design" caption="The Quad design." />
+      <Figure src={img.trussQuad} alt="The Quad Truss calibration beam design" caption="The Quad-Beam design." />
 
       <p>
         Slice it with settings that print reliably and accurately - the print should not warp, curl, or overshoot from pushing speed too far.  
@@ -193,7 +193,7 @@ export function QuadSlice(props: { app: AppApi }) {
 
       <h3>Ensure no seams on measurement surfaces</h3>
       <p>
-        In the sliced preview, ensure that seams are not placed on the walls used for measurement shownn below. <br/>
+        In the sliced preview, ensure that there are no seams placed on the walls used for measurement (shown below). <br/>
         Enable seam visibility if needed; if any seams need to be moved, adjust seam placement settings or use a manual seam painting tool.
       </p>
       <div class="truss-image-grid">
