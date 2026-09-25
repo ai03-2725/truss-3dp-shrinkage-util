@@ -8,19 +8,16 @@ import { Figure } from '../../components/Figure.tsx'
 export function MeasurementWarningsContent() {
   return (
     <div class="truss-callout">
-      <h3>測定の前に</h3>
+      <h3>測定する際の注意点</h3>
       <ol>
         <li>
-          <strong>ノギスで過剰な力を加えないでください。</strong>Trussキャリブレーターは可能な限り
-          乱暴な扱いに耐えるよう設計されていますが、3Dプリントされたプラスチックはすべて弾性があります。
-          過剰な力を加えるとプリントが変形し、実際に印刷された寸法より大きくも小さくも測定されてしまいます。 <br/>
-          理想的にはノギスがまったく力を加えない状態にしてください。クランプ側から手を離し、必要なら
-          プリントがノギスを押し戻すようにします。ノギスにサムホイール式のローラーがある場合、
-          それを使って過剰な力を加えないでください。
+          <strong>ノギスで過度な力を加えないでください。</strong><br/>
+          Trussはある程度の圧力に耐えるよう設計されていますが、プラスチックには弾性があります。過度な力を加えるとプリントが変形し、計測する寸法が変化してしまう可能性があります。 <br/>
+          可能であればノギスがプリントにまったく圧を加えていない状態で計測してください。ノギスにサムローラーが付いている場合、計測中にサムローラーで力を加えないでください。
         </li>
         <li>
-          <strong>測定する寸法と平行に測ってください。</strong>ノギスが大きく傾いていると、
-          寸法を正しく測定できません。
+          <strong>測定する寸法と平行に測ってください。</strong><br/>
+          ノギスが大きく傾いている場合、寸法を正しく測定できません。
         </li>
       </ol>
     </div>
@@ -32,9 +29,9 @@ export function MeasurementWarningsContent() {
 export function InnerJawGuidanceContent(props: { note?: JSX.Element }) {
   return (
     <div class="truss-guidance">
-      <h3>内側寸法の測定</h3>
+      <h3>内側の寸法の測定方法</h3>
       <p>
-        以下に説明するように、ノギスが正しく位置決めされていることを確認してください。
+        内側の寸法を計測する際、ノギスが正しい位置にあることを確認してください。
       </p>
       {props.note}
 
@@ -45,15 +42,14 @@ export function InnerJawGuidanceContent(props: { note?: JSX.Element }) {
           <Figure src={img.caliperEnterTop} alt="ノギスをプリントの上面から差し込む" />
         </li>
         <li>
-          ノギスの<strong>平らな内側の面を、梁の途中にある支持壁に密着</strong>させます。
+          ノギスの<strong>平らな内側の面を、梁の中間にある支持面に密着</strong>させます。
           <Figure
             src={img.innerCorrect1}
             alt="一方の端で、ノギスの内側ジョーを支持壁に密着させる"
           />
         </li>
         <li>
-          ノギスの<strong>両端</strong>で同様にします（片側を位置決めしている間に、もう片側が
-          ずれないよう注意してください）。
+          ノギスの<strong>両端</strong>が同様に配置してあることを確認します。（片側の調整中に、もう片側がずれないよう注意してください）
           <Figure
             src={img.innerCorrect2}
             alt="もう一方の端で、ノギスの内側ジョーを支持壁に密着させる"
@@ -64,16 +60,14 @@ export function InnerJawGuidanceContent(props: { note?: JSX.Element }) {
       <h4>誤った例</h4>
       <ul>
         <li>
-          誤り：ノギスの内側の平面が支持壁に接触していません。この場合、実際に印刷された
-          寸法より長い対角線の測定値になります。
+          ノギスの位置のミス：ノギスの内側の平面が支持壁に接触していません。この場合、測定したい寸法より長い対角線の測定値になります。
           <Figure
             src={img.calipersIncorrectGap}
             alt="ジョーと壁の間に隙間がある誤った内側測定"
           />
         </li>
         <li>
-          誤り：ノギスをプリントの下面から使用しています。ノギスの先端の斜めの面を、
-          中央の支持壁に向けてはいけません。
+          利用面のミス：ノギスをプリントの下面から差し込んでしています。ノギスの外側の斜めの面が中央の支持面に向いてしまっています。
           <Figure
             src={img.calipersIncorrectSide}
             alt="プリントの下面から行った誤った内側測定"

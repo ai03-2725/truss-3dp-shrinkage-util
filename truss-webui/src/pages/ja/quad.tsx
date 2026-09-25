@@ -17,7 +17,7 @@ export function QuadEquipmentContent(props: { app: AppApi; complete: boolean }) 
 
   return (
     <>
-      <p>開始する前に、次の3つの前提条件をすべて満たしていることを確認してください。</p>
+      <p>必要な機材が揃っていることを確認してください。</p>
       <ul class="truss-checklist">
         <li>
           <label class="truss-checkbox">
@@ -27,9 +27,9 @@ export function QuadEquipmentContent(props: { app: AppApi; complete: boolean }) 
               onChange={(event) => props.app.updateEquipment({ calipers: event.currentTarget.checked })}
             />
             <span>
-              <strong>現代的で信頼できるデジタルノギス。</strong> <br/>
-              ノギスは幅140mmの対象物を測定できる十分な大きさが必要です。<br/>
-              また、誤差やドリフトなく安定して測定できる必要があります。<br/>
+              <strong>正確なノギス</strong> <br/>
+              幅140mmの印刷物を測定できるノギスを準備してください。<br/>
+              必要であれば事前に校正などを行い、正確に測定できる状態であることをご確認ください。
             </span>
           </label>
         </li>
@@ -41,9 +41,9 @@ export function QuadEquipmentContent(props: { app: AppApi; complete: boolean }) 
               onChange={(event) => props.app.updateEquipment({ printer: event.currentTarget.checked })}
             />
             <span>
-              <strong>正常に動作し校正済みの現代的なプリンター。</strong> <br/>
-              プリンターは、反り・カール・変形なく幅140mmの対象物を安定して印刷できる必要があります。 <br/>
-              自作プリンターの場合は、事前にすべての動作が正しく校正されていることを確認してください。Klipperを使用しているプリンターは、XYスキュー補正を算出して有効にしておくのが理想的です。
+              <strong>正しく動作する3Dプリンター</strong> <br/>
+              幅140mm程度のプリントデータを反りや変形なく印刷できる程度の性能が必要です。 <br/>
+              自作プリンターの場合、事前にすべての動作設定が正しく校正されていることを確認してください。Klipperを使用しているプリンターの場合、可能であればXY面の歪み補正（XY Skew Correction）を適用してください。
             </span>
           </label>
         </li>
@@ -55,8 +55,8 @@ export function QuadEquipmentContent(props: { app: AppApi; complete: boolean }) 
               onChange={(event) => props.app.updateEquipment({ slicer: event.currentTarget.checked })}
             />
             <span>
-              <strong>現代的なスライサー。</strong> <br/>
-              スライサーは提供されたシンプルなモデルを安定してスライスでき、フィラメントごとのXY収縮設定を備えている必要があります（例：OrcaSlicer、Bambu Studio、SuperSlicer）。
+              <strong>現代的なスライサー</strong> <br/>
+              補正用モデルを正しくスライスでき、フィラメントごとのXY収縮率（XY Shrinkage）を設定できるスライサー（OrcaSlicer、Bambu Studio、SuperSlicerなど）をご利用ください。<br/>
             </span>
           </label>
         </li>
@@ -69,7 +69,7 @@ export function QuadEquipmentContent(props: { app: AppApi; complete: boolean }) 
           checked={props.app.skipEquipment()}
           onChange={(event) => props.app.setSkipEquipment(event.currentTarget.checked)}
         />
-        <small>次回から確認しない - 今後の校正でこの画面をスキップする</small>
+        <small>次回から確認しない - 今後この画面をスキップする</small>
       </label>
     </>
   )
@@ -90,9 +90,9 @@ export function QuadFilamentContent(props: { app: AppApi }) {
               onChange={(event) => props.app.updateTuning({ temperature: event.currentTarget.checked })}
             />
             <span>
-              <strong>温度設定。</strong><br/>
-              通常はメーカー推奨の設定で十分です。 <br/>
-              温度タワーを印刷する場合は、折って層間接着を確認することを強くおすすめします。
+              <strong>温度設定</strong><br/>
+              ほとんどの場合はメーカー推奨の設定で十分です。 <br/>
+              温度タワーを印刷する場合、タワーを折って層間接着を確認することを強くおすすめします。
             </span>
           </label>
         </li>
@@ -104,9 +104,9 @@ export function QuadFilamentContent(props: { app: AppApi }) {
               onChange={(event) => props.app.updateTuning({ pressure: event.currentTarget.checked })}
             />
             <span>
-              <strong>プレッシャーアドバンス / フローダイナミクス。</strong> <br/>
-              OrcaSlicerの校正ユーティリティ（上部メニューバー → 校正 → Pressure Advance）またはBambu Studioの校正ページ（Calibrationタブ → Flow dynamics）の使用をおすすめします。 <br/> 
-              選択した値がプリンターに正しく適用されていることを確認してください（BambuではDevice → FilamentからK値を選択する必要がある場合があります。Klipperデバイスでは、スタートGコードなどで<code>pressure_advance[0]</code>などの値を受け取る必要がある場合があります）。
+              <strong>圧力アドバンス / 動的流量</strong> <br/>
+              OrcaSlicerのキャリブレーションツール（上部メニューバー → キャリブレーション → 圧力アドバンス）またはBambu Studioのキャリブレーションページ（キャリブレーションタブ → 動的流量）の使用をおすすめします。 <br/> 
+              測定した値がプリンターに正しく適用されていることをご確認ください。（Bambuプリンターの場合はデバイス → フィラメントからK値を選択、Klipperプリンターの場合は開始G-codeなどで<code>pressure_advance[0]</code>などの値をプリンターに適用）
             </span>
           </label>
         </li>
@@ -118,9 +118,9 @@ export function QuadFilamentContent(props: { app: AppApi }) {
               onChange={(event) => props.app.updateTuning({ flow: event.currentTarget.checked })}
             />
             <span>
-              <strong>流量 / フロー比。</strong> <br/>
-              OrcaSlicerの校正ユーティリティ（上部メニューバー → 校正 → Flow Ratio。「YOLO single-pass」方式を強く推奨）またはBambu Studioの校正ページ（Calibrationタブ → Flow rate）の使用をおすすめします。 <br/> 
-              Bambu Studio内蔵の2パス校正を使う場合、1回目で2つのチップのどちらを選ぶか迷ったら高い方の値を選んでください。2回目は1回目より低い値のみをテストします。
+              <strong>流量比</strong> <br/>
+              OrcaSlicerのキャリブレーションツール（上部メニューバー → キャリブレーション → 流量比、「YOLO」方式を推奨）またはBambu Studioのキャリブレーションページ（キャリブレーションタブ → 流量）の使用をおすすめします。 <br/> 
+              Bambu Studio内蔵の2段階キャリブレーションを使う場合、もし1段階目で2つのチップのどちらを選ぶかで迷った場合、数値が高い方を選んでください。2段階目は1段階目で選んだ値より低い値のみをテストします。
             </span>
           </label>
         </li>
@@ -133,36 +133,37 @@ export function QuadSliceContent() {
   return (
     <>
       <p>
-       クアッドビーム校正モデルをダウンロードし、お使いのスライサーでスライスしてください。 <br/>
-        このガイドはOrcaSlicer / Bambu Studioを対象としています。他のスライサーでは手順を適宜読み替えてください。
+        4軸補正の3Dモデルをダウンロードし、お使いのスライサーでスライスしてください。 <br/>
+        このガイドはOrcaSlicer / Bambu Studioを対象としています。他のスライサーをご利用の場合、必要に応じて手順を変更してください。
       </p>
 
       <p>
         <a class="button truss-icon-label" href={stl.quad} download="Truss Calibration Beam Quad.stl">
           <Icon svg={icons.downloadSimple} />
-          クアッド校正ビームをダウンロード（STL）
+          4軸補正用モデルをダウンロード（Truss Calibration Beam Quad.stl）
         </a>
       </p>
 
-      <Figure src={img.trussQuad} alt="クアッドTruss校正ビームの設計" caption="クアッドビーム設計。" />
+      <Figure src={img.trussQuad} alt="4軸補正用モデル" caption="4軸補正用モデル" />
 
       <p>
-        安定して正確に印刷できる設定でスライスしてください。速度を上げすぎて反り・カール・オーバーシュートが発生しないようにします。  
+        正確かつ確実に印刷できる設定でスライスしてください。<br/>
+        印刷時に曲がり角などで移動の超過が起きるほど早く印刷したり、反りなどの製造不備が発生するような設定は避けてください。
       </p>
-      <Figure src={img.slicerLoaded} alt="スライサーに読み込まれたクアッドビーム" />
+      <Figure src={img.slicerLoaded} alt="スライサーに読み込まれた4軸補正用モデル" />
 
-      <h3>測定面にシームがないことを確認する</h3>
+      <h3>測定面に継ぎ目がないことを確認する</h3>
       <p>
-        スライス後のプレビューで、測定に使用する壁（下図）にシームが配置されていないことを確認してください。 <br/>
-        必要に応じてシーム表示を有効にし、移動が必要なシームがあればシーム配置設定を調整するか、手動のシームペイントツールを使用してください。
+        スライス後のプレビュー画面で継ぎ目表示を有効にし、測定に使用する面（下図）に継ぎ目が配置されていないことを確認してください。 <br/>
+        継ぎ目の移動が必要な場合、継ぎ目位置の設定の調整または手動の継ぎ目ペイントツールを使用してください。
       </p>
       <div class="truss-image-grid">
-        <Figure src={img.outerMeasurementWalls} alt="外側測定に使用する壁" caption="外側測定用の壁。" />
-        <Figure src={img.innerMeasurementWalls} alt="内側測定に使用する壁" caption="内側測定用の壁。" />
-        <Figure src={img.seamVisibility} alt="スライサープレビューでシーム表示を有効にする" caption="シーム表示の有効化。" />
-        <Figure src={img.seamTool} alt="スライサーのシームペイントツール" caption="OrcaSlicer/Bambu Studioのシームペイントツール。" />
+        <Figure src={img.outerMeasurementWalls} alt="外側の測定に使用する面" caption="外側の測定用の面" />
+        <Figure src={img.innerMeasurementWalls} alt="内側の測定に使用する面" caption="内側の測定用の面" />
+        <Figure src={img.seamVisibilityJa} alt="継ぎ目表示の有効化" caption="継ぎ目表示の有効化" />
+        <Figure src={img.seamToolJa} alt="継ぎ目ペイントツール" caption="OrcaSlicer/Bambu Studioの継ぎ目ペイントツール。" />
       </div>
-      <Figure src={img.outerSeamExample} alt="測定面から離れた位置に移動したシーム" caption="シームペイントツールでシーム位置を測定壁から離して指定する。" />
+      <Figure src={img.outerSeamExampleJa} alt="継ぎ目ペイントツール利用の例" caption="継ぎ目ペイントツールで測定面以外を指定した例" />
     </>
   )
 }
@@ -173,15 +174,15 @@ export function QuadPrintContent() {
       <p>スライスしたファイルを印刷します。</p>
       <Figure src={img.printingQuad} alt="印刷中のクアッドビーム" />
       <div class="truss-callout">
-        <h3>プリントの取り外し</h3>
+        <h3>プリントの取り出し</h3>
         <p>
-          <strong>プリントをビルドプレートから無理に剥がさないでください</strong>。プリントが反り、
-          測定値が無意味になるおそれがあります。 <br/>
-          プリントが完全に冷えるまで待ってから、ビルドプレートから取り外してください。 <br/>
-          <strong>ビルドプレートに付いたままのプリントを測定しないでください。</strong>
+          <strong>プリントをビルドプレートから無理やり剥がさないでください</strong>。プリントが反ってしまい、
+          測定値が無効になるおそれがあります。 <br/>
+          プリントが完全に冷えるまで待ってから、ビルドプレートから慎重に取り外してください。 <br/>
+          <strong>ビルドプレートに付いた状態のまま測定を行わないでください。</strong>
         </p>
       </div>
-      <Figure src={img.finishedPrint} alt="完成し冷却されたクアッドビームのプリント" caption="取り外して測定する前にプリントを冷ましてください。" />
+      <Figure src={img.finishedPrint} alt="取り外し前のプリント" caption="取り外し前のプリント" />
     </>
   )
 }
@@ -190,10 +191,10 @@ export function QuadLocateContent() {
   return (
     <>
       <p>
-        X軸に沿ったX梁を探します。プリントには<strong>X</strong>のラベルが付いています。
+        X軸に対応するX梁を見つけます。プリント本体にXのラベルが付いています。
       </p>
       <p>
-        注：文字は下に示す試作段階から拡大されています。実際に印刷したものはより読み取りやすく識別しやすくなっています。
+        注：以下の写真は試作品のものです。実際に印刷したファイルではラベルが拡大されて読みやすくなっているはずです。
       </p>
       <Figure src={img.xBeam} alt="プリント上でXラベルが付いたX梁" />
     </>
@@ -205,8 +206,8 @@ export function QuadXContent(props: { app: AppApi; beam: BeamInput }) {
     <>
       <MeasurementWarnings />
 
-      <p>X梁を横断する次の2つの寸法（外側と内側）を測定します。</p>
-      <p>必要に応じて画像をタップ/クリックして拡大し、さらにズームできます。</p>
+      <p>X梁の2つの計測点（外側と内側）を測定します。</p>
+      <p>必要に応じて画像をタップ/クリックし、拡大してご確認ください。</p>
       <div class="truss-image-grid">
         <Figure src={img.xOuterDiagram} alt="X外側測定の図" caption="外側測定。" />
         <Figure src={img.xOuterMeasurement} alt="ノギスによるX外側測定の写真" />
@@ -216,8 +217,8 @@ export function QuadXContent(props: { app: AppApi; beam: BeamInput }) {
 
       <InnerJawGuidance />
 
-      <p>寸法を測定したら、下に値を入力してください。 <br/>
-      常に正しい梁（Xが付いたもの）を測定していることを確認してください。</p>
+      <p>注意点を踏まえて寸法し、測定値をを入力してください。 <br/>
+      正しい梁（Xが付いたもの）を測定していることを確認してください。</p>
       <BeamFields
         idPrefix="quad-x"
         legend="X梁"
@@ -238,15 +239,15 @@ export function QuadYabContent(props: { app: AppApi; quad: QuadInput }) {
   return (
     <>
       <p>
-        残り3本の梁についても、同じ内側/外側の2つの測定を繰り返します。 <br/> 
-        正しい梁を測定し、正しい入力欄に値を入力していることを確認してください。
+        残り3本の梁を同様に測定してください。<br/> 
+        測定後、数値を入力してください。
       </p>
       <div class="truss-callout">
         <p>
-          X梁と同じ注意事項に従ってください。過剰な力を加えない、平行に合わせる、内側の梁を正しく測定する、の3点です。 
+          X梁と同じ注意事項に従って測定してください。
         </p>
         <p>
-          ページ下部の戻るボタンでいつでも前の手順を確認できます。入力した値はその都度保存されます。
+          ページ下部の「戻る」ボタンでいつでも前の手順を確認できます。入力した値は入力次第自動的に保存されます。
         </p>
       </div>
 
@@ -272,12 +273,12 @@ export function QuadNameContent(props: { app: AppApi; name: string; duplicate: b
   return (
     <>
       <p>
-        プリンターの特性はブラウザーに保存されます。これにより、今後シングルビームの簡易校正フローを利用できます。  <br/>
-        このプリンターに識別しやすい名前を付けてください。同じ機種を複数台お持ちの場合は、名前で個体を区別できるようにしてください。
+        この補正プリントに利用したプリンターの特性を保存します。今後はこの特性を参照し、1軸のみの簡易補正を利用できます。  <br/>
+        利用したプリンターを識別できる名前を入力してください。同じ機種を複数台持っている場合は、名前で個体を識別できるようにしてください。
       </p>
       <p class="truss-note">
-        この係数はこのプリンター固有のもので、スキューが一貫している間のみ有効です。後で
-        スキュー補正の変更やプリンターの分解整備によってスキュー設定を変更した場合は、クアッドビーム校正フローを再実行してください。
+        保存するデータはこのプリンター固有のもので、歪みなどの特性が変更されない限り有効です。<br/>
+        今後歪み補正の変更やプリンターの分解整備によって印刷の寸法特性が変化した場合は、再度4軸補正を行ってください。
       </p>
 
       <div class="truss-field">
@@ -301,7 +302,7 @@ export function QuadNameContent(props: { app: AppApi; name: string; duplicate: b
         )}
         {props.duplicate && (
           <p id="quad-printer-name-warning" class="truss-warning" role="status">
-            “{props.name.trim()}”という名前のプリンターはすでに存在します。続行すると保存済みの係数が上書きされます。
+            「{props.name.trim()}」という名前のプリンターはすでに存在します。続行すると保存済みのプリンターは上書きされます。
           </p>
         )}
       </div>
@@ -323,15 +324,15 @@ export function QuadResultContent(props: {
   return (
     <>
       <small>
-        このプリントの測定収縮率： <strong>{props.shrinkage}</strong>
+        測定された収縮率： <strong>{props.shrinkage}</strong>
       </small>
 
       {props.app.active()!.quadSaveFailed && (
         <div class="truss-callout truss-callout-warning">
-          <h3>プリンターの外摺係数を保存できませんでした</h3>
+          <h3>プリンターの特性係数を保存できませんでした</h3>
           <p>
-            ブラウザーのストレージが利用できないため、このプリンターのスキュー情報は今後のシングルビーム校正用に保存されませんでした。
-            後でプリンター管理から追加できるよう、手動で控えておいてください：
+            ブラウザーのストレージが利用できないため、このプリンターの特性係数を保存されませんでした。
+            後でプリンター管理メニューから追加できるよう、手動で控えておいてください：
           </p>
           <p class="truss-factor">
             <strong>{String(props.factor)}</strong>
@@ -339,15 +340,16 @@ export function QuadResultContent(props: {
         </div>
       )}
 
-      <h3>現在のフィラメントXY収縮設定を確認する</h3>
+      <h3>現在のフィラメント収縮設定を確認する</h3>
       <p>
-        フィラメントの設定を開き、現在のXY収縮値を確認します。通常は100%が初期値です。 <br/>
-        下に入力してください。  
+        スライサーでフィラメントの設定を開き、現在のXY面の収縮値（OrcaSlicerの場合は「Shrinkage (XY)」、Bambu Studioの場合は「収縮」）を確認します。ほとんどの場合、初期値は100%です。 <br/>
+        現在の収縮値を下の欄に入力してください。
       </p>
-      <Figure src={img.shrinkageAdjust1} alt="フィラメント設定でXY収縮設定を確認する" caption="OrcaSlicer/Bambu StudioでのXY収縮の場所。" />
+      <Figure src={img.shrinkageAdjust1JaOrca} alt="フィラメント設定（OrcaSlicer）" caption="OrcaSlicerのXY面収縮設定（「Shrinkage (XY)」 ）の場所" />
+      <Figure src={img.shrinkageAdjust1JaBambu} alt="フィラメント設定（Bambu Studio）" caption="Bambu Studioの収縮設定の場所" />
 
       <div class="truss-field">
-        <label for="quad-current-xy">スライサーでの現在のXY収縮率（%）</label>
+        <label for="quad-current-xy">現在のXY面の収縮設定（%）</label>
         <input
           id="quad-current-xy"
           type="text"
@@ -377,12 +379,14 @@ export function QuadResultContent(props: {
 
       <h3>結果を適用する</h3>
       <p>
-        上で求めた更新後の収縮率を、元の収縮値を取得したのと同じ欄に貼り付けます。
+        上で計算された結果を、元の収縮値と同じ欄に貼り付けます。
+        その後、フィラメントの設定を保存します。
       </p>
-      <Figure src={img.shrinkageAdjust2} alt="計算された割合に調整されたXY収縮値" caption="更新後の割合の例。" />
+      <Figure src={img.shrinkageAdjust2JaOrca} alt="変更後の例（OrcaSlicer）" caption="変更後の例（OrcaSlicer）" />
+      <Figure src={img.shrinkageAdjust2JaBambu} alt="変更後の例（Bambu Studio）" caption="変更後の例（Bambu Studio）" />
 
       <p>
-        他のスライサーでは、手順を適宜読み替えてください。
+        他のスライサーをご利用の場合、必要に応じて手順を変更してください。
       </p>
     </>
   )
