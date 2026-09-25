@@ -16,6 +16,7 @@ import { upsertPrinter } from './lib/printers.ts'
 import { ConfirmDialog } from './components/ConfirmDialog.tsx'
 import { Home } from './pages/Home.tsx'
 import { Printers } from './pages/Printers.tsx'
+import { About } from './pages/About.tsx'
 import {
   QuadEquipment,
   QuadFilament,
@@ -43,7 +44,7 @@ function App() {
   const [printers, setPrinters] = createSignal<Printer[]>(initial.state.printers)
   const [skipEquipment, setSkipEquipmentSignal] = createSignal(initial.state.skipEquipment)
   const [active, setActive] = createSignal<ActiveCalibration | null>(initial.state.active)
-  const [view, setView] = createSignal<'home' | 'printers'>('home')
+  const [view, setView] = createSignal<'home' | 'printers' | 'about'>('home')
   const [storageWarning, setStorageWarning] = createSignal<string | null>(initial.warning)
   const [exitConfirmOpen, setExitConfirmOpen] = createSignal(false)
 
@@ -130,6 +131,7 @@ function App() {
     startQuad,
     startSingle,
     openPrinters: () => setView('printers'),
+    openAbout: () => setView('about'),
     back,
     requestExit,
     finish,
@@ -171,6 +173,9 @@ function App() {
         </Match>
         <Match when={screen() === 'printers'}>
           <Printers app={api} />
+        </Match>
+        <Match when={screen() === 'about'}>
+          <About app={api} />
         </Match>
         <Match when={screen() === 'quad-equipment'}>
           <QuadEquipment app={api} />

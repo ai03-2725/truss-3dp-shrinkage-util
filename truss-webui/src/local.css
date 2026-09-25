@@ -5,6 +5,7 @@
 .truss-flow :focus-visible,
 .truss-home :focus-visible,
 .truss-printers :focus-visible,
+.truss-about :focus-visible,
 .truss-modal :focus-visible,
 .truss-lightbox :focus-visible {
   outline: 3px solid #1a5fb4;
@@ -435,6 +436,11 @@
 
 /* ---- Printers ---- */
 .truss-printers {
+  padding-block: 1rem 3rem;
+}
+
+/* ---- About ---- */
+.truss-about {
   padding-block: 1rem 3rem;
 }
 
