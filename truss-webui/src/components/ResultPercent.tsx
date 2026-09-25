@@ -45,7 +45,7 @@ export function ResultPercent(props: { percent: string | null }) {
 
   return (
     <>
-      <p>Updated XY shrinkage percentage to enter:</p>
+      <h6>Updated XY shrinkage percentage to use:</h6>
       <div class="truss-result-percent">
         <output class="truss-result-percent-value">
           {props.percent === null ? '—' : `${props.percent}%`}

@@ -425,15 +425,15 @@ export function QuadResult(props: { app: AppApi }) {
   return (
     <FlowFrame
       app={props.app}
-      title="Quad calibration result"
+      title="Calculating XY shrinkage"
       onNext={props.app.finish}
       nextLabel="Finish"
       nextClass="truss-button-secondary"
       nextDisabled={!currentValid()}
     >
-      <p>
-        Filament XY shrinkage value for this print: <strong>{formatShrinkage(shrinkage())}</strong>
-      </p>
+      <small>
+        Measured shrinkage ratio for this print: <strong>{formatShrinkage(shrinkage())}</strong>
+      </small>
 
       <Show when={props.app.active()!.quadSaveFailed}>
         <div class="truss-callout truss-callout-warning">
@@ -447,6 +447,13 @@ export function QuadResult(props: { app: AppApi }) {
           </p>
         </div>
       </Show>
+
+      <h3>Find your current filament XY shrinkage settings</h3>
+      <p>
+        Edit the filament's settings and locate its current XY shrinkage value - this usually defaults to 100%. <br/>
+        Please enter it below.  
+      </p>
+      <Figure src={img.shrinkageAdjust1} alt="Locating the XY shrinkage setting in the filament settings" caption="XY shrinkage location in OrcaSlicer/Bambu Studio." />
 
       <div class="truss-field">
         <label for="quad-current-xy">Current XY shrinkage percentage in your slicer (%)</label>
@@ -477,19 +484,14 @@ export function QuadResult(props: { app: AppApi }) {
 
       <ResultPercent percent={recommended() === null ? null : formatPercent(recommended()!)} />
 
-      <h3>Applying the result (OrcaSlicer / Bambu Studio)</h3>
+      <h3>Applying the result</h3>
       <p>
-        Edit the filament's settings and locate the XY shrinkage option. Multiply the existing value by
-        the shrinkage value above. For example, a shrinkage of 0.987 with an existing 100% gives
-        98.7%.
+        Paste the updated shrinkage percentage from above into the same field you obtained the original shrinkage value from.
       </p>
-      <div class="truss-image-grid">
-        <Figure src={img.shrinkageAdjust1} alt="Locating the XY shrinkage setting in the filament settings" caption="Locate XY shrinkage." />
-        <Figure src={img.shrinkageAdjust2} alt="The XY shrinkage value adjusted to the calculated percentage" caption="Enter the updated percentage." />
-      </div>
-      <p class="truss-note">
-        Using a different slicer? Adapt these instructions to find the equivalent per-filament XY
-        shrinkage setting.
+      <Figure src={img.shrinkageAdjust2} alt="The XY shrinkage value adjusted to the calculated percentage" caption="An example updated percentage." />
+
+      <p>
+        For other slicers, adapt the steps as necessary.
       </p>
     </FlowFrame>
   )
