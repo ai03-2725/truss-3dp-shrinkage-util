@@ -81,17 +81,18 @@ export function Home(props: { app: AppApi }) {
           aria-label="View the source on GitHub"
           title="GitHub repository"
         >
-          <Icon svg={icons.githubLogoLight} />
+          <Icon svg={icons.githubLogo} />
         </a>
         <a
           class="truss-icon-button"
           href="https://ai03.com"
-          target="_blank"
-          rel="noopener noreferrer"
+          // target="_blank"
+          target="_self"
+          // rel="noopener noreferrer"
           aria-label="ai03.com"
           title="ai03.com"
         >
-          <Icon svg={icons.houseLineLight} />
+          <Icon svg={icons.houseLine} />
         </a>
       </div>
     </main>
