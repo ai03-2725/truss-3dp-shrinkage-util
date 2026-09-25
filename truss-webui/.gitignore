@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Generated guide images (see scripts/generate-images.ts). Run
+# `pnpm generate:images` to (re)create missing AVIFs; sources stay in
+# Documentation/Images/.
+src/assets/images/*.avif
+src/assets/images/.*.tmp-*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

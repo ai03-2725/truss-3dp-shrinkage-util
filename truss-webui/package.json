@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "test": "node --test 'src/**/*.test.ts'",
+    "dev": "node scripts/generate-images.ts && vite",
+    "build": "node scripts/generate-images.ts && tsc -b && vite build",
+    "test": "node scripts/generate-images.ts && node --test 'src/**/*.test.ts' 'scripts/**/*.test.ts'",
+    "generate:images": "node scripts/generate-images.ts",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -15,6 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
+    "sharp": "^0.35.4",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
     "vite-plugin-solid": "^2.11.14"
