@@ -1,0 +1,116 @@
+// Japanese page content for Home. PLACEHOLDER: currently English wording, to be
+// translated before public release (implementation-plan task 9). Layout may differ
+// from English; shared behavior comes from the container.
+import type { AppApi } from '../../lib/app-api.ts'
+import { Icon } from '../../components/Icon.tsx'
+import { LocaleSwitcher } from '../../components/LocaleSwitcher.tsx'
+import { icons } from '../../lib/icons.ts'
+
+export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
+  return (
+    <main class="container truss-home">
+      <h1 class="text-center">Truss Calibrator</h1>
+      <p class="text-center">
+        Rapid, accurate calibration for filament XY shrinkage which minimizes wasted time and filament.
+      </p>
+
+      <div class="truss-card-list">
+        <button type="button" class="truss-card" onClick={props.app.startQuad}>
+          <span class="truss-card-content">
+            <span class="truss-card-title">Quad-Beam Calibration</span>
+            <span class="truss-card-body">
+              Runs a full calibration. <br/>
+              Start here if using Truss Calibrator for the first time on the printer being used.
+            </span>
+          </span>
+          <span class="truss-card-action">
+            <span class="truss-card-action-label">Start full calibration</span>
+            <span class="truss-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="truss-card"
+          onClick={props.app.startSingle}
+          disabled={!props.hasPrinters}
+        >
+          <span class="truss-card-content">
+            <span class="truss-card-title">Single-Beam Calibration</span>
+            <span class="truss-card-body">
+              Runs a rapid calibration. <br/>
+              Use this if you've already run a quad-beam calibration on the printer you will be using.
+            </span>
+            {!props.hasPrinters && (
+              <span class="truss-card-note">
+                A saved printer is required - run a quad-beam calibration first, or import a printer
+                from the manage printers menu.
+              </span>
+            )}
+          </span>
+          <span class="truss-card-action">
+            <span class="truss-card-action-label">Start rapid calibration</span>
+            <span class="truss-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </span>
+        </button>
+
+        <button type="button" class="truss-card" onClick={props.app.openPrinters}>
+          <span class="truss-card-content">
+            <span class="truss-card-title">Manage printers</span>
+            <span class="truss-card-body">
+              Edit and import/export saved printer profiles.
+            </span>
+          </span>
+          <span class="truss-card-action">
+            <span class="truss-card-action-label">Manage printers</span>
+            <span class="truss-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </span>
+        </button>
+
+        <button type="button" class="truss-card" onClick={props.app.openAbout}>
+          <span class="truss-card-content">
+            <span class="truss-card-title">About</span>
+            <span class="truss-card-body">About the Truss Calibrator tool.</span>
+          </span>
+          <span class="truss-card-action">
+            <span class="truss-card-action-label">About</span>
+            <span class="truss-card-arrow" aria-hidden="true">
+              →
+            </span>
+          </span>
+        </button>
+      </div>
+
+      <div class="truss-home-links">
+        <a
+          class="truss-icon-button"
+          href="https://github.com/ai03-2725/truss-3dp-shrinkage-util"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View the source on GitHub"
+          title="GitHub repository"
+        >
+          <Icon svg={icons.githubLogo} />
+        </a>
+        <a
+          class="truss-icon-button"
+          href="https://ai03.com"
+          // target="_blank"
+          target="_self"
+          // rel="noopener noreferrer"
+          aria-label="ai03.com"
+          title="ai03.com"
+        >
+          <Icon svg={icons.houseLine} />
+        </a>
+        <LocaleSwitcher app={props.app} />
+      </div>
+    </main>
+  )
+}

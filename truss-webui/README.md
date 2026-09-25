@@ -66,10 +66,44 @@ generation. The deployed `dist/` bundles the JPEG files and does not need access
   (profiles + JSON import/export), `storage.ts` (browser storage with an injectable
   surface for tests), `flow.ts` (step order), `assets.ts` (bundled asset URLs).
 - `src/pages/` holds the home, printer-management, and the Quad/Single step screens.
+  Each screen is a thin shared container in `src/pages/<Name>.tsx` that owns
+  validation/navigation and renders locale-selected body content from
+  `src/pages/en/` or `src/pages/ja/`.
 - `src/components/` holds the few shared pieces (flow chrome, number field, measurement
   fields, dialogs, guide fragments).
 - `src/styles/global.css` is the provided global stylesheet; `src/local.css` holds only
   `truss-`-prefixed app styles. There is no CSS reset and no path-based router.
+
+## Internationalization (English/Japanese)
+
+The UI supports `en` and `ja`. Language is chosen before the first render: a saved manual
+choice first, otherwise the first supported entry in `navigator.languages`, else English.
+A manual choice is stored under its own key (`truss-calibrator-locale`) so it never enters
+printer JSON or the calibration state, and `<html lang>` tracks it. If browser storage is
+unavailable the choice still applies for the session.
+
+Where to edit copy:
+
+- **Page-like, formatted copy** (headings, paragraphs, lists, figures, captions, alt text):
+  edit the matching file in `src/pages/en/` or `src/pages/ja/`. These files receive shared
+  state/callbacks as props and may reorder content, but must not duplicate behavior.
+- **Short shared messages** (flow chrome, field labels, warnings, dialogs, lightbox, errors):
+  edit `src/lib/messages.ts`. Dynamic failures (storage and printer/import errors) are
+  stored as stable codes and rendered through helpers there, so visible errors change
+  language immediately.
+- **Language options**: add a native display name to `LOCALE_NAMES` in `src/lib/locale.ts`.
+
+Adding a locale:
+
+1. Add its id to `SUPPORTED_LOCALES` and a native name to `LOCALE_NAMES` in
+   `src/lib/locale.ts`.
+2. Add a `Messages` entry in `src/lib/messages.ts`.
+3. Add `src/pages/<id>/` content files (Home, About, Printers, quad, single, guides) and
+   wire them in the shared containers in `src/pages/`.
+
+**Translation gate:** Japanese currently ships English placeholders (marked in each file).
+Completed, manually reviewed Japanese copy is a separate public-release requirement
+(implementation-plan task 9) and is not part of the feature milestone.
 
 ## Standalone deployment
 
@@ -149,3 +183,9 @@ Image delivery was smoke-checked in headless Chromium (desktop and a mobile view
 standalone `dist/` served from a nested URL loaded every guide image, and the enlarged
 lightbox stayed readable when zoomed. An actual embedding-host build was not available, and
 Firefox/WebKit were not exercised locally, so those remain outstanding.
+
+The English/Japanese milestone was smoke-checked in desktop Chrome and a 360px mobile
+viewport: locale detection and persistence, the switcher on Home/About/Manage printers/flow
+steps, mid-flow and mid-warning language switching, refresh/resume, both full flows with
+their results, and keyboard/Escape/focus behavior in the language popover. Mobile Safari,
+Firefox, and Edge, and real screen-reader passes, still need a manual check before release.

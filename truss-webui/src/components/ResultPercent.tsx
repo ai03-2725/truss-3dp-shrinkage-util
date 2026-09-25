@@ -1,6 +1,8 @@
 import { Show, createSignal, onCleanup } from 'solid-js'
 import { Icon } from './Icon.tsx'
 import { icons } from '../lib/icons.ts'
+import { useLocale } from '../lib/locale-context.ts'
+import { messages } from '../lib/messages.ts'
 
 // Copy with the Clipboard API, falling back to a hidden textarea for
 // non-secure-context deployments where the API is unavailable.
@@ -32,6 +34,8 @@ async function copyText(text: string): Promise<boolean> {
 // is the already-formatted value (without the % sign); null while invalid.
 export function ResultPercent(props: { percent: string | null }) {
   const [status, setStatus] = createSignal<'idle' | 'copied' | 'failed'>('idle')
+  const locale = useLocale()
+  const t = () => messages(locale())
   let timer: number | undefined
   onCleanup(() => clearTimeout(timer))
 
@@ -45,7 +49,7 @@ export function ResultPercent(props: { percent: string | null }) {
 
   return (
     <>
-      <h6>Updated XY shrinkage percentage to use:</h6>
+      <h6>{t().resultHeading}</h6>
       <div class="truss-result-percent">
         <output class="truss-result-percent-value">
           {props.percent === null ? '—' : `${props.percent}%`}
@@ -57,11 +61,11 @@ export function ResultPercent(props: { percent: string | null }) {
           disabled={props.percent === null}
         >
           <Icon svg={icons.copySimple} />
-          {status() === 'copied' ? 'Copied!' : 'Copy'}
+          {status() === 'copied' ? t().copied : t().copy}
         </button>
         <span class="truss-visually-hidden" role="status">
-          <Show when={status() === 'copied'}>Value copied to clipboard</Show>
-          <Show when={status() === 'failed'}>Could not copy the value</Show>
+          <Show when={status() === 'copied'}>{t().copiedAnnounce}</Show>
+          <Show when={status() === 'failed'}>{t().copyFailedAnnounce}</Show>
         </span>
       </div>
     </>

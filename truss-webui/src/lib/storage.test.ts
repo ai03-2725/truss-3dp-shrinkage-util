@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { STORAGE_WARNING, load, save, sanitizeState } from './storage.ts'
+import { load, save, sanitizeState } from './storage.ts'
 import type { StorageApi } from './storage.ts'
 import type { PersistedState } from './types.ts'
 import { emptyEquipment, emptyQuad, emptySingle, emptyTuning } from './types.ts'
@@ -92,10 +92,10 @@ test('loads an unknown step as no active flow to avoid a broken screen', () => {
 
 test('missing storage or a failed write warns but never throws', () => {
   const missing = load(null)
-  assert.equal(missing.warning, STORAGE_WARNING)
-  assert.equal(save(null, midFlowState()), STORAGE_WARNING)
+  assert.equal(missing.warning, 'unavailable')
+  assert.equal(save(null, midFlowState()), 'unavailable')
 
   const store = fakeStore()
   store.failWrites()
-  assert.equal(save(store.api, midFlowState()), STORAGE_WARNING)
+  assert.equal(save(store.api, midFlowState()), 'unavailable')
 })

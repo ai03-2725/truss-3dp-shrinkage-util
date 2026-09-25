@@ -1,4 +1,6 @@
 import { Show, onCleanup, onMount, type JSX } from 'solid-js'
+import { useLocale } from '../lib/locale-context.ts'
+import { messages } from '../lib/messages.ts'
 
 // Native <dialog> keeps focus trapping and Escape handling in the platform; we
 // only add Back/named buttons so keyboard and screen-reader use come for free.
@@ -12,6 +14,8 @@ export function ConfirmDialog(props: {
 }) {
   let ref!: HTMLDialogElement
   let trigger: Element | null = null
+  const locale = useLocale()
+  const t = () => messages(locale())
   onMount(() => {
     trigger = document.activeElement
     ref.showModal()
@@ -36,7 +40,7 @@ export function ConfirmDialog(props: {
       <Show when={props.children}>{props.children}</Show>
       <div class="truss-modal-actions">
         <button type="button" class="truss-button-secondary" onClick={props.onCancel}>
-          Cancel
+          {t().cancel}
         </button>
         <button type="button" onClick={props.onConfirm}>
           {props.confirmLabel}

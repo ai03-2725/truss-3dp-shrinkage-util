@@ -1,4 +1,6 @@
 import type { Accessor } from 'solid-js'
+import type { LocaleId } from './locale.ts'
+import type { StorageIssue } from './storage.ts'
 import type {
   ActiveCalibration,
   BeamInput,
@@ -17,9 +19,11 @@ export type QuadAxis = 'x' | 'y' | 'a' | 'b'
 export interface AppApi {
   printers: Accessor<Printer[]>
   skipEquipment: Accessor<boolean>
-  storageWarning: Accessor<string | null>
+  storageWarning: Accessor<StorageIssue | null>
   active: Accessor<ActiveCalibration | null>
   screen: Accessor<string>
+  locale: Accessor<LocaleId>
+  setLocale: (locale: LocaleId) => void
 
   startQuad: () => void
   startSingle: () => void

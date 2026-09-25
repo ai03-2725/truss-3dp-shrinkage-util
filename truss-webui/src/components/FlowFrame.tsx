@@ -1,7 +1,9 @@
 import { Show, type JSX } from 'solid-js'
 import type { AppApi } from '../lib/app-api.ts'
 import { flowProgress } from '../lib/flow.ts'
+import { messages } from '../lib/messages.ts'
 import { Icon } from './Icon.tsx'
+import { LocaleSwitcher } from './LocaleSwitcher.tsx'
 import { icons } from '../lib/icons.ts'
 
 // Consistent step chrome: Exit is always available, Back only before results,
@@ -17,6 +19,7 @@ export function FlowFrame(props: {
   children: JSX.Element
 }) {
   const progress = () => flowProgress(props.app.screen(), props.app.skipEquipment())
+  const t = () => messages(props.app.locale())
 
   return (
     <main class="container truss-flow" aria-labelledby="truss-step-title">
@@ -25,7 +28,7 @@ export function FlowFrame(props: {
           {(value) => (
             <div class="truss-progress">
               <span class="truss-progress-label">
-                Step {value().current} of {value().total}
+                {t().stepOf(value().current, value().total)}
               </span>
               <div
                 class="truss-progress-track"
@@ -33,7 +36,7 @@ export function FlowFrame(props: {
                 aria-valuemin={1}
                 aria-valuemax={value().total}
                 aria-valuenow={value().current}
-                aria-label="Calibration progress"
+                aria-label={t().progressLabel}
               >
                 <div
                   class="truss-progress-fill"
@@ -43,10 +46,11 @@ export function FlowFrame(props: {
             </div>
           )}
         </Show>
+        <LocaleSwitcher app={props.app} />
         <button
           type="button"
           class="truss-icon-button"
-          aria-label="Exit calibration"
+          aria-label={t().exitCalibration}
           onClick={props.app.requestExit}
         >
           <Icon svg={icons.x} />
@@ -59,7 +63,7 @@ export function FlowFrame(props: {
       <div class="truss-step-actions">
         {props.onBack && (
           <button type="button" class="truss-button-secondary" onClick={props.onBack}>
-            Back
+            {t().back}
           </button>
         )}
         {props.onNext && (
@@ -69,7 +73,7 @@ export function FlowFrame(props: {
             onClick={props.onNext}
             disabled={props.nextDisabled}
           >
-            {props.nextLabel ?? 'Next'}
+            {props.nextLabel ?? t().next}
           </button>
         )}
       </div>
