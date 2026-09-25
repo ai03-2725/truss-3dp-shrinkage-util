@@ -101,6 +101,12 @@ a.truss-icon-button:visited {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* Flipped placement for when the button sits too close to the viewport bottom. */
+.truss-locale-options--up {
+  top: auto;
+  bottom: calc(100% + 0.375rem);
+}
+
 .truss-locale-option {
   display: flex;
   align-items: center;
