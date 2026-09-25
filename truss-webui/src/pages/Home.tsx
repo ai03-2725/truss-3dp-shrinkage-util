@@ -7,21 +7,20 @@ export function Home(props: { app: AppApi }) {
     <main class="container truss-home">
       <h1 class="text-center">Truss Calibrator</h1>
       <p class="text-center">
-        Measure a calibration beam to get your filament's XY shrinkage and the percentage to enter in
-        your slicer.
+        Rapid, accurate calibration for filament XY shrinkage which minimizes wasted time and filament.
       </p>
 
       <div class="truss-card-list">
         <button type="button" class="truss-card" onClick={props.app.startQuad}>
           <span class="truss-card-content">
-            <span class="truss-card-title">Quad calibration (Full)</span>
+            <span class="truss-card-title">Quad-Beam Calibration</span>
             <span class="truss-card-body">
-              For a printer's first calibration. Measures all four beams and saves this printer's
-              extrapolation factor so later calibrations can be quick.
+              Runs a full calibration. <br/>
+              Start here if using Truss Calibrator for the first time on the printer being used.
             </span>
           </span>
           <span class="truss-card-action">
-            <span class="truss-card-action-label">Start Quad calibration</span>
+            <span class="truss-card-action-label">Start full calibration</span>
             <span class="truss-card-arrow" aria-hidden="true">
               →
             </span>
@@ -35,20 +34,20 @@ export function Home(props: { app: AppApi }) {
           disabled={!hasPrinters()}
         >
           <span class="truss-card-content">
-            <span class="truss-card-title">Single calibration (Quick)</span>
+            <span class="truss-card-title">Single-Beam Calibration</span>
             <span class="truss-card-body">
-              For a printer you have already calibrated. Prints one beam and reuses its saved
-              extrapolation factor.
+              Runs a rapid calibration. <br/>
+              Use this if you've already run a quad-beam calibration on the printer you will be using.
             </span>
             {!hasPrinters() && (
               <span class="truss-card-note">
-                A saved printer is required. Run a Quad calibration first, or add or import a printer
-                from Manage printers.
+                A saved printer is required - run a quad-beam calibration first, or import a printer
+                from the manage printers menu.
               </span>
             )}
           </span>
           <span class="truss-card-action">
-            <span class="truss-card-action-label">Start Single calibration</span>
+            <span class="truss-card-action-label">Start rapid calibration</span>
             <span class="truss-card-arrow" aria-hidden="true">
               →
             </span>
@@ -59,7 +58,7 @@ export function Home(props: { app: AppApi }) {
           <span class="truss-card-content">
             <span class="truss-card-title">Manage printers</span>
             <span class="truss-card-body">
-              Edit, delete, add, import, and export saved printer profiles.
+              Edit and import/export saved printer profiles.
             </span>
           </span>
           <span class="truss-card-action">
