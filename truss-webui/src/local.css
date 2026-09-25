@@ -253,7 +253,7 @@
 /* Attention-drawing callout using the same palette as the out-of-range warning
    messages (.truss-warning). */
 .truss-callout {
-  border: 1px solid var(--warning-border, #e6c35c);
+  /* border: 1px solid var(--warning-border, #e6c35c); */
   border-left: 4px solid var(--warning-accent, #e6a700);
   background: var(--warning-background, #fff4d6);
   color: var(--warning-text, #7a5200);
@@ -576,7 +576,7 @@
 /* ---- Dialog ---- */
 .truss-modal {
   border: none;
-  border-radius: var(--radius-large, 4px);
+  border-radius: 0.44rem;
   padding: 1.25rem;
   max-width: min(32rem, 92vw);
   color: var(--text-color-default, #414141);
@@ -590,7 +590,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-top: 1.25rem;
+  margin-top: 1.4375rem;
+}
+
+.truss-modal > h1, h2, h3, h4, h5, h6 {
+  margin-top: 0.3375rem;
+  margin-bottom: 1.125rem;
 }
 
 @media (min-width: 600px) {
