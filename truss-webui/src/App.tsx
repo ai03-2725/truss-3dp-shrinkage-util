@@ -1,4 +1,4 @@
-import { Match, Show, Switch, createEffect, createSignal } from 'solid-js'
+import { Match, Show, Switch, createEffect, createMemo, createSignal } from 'solid-js'
 import type { AppApi, QuadAxis } from './lib/app-api.ts'
 import type {
   ActiveCalibration,
@@ -62,7 +62,8 @@ function App() {
     if (warning) setStorageWarning(warning)
   })
 
-  const screen = () => active()?.step ?? view()
+  // Memoized so it only changes when the step changes, not on every state edit.
+  const screen = createMemo(() => active()?.step ?? view())
 
   // Start each screen at the top; otherwise a long page's scroll position
   // carries over to the next step.
