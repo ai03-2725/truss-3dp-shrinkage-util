@@ -38,7 +38,7 @@ export function SinglePrinter(props: { app: AppApi }) {
         </p>
       ) : (
         <fieldset class="truss-printer-picker">
-          <legend>Choose a saved printer</legend>
+          {/* <legend>Choose a saved printer</legend> */}
           <For each={printers()}>
             {(printer) => (
               <label class="truss-radio">

@@ -16,6 +16,10 @@ export function Lightbox(props: {
 }) {
   const [scale, setScale] = createSignal(1)
   const [offset, setOffset] = createSignal({ x: 0, y: 0 })
+  // Scale at which the image just fits inside the viewport. Small images are
+  // upscaled to this so the viewer opens as large as possible without the
+  // image spilling past the screen edges.
+  let fitScale = 1
   let dialog!: HTMLDialogElement
   let viewport!: HTMLDivElement
   let image!: HTMLImageElement
@@ -38,8 +42,25 @@ export function Lightbox(props: {
   })
 
   const reset = () => {
-    setScale(1)
+    setScale(fitScale)
     setOffset({ x: 0, y: 0 })
+  }
+
+  // The scale that makes the laid-out image fill the viewport (with a small
+  // margin) while preserving its aspect ratio. Never shrinks below 1:1.
+  const computeFitScale = () => {
+    const w = image.offsetWidth
+    const h = image.offsetHeight
+    if (!w || !h) return 1
+    return Math.max(
+      1,
+      Math.min((viewport.clientWidth * 0.94) / w, (viewport.clientHeight * 0.94) / h),
+    )
+  }
+
+  const onImageLoad = () => {
+    fitScale = computeFitScale()
+    reset()
   }
 
   const close = () => {
@@ -137,7 +158,7 @@ export function Lightbox(props: {
 
   const onViewportClick = (event: MouseEvent) => {
     if (moved) return
-    if (event.target === viewport || (event.target === image && scale() === 1)) close()
+    if (event.target === viewport || (event.target === image && scale() === fitScale)) close()
   }
 
   return (
@@ -165,6 +186,7 @@ export function Lightbox(props: {
           src={props.src}
           alt={props.alt}
           draggable={false}
+          onLoad={onImageLoad}
           style={{
             transform: `translate(${offset().x}px, ${offset().y}px) scale(${scale()})`,
             cursor: scale() > 1 ? 'grab' : 'zoom-in',

@@ -320,8 +320,8 @@
 .truss-printer-picker {
   border: 1px solid var(--form-input-border, #c3c3c3);
   border-radius: var(--radius-large, 4px);
-  padding: 0.5rem 1rem 1rem;
-  margin: 1rem 0;
+  /* padding: 0.5rem 1rem 1rem; */
+  /* margin: 1rem 0; */
 }
 
 .truss-radio {
@@ -510,7 +510,7 @@
   touch-action: none;
 }
 
-.truss-lightbox-viewport img {
+.truss-lightbox .truss-lightbox-viewport img {
   max-width: 94vw;
   max-height: 94vh;
   width: auto;

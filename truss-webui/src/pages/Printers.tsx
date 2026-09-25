@@ -144,8 +144,7 @@ export function Printers(props: { app: AppApi }) {
 
       <h1>Manage printers</h1>
       <p>
-        Printer profiles store only a name and its full-precision extrapolation factor. They are kept
-        in this browser; export them to move or back them up.
+        Printer profiles are kept only in this browser; export them to move or back them up.
       </p>
 
       <Show
