@@ -1,6 +1,6 @@
-// Japanese page content for Manage printers. PLACEHOLDER: currently English wording,
-// to be translated before public release (implementation-plan task 9). Handlers/state
-// come from the shared container.
+// Japanese page content for Manage printers. Handlers/state come from the shared
+// container; dialog copy and table labels live here so they can be translated in
+// context.
 import { For, Show } from 'solid-js'
 import type { PrintersContentProps } from '../Printers.tsx'
 import { ConfirmDialog } from '../../components/ConfirmDialog.tsx'
@@ -19,51 +19,51 @@ export function PrintersContent(props: PrintersContentProps) {
           <button
             type="button"
             class="truss-icon-button"
-            aria-label="Home"
+            aria-label="ホーム"
             onClick={() => props.app.finish()}
           >
             <Icon svg={icons.house} />
           </button>
         </div>
 
-        <h1>Manage printers</h1>
+        <h1>プリンター管理</h1>
         <p>
-          Printer profiles are kept only in this browser; export them to move or back them up.
+          プリンタープロファイルはこのブラウザーにのみ保存されます。移行やバックアップのためにエクスポートしてください。
         </p>
 
         <Show
           when={props.app.printers().length > 0}
-          fallback={<p class="truss-note">No printers saved yet. Add one below or run a Quad calibration.</p>}
+          fallback={<p class="truss-note">保存されたプリンターはまだありません。下で追加するか、クアッド校正を実行してください。</p>}
         >
           <table class="truss-printer-table">
-            <caption class="truss-visually-hidden">Saved printer profiles</caption>
+            <caption class="truss-visually-hidden">保存済みプリンタープロファイル</caption>
             <thead>
               <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Extrapolation factor</th>
-                <th scope="col">Actions</th>
+                <th scope="col">名前</th>
+                <th scope="col">外挿係数</th>
+                <th scope="col">操作</th>
               </tr>
             </thead>
             <tbody>
               <For each={props.app.printers()}>
                 {(printer, index) => (
                   <tr>
-                    <td data-label="Name">{printer.name}</td>
-                    <td data-label="Factor">{String(printer.extrapolationFactor)}</td>
-                    <td data-label="Actions" class="truss-row-actions">
+                    <td data-label="名前">{printer.name}</td>
+                    <td data-label="係数">{String(printer.extrapolationFactor)}</td>
+                    <td data-label="操作" class="truss-row-actions">
                       <button
                         type="button"
                         class="truss-button-secondary"
                         onClick={() => props.onEdit(index())}
                       >
-                        Edit
+                        編集
                       </button>
                       <button
                         type="button"
                         class="truss-button-secondary"
                         onClick={() => props.onDelete(index())}
                       >
-                        Delete
+                        削除
                       </button>
                     </td>
                   </tr>
@@ -75,52 +75,51 @@ export function PrintersContent(props: PrintersContentProps) {
 
         <div class="truss-printer-toolbar">
           <button type="button" onClick={props.onAdd}>
-            Add printer
+            プリンターを追加
           </button>
           <button type="button" class="truss-button-secondary" onClick={props.onExport}>
-            Export JSON
+            JSONをエクスポート
           </button>
           <button type="button" class="truss-button-secondary" onClick={props.onImportClick}>
-            Import JSON
+            JSONをインポート
           </button>
           <input
             ref={props.setFileInput}
             class="truss-visually-hidden"
             type="file"
             accept="application/json,.json"
-            aria-label="Import printer profiles from a JSON file"
+            aria-label="JSONファイルからプリンタープロファイルをインポート"
             onChange={(event) => props.onImport(event.currentTarget.files?.[0])}
           />
         </div>
 
         {props.importError && (
           <p class="truss-error" role="alert">
-            Import failed: {printerErrorMessage(props.app.locale(), props.importError)}
+            インポートに失敗しました：{printerErrorMessage(props.app.locale(), props.importError)}
           </p>
         )}
         {props.importSkipped.length > 0 && (
           <p class="truss-warning" role="status">
-            Imported, but kept your saved profiles for {props.importSkipped.length} name
-            {props.importSkipped.length === 1 ? '' : 's'} already present: {props.importSkipped.join(', ')}.
+            インポートしましたが、すでに存在する{props.importSkipped.length}件の名前については保存済みプロファイルを保持しました：{props.importSkipped.join(', ')}。
           </p>
         )}
 
         <section class="truss-preference" aria-labelledby="truss-preference-title">
-          <h2 id="truss-preference-title">Calibration setup</h2>
+          <h2 id="truss-preference-title">校正の設定</h2>
           <label class="truss-checkbox">
             <input
               type="checkbox"
               checked={props.app.skipEquipment()}
               onChange={(event) => props.app.setSkipEquipment(event.currentTarget.checked)}
             />
-            Skip the equipment prerequisites screen on future Quad calibrations
+            今後のクアッド校正で機器の前提条件画面をスキップする
           </label>
         </section>
       </main>
 
       <Show when={props.adding}>
         <PrinterFormDialog
-          title="Add printer"
+          title="プリンターを追加"
           initialName=""
           initialFactor=""
           onClose={props.onCloseAdd}
@@ -130,7 +129,7 @@ export function PrintersContent(props: PrintersContentProps) {
 
       <Show when={props.editingIndex !== null}>
         <PrinterFormDialog
-          title="Edit printer"
+          title="プリンターを編集"
           initialName={props.app.printers()[props.editingIndex!].name}
           initialFactor={String(props.app.printers()[props.editingIndex!].extrapolationFactor)}
           onClose={props.onCloseEdit}
@@ -140,9 +139,9 @@ export function PrintersContent(props: PrintersContentProps) {
 
       <Show when={props.deletingIndex !== null}>
         <ConfirmDialog
-          title="Delete printer?"
-          message={`Delete “${props.app.printers()[props.deletingIndex!].name}”? This cannot be undone.`}
-          confirmLabel="Delete"
+          title="プリンターを削除しますか？"
+          message={`“${props.app.printers()[props.deletingIndex!].name}”を削除しますか？この操作は元に戻せません。`}
+          confirmLabel="削除"
           onConfirm={props.onConfirmDelete}
           onCancel={props.onCloseDelete}
         />

@@ -1,6 +1,5 @@
-// Japanese page content for Home. PLACEHOLDER: currently English wording, to be
-// translated before public release (implementation-plan task 9). Layout may differ
-// from English; shared behavior comes from the container.
+// Japanese page content for Home. Layout may differ from English; shared behavior
+// comes from the container.
 import type { AppApi } from '../../lib/app-api.ts'
 import { Icon } from '../../components/Icon.tsx'
 import { LocaleSwitcher } from '../../components/LocaleSwitcher.tsx'
@@ -9,22 +8,22 @@ import { icons } from '../../lib/icons.ts'
 export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
   return (
     <main class="container truss-home">
-      <h1 class="text-center">Truss Calibrator</h1>
+      <h1 class="text-center">Trussキャリブレーター</h1>
       <p class="text-center">
-        Rapid, accurate calibration for filament XY shrinkage which minimizes wasted time and filament.
+        フィラメントのXY収縮を素早く正確に校正し、時間とフィラメントの無駄を最小限に抑えます。
       </p>
 
       <div class="truss-card-list">
         <button type="button" class="truss-card" onClick={props.app.startQuad}>
           <span class="truss-card-content">
-            <span class="truss-card-title">Quad-Beam Calibration</span>
+            <span class="truss-card-title">クアッドビーム校正</span>
             <span class="truss-card-body">
-              Runs a full calibration. <br/>
-              Start here if using Truss Calibrator for the first time on the printer being used.
+              本格的な校正を実行します。 <br/>
+              使用するプリンターでTrussキャリブレーターを初めて使う場合はここから始めてください。
             </span>
           </span>
           <span class="truss-card-action">
-            <span class="truss-card-action-label">Start full calibration</span>
+            <span class="truss-card-action-label">本校正を開始</span>
             <span class="truss-card-arrow" aria-hidden="true">
               →
             </span>
@@ -38,20 +37,20 @@ export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
           disabled={!props.hasPrinters}
         >
           <span class="truss-card-content">
-            <span class="truss-card-title">Single-Beam Calibration</span>
+            <span class="truss-card-title">シングルビーム校正</span>
             <span class="truss-card-body">
-              Runs a rapid calibration. <br/>
-              Use this if you've already run a quad-beam calibration on the printer you will be using.
+              迅速な校正を実行します。 <br/>
+              使用するプリンターでクアッドビーム校正をすでに実行済みの場合に使用します。
             </span>
             {!props.hasPrinters && (
               <span class="truss-card-note">
-                A saved printer is required - run a quad-beam calibration first, or import a printer
-                from the manage printers menu.
+                保存済みのプリンターが必要です。先にクアッドビーム校正を実行するか、プリンター管理
+                メニューからプリンターをインポートしてください。
               </span>
             )}
           </span>
           <span class="truss-card-action">
-            <span class="truss-card-action-label">Start rapid calibration</span>
+            <span class="truss-card-action-label">簡易校正を開始</span>
             <span class="truss-card-arrow" aria-hidden="true">
               →
             </span>
@@ -60,13 +59,13 @@ export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
 
         <button type="button" class="truss-card" onClick={props.app.openPrinters}>
           <span class="truss-card-content">
-            <span class="truss-card-title">Manage printers</span>
+            <span class="truss-card-title">プリンター管理</span>
             <span class="truss-card-body">
-              Edit and import/export saved printer profiles.
+              保存済みプリンタープロファイルの編集とインポート/エクスポート。
             </span>
           </span>
           <span class="truss-card-action">
-            <span class="truss-card-action-label">Manage printers</span>
+            <span class="truss-card-action-label">プリンター管理</span>
             <span class="truss-card-arrow" aria-hidden="true">
               →
             </span>
@@ -75,11 +74,11 @@ export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
 
         <button type="button" class="truss-card" onClick={props.app.openAbout}>
           <span class="truss-card-content">
-            <span class="truss-card-title">About</span>
-            <span class="truss-card-body">About the Truss Calibrator tool.</span>
+            <span class="truss-card-title">このツールについて</span>
+            <span class="truss-card-body">Trussキャリブレーターの概要。</span>
           </span>
           <span class="truss-card-action">
-            <span class="truss-card-action-label">About</span>
+            <span class="truss-card-action-label">このツールについて</span>
             <span class="truss-card-arrow" aria-hidden="true">
               →
             </span>
@@ -93,8 +92,8 @@ export function HomeContent(props: { app: AppApi; hasPrinters: boolean }) {
           href="https://github.com/ai03-2725/truss-3dp-shrinkage-util"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="View the source on GitHub"
-          title="GitHub repository"
+          aria-label="GitHubでソースを表示"
+          title="GitHubリポジトリ"
         >
           <Icon svg={icons.githubLogo} />
         </a>

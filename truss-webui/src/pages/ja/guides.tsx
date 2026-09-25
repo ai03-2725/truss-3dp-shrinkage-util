@@ -1,5 +1,5 @@
-// Japanese formatted guidance shared by both flows. PLACEHOLDER: currently English
-// wording, to be translated before public release (implementation-plan task 9).
+// Japanese formatted guidance shared by both flows. Paragraph order and figure
+// placement may differ per locale; behavior is unaffected.
 import type { JSX } from 'solid-js'
 import { img } from '../../lib/assets.ts'
 import { Figure } from '../../components/Figure.tsx'
@@ -8,19 +8,19 @@ import { Figure } from '../../components/Figure.tsx'
 export function MeasurementWarningsContent() {
   return (
     <div class="truss-callout">
-      <h3>Before measuring</h3>
+      <h3>測定の前に</h3>
       <ol>
         <li>
-          <strong>Do not apply excess force with your calipers.</strong> The Truss Calibrator is designed to 
-          resist abuse as much as possible, but all 3D printed plastics are elastic. Applying excess
-          force deforms the print and yields dimensions larger or smaller than actually printed. <br/>
-          Ideally the calipers should exert no force at all - let go of the clamping side and let the
-          print push the calipers back if necessary. If your calipers have thumb-wheel rollers, do
-          not use them to exert excess force.
+          <strong>ノギスで過剰な力を加えないでください。</strong>Trussキャリブレーターは可能な限り
+          乱暴な扱いに耐えるよう設計されていますが、3Dプリントされたプラスチックはすべて弾性があります。
+          過剰な力を加えるとプリントが変形し、実際に印刷された寸法より大きくも小さくも測定されてしまいます。 <br/>
+          理想的にはノギスがまったく力を加えない状態にしてください。クランプ側から手を離し、必要なら
+          プリントがノギスを押し戻すようにします。ノギスにサムホイール式のローラーがある場合、
+          それを使って過剰な力を加えないでください。
         </li>
         <li>
-          <strong>Measure parallel to the dimension.</strong> Excessively angled calipers will fail
-          to measure the dimension correctly.
+          <strong>測定する寸法と平行に測ってください。</strong>ノギスが大きく傾いていると、
+          寸法を正しく測定できません。
         </li>
       </ol>
     </div>
@@ -32,51 +32,51 @@ export function MeasurementWarningsContent() {
 export function InnerJawGuidanceContent(props: { note?: JSX.Element }) {
   return (
     <div class="truss-guidance">
-      <h3>Measuring the inner dimension</h3>
+      <h3>内側寸法の測定</h3>
       <p>
-        Please ensure that your calipers are positioned properly as described below.
+        以下に説明するように、ノギスが正しく位置決めされていることを確認してください。
       </p>
       {props.note}
 
-      <h4>Correct</h4>
+      <h4>正しい例</h4>
       <ul>
         <li>
-          The calipers enter from the <strong>top of the print</strong>.
-          <Figure src={img.caliperEnterTop} alt="Caliper entering the print from the top" />
+          ノギスは<strong>プリントの上面</strong>から差し込みます。
+          <Figure src={img.caliperEnterTop} alt="ノギスをプリントの上面から差し込む" />
         </li>
         <li>
-          The <strong>flat inner sides of the caliper are flush</strong> against the supportive walls located halfway
-          across the beam.
+          ノギスの<strong>平らな内側の面を、梁の途中にある支持壁に密着</strong>させます。
           <Figure
             src={img.innerCorrect1}
-            alt="Inner caliper jaws flush against the supportive wall on one end"
+            alt="一方の端で、ノギスの内側ジョーを支持壁に密着させる"
           />
         </li>
         <li>
-          The same is true for <strong>both ends</strong> of the caliper (watch out for one side slipping out of position while positioning the other).
+          ノギスの<strong>両端</strong>で同様にします（片側を位置決めしている間に、もう片側が
+          ずれないよう注意してください）。
           <Figure
             src={img.innerCorrect2}
-            alt="Inner caliper jaws flush against the supportive wall on the other end"
+            alt="もう一方の端で、ノギスの内側ジョーを支持壁に密着させる"
           />
         </li>
       </ul>
 
-      <h4>Incorrect</h4>
+      <h4>誤った例</h4>
       <ul>
         <li>
-          Incorrect: The calipers' inner flat sides are not making contact against the supportive walls. This
-          yields a diagonal measurement longer than what is printed.
+          誤り：ノギスの内側の平面が支持壁に接触していません。この場合、実際に印刷された
+          寸法より長い対角線の測定値になります。
           <Figure
             src={img.calipersIncorrectGap}
-            alt="Incorrect inner measurement with a gap between the jaw and the wall"
+            alt="ジョーと壁の間に隙間がある誤った内側測定"
           />
         </li>
         <li>
-          Incorrect: The calipers are being used from the bottom of the print. The slanted sides of the caliper
-          teeth should never face the supportive walls in the middle.
+          誤り：ノギスをプリントの下面から使用しています。ノギスの先端の斜めの面を、
+          中央の支持壁に向けてはいけません。
           <Figure
             src={img.calipersIncorrectSide}
-            alt="Incorrect inner measurement taken from the bottom of the print"
+            alt="プリントの下面から行った誤った内側測定"
           />
         </li>
       </ul>

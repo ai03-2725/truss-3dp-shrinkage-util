@@ -1,6 +1,5 @@
-// Japanese page content for About. PLACEHOLDER: currently English wording, to be
-// translated before public release (implementation-plan task 9). Layout/paragraph
-// order may differ from English; navigation comes from the shared container.
+// Japanese page content for About. Formatted long-form copy lives here so it can
+// be translated in context; navigation comes from the shared container.
 import type { AppApi } from '../../lib/app-api.ts'
 import { Icon } from '../../components/Icon.tsx'
 import { LocaleSwitcher } from '../../components/LocaleSwitcher.tsx'
@@ -16,53 +15,53 @@ export function AboutContent(props: { app: AppApi }) {
         <button
           type="button"
           class="truss-icon-button"
-          aria-label="Home"
+          aria-label="ホーム"
           onClick={() => props.app.finish()}
         >
           <Icon svg={icons.house} />
         </button>
       </div>
 
-      <h1>About</h1>
-      <img loading='lazy' src="og-truss.jpg" alt="Header image of the truss calibrator" style="width: 100%;"/>
-      <p>The Truss Calibrator is a tool designed to calibrate 3D printer filament shrinkage.</p>
-      <p>All filaments shrink after printing due to thermal contraction; Truss aims to calculate and correct this behavior with high accuracy and minimized filament waste.</p>
+      <h1>このツールについて</h1>
+      <img loading='lazy' src="og-truss.jpg" alt="Trussキャリブレーターのヘッダー画像" style="width: 100%;"/>
+      <p>Trussキャリブレーターは、3Dプリンター用フィラメントの収縮を校正するためのツールです。</p>
+      <p>すべてのフィラメントは熱収縮により印刷後に縮みます。Trussは、この挙動を高い精度で算出・補正し、フィラメントの無駄を最小限に抑えることを目指しています。</p>
       <br/>
-      <p>Specifically, Truss accomplishes the above with the following:</p>
+      <p>具体的には、Trussは以下の方法でこれを実現します：</p>
       <ul>
         <li>
-          Truss assumes you have modern, accurate calipers capable of measuring a 140mm wide object (most modern calipers have at least 150mm length).
+          Trussは、幅140mmの対象物を測定できる、現代的で正確なノギスを前提としています（最近のノギスの多くは150mm以上の測定長があります）。
         </li>
         <li>
-          With this assumption, Truss uses a "one-shot" long-distance measurement across a 140mm wide dimension rather than multiple small measurements used on other calibrators; this minimizes the effect of measurement errors/noise and yields an accurate shrinkage distance with few measurements required.
+          この前提のもと、Trussは他のキャリブレーターのような多数の小さな測定ではなく、幅140mmの寸法を横断する「一発式」の長距離測定を用います。これにより測定誤差やノイズの影響を最小限に抑え、わずかな測定回数で正確な収縮量を得られます。
         </li>
         <li>
-          A truss-beam structure minimizes the amount of filament used for the test print while providing sufficient structural rigidity for the measuring phase.
+          トラス梁構造により、テスト印刷に使うフィラメント量を最小限に抑えつつ、測定段階に十分な構造剛性を確保します。
         </li>
       </ul>
       <br/>
-      <p>The Truss calibrator uses two test print variants to balance maximum precision with speed:</p>
+      <p>Trussキャリブレーターは、最高の精度と速度のバランスを取るために2種類のテスト印刷を使い分けます：</p>
       <ul>
         <li>
-          First, a four-beam file is provided for printing; this is used to measure the X/Y axes and the two diagonals.<br/>
-          This file uses around 10 grams of filament.<br/>
-          <Figure src={img.trussQuad} alt="The quad beam design" />
+          まず、4本梁のファイルを印刷します。これはX/Y軸と2本の対角線を測定するために使用します。<br/>
+          このファイルは約10グラムのフィラメントを使用します。<br/>
+          <Figure src={img.trussQuad} alt="クアッドビーム設計" />
         </li>
         <li>
-          Based on these first measurements, Truss calculates an "extrapolation factor" to predict what a four-axis measurement would be from just the X axis measurement; this accounts for the printer's dimensional skew and inequalities.<br/>
-          This value is saved within the webapp.
+          これらの最初の測定値をもとに、Trussは「外挿係数」を算出し、X軸のみの測定から4軸測定の値を予測します。これはプリンターの寸法上の歪みやばらつきを考慮します。<br/>
+          この値はWebアプリ内に保存されます。
         </li>
         <li>
-          For the second run onwards, a single-beam file is provided to measure only the X axis; this file only uses around 2.5 grams of filament.<br/>
-          <Figure src={img.trussSingle} alt="The single beam design" />
+          2回目以降は、X軸のみを測定するシングルビームファイルを印刷します。このファイルは約2.5グラムのフィラメントしか使用しません。<br/>
+          <Figure src={img.trussSingle} alt="シングルビーム設計" />
         </li>
         <li>
-          For the single beam calibration runs, the measured X length is multiplied by the saved multiplier to extraploate what the full quad-beam print would yield from just the X beam measurements; this yields an accurate shrinkage compensation value with a tiny amount of filament and minimal number of manual measurements.
+          シングルビーム校正では、測定したX長に保存済みの倍率を掛けて、X梁のみの測定からクアッドビーム全体の結果を外挿します。これにより、ごく少量のフィラメントと最小限の手作業測定で、正確な収縮補正値を得られます。
         </li>
       </ul>
       <br/>
-      <p>The web UI does all of the averaging and multiplying on your behalf for ease of use.</p>
-      <small>Note: Printers and their extrapolation factors are currently only saved to the browser's storage; export the printer list to have a backup.</small>
+      <p>Web UIが、使いやすさのために平均化と乗算をすべて代行します。</p>
+      <small>注意：プリンターとその外挿係数は現在ブラウザーのストレージにのみ保存されます。バックアップとしてプリンターリストをエクスポートしてください。</small>
     </main>
   )
 }
