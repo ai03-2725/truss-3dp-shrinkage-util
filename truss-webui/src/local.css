@@ -80,9 +80,9 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 0.625rem;
+  padding: 0.3375rem;
   border: none;
-  border-radius: 10px;
+  border-radius: calc(0.325rem + 0.2125rem);
   background: #e4e4e4;
   color: var(--text-color-default, #414141);
   font-family: var(--font-body);
@@ -107,7 +107,7 @@
   flex: 1;
   padding: 1rem 1.25rem;
   background: #fff;
-  border-radius: 6px;
+  border-radius: 0.3426rem;
 }
 
 .truss-card:disabled .truss-card-content,
@@ -158,6 +158,12 @@
   .truss-card {
     flex-direction: row;
     align-items: stretch;
+    padding: 0.4125rem;
+    border-radius: calc(0.325rem + 0.2875rem);
+  }
+
+  .truss-card-content {
+    border-radius: 0.3375rem;
   }
 
   .truss-card-action {
