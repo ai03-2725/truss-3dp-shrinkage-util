@@ -6,15 +6,31 @@ import { namesMatch, normalizeName, parsePositiveDecimal } from './calc.ts'
 
 export const EXPORT_VERSION = 1
 
+// Stable error identifiers. UI code renders these through the locale messages so
+// an already-visible error changes language without re-running the action.
+export type PrinterError =
+  | { code: 'nameRequired' }
+  | { code: 'nameDuplicate'; name: string }
+  | { code: 'factorInvalid' }
+  | { code: 'notFound' }
+  | { code: 'invalidJson' }
+  | { code: 'notExportObject' }
+  | { code: 'unsupportedVersion'; expected: number }
+  | { code: 'printersList' }
+  | { code: 'entryNotObject' }
+  | { code: 'entryNameEmpty' }
+  | { code: 'entryFactorInvalid'; name: string }
+  | { code: 'duplicateInFile'; name: string }
+
 export type PrinterOpResult =
   | { ok: true; printers: Printer[] }
-  | { ok: false; error: string }
+  | { ok: false; error: PrinterError }
 
-function validateName(printers: Printer[], name: string, ignoreIndex = -1): string | null {
+function validateName(printers: Printer[], name: string, ignoreIndex = -1): PrinterError | null {
   const trimmed = normalizeName(name)
-  if (!trimmed) return 'Printer name is required.'
+  if (!trimmed) return { code: 'nameRequired' }
   if (printers.some((printer, index) => index !== ignoreIndex && namesMatch(printer.name, trimmed))) {
-    return `A printer named “${trimmed}” already exists.`
+    return { code: 'nameDuplicate', name: trimmed }
   }
   return null
 }
@@ -32,7 +48,7 @@ export function addPrinter(
   if (nameError) return { ok: false, error: nameError }
   const factor = validateFactor(factorInput)
   if (factor === null) {
-    return { ok: false, error: 'Enter a finite, positive extrapolation factor.' }
+    return { ok: false, error: { code: 'factorInvalid' } }
   }
   return { ok: true, printers: [...printers, { name: normalizeName(name), extrapolationFactor: factor }] }
 }
@@ -43,12 +59,12 @@ export function editPrinter(
   name: string,
   factorInput: string,
 ): PrinterOpResult {
-  if (index < 0 || index >= printers.length) return { ok: false, error: 'Printer not found.' }
+  if (index < 0 || index >= printers.length) return { ok: false, error: { code: 'notFound' } }
   const nameError = validateName(printers, name, index)
   if (nameError) return { ok: false, error: nameError }
   const factor = validateFactor(factorInput)
   if (factor === null) {
-    return { ok: false, error: 'Enter a finite, positive extrapolation factor.' }
+    return { ok: false, error: { code: 'factorInvalid' } }
   }
   const next = printers.slice()
   next[index] = { name: normalizeName(name), extrapolationFactor: factor }
@@ -82,45 +98,45 @@ export function exportJSON(printers: Printer[]): string {
 
 export type ImportResult =
   | { ok: true; printers: Printer[]; skipped: string[] }
-  | { ok: false; error: string }
+  | { ok: false; error: PrinterError }
 
 export function importJSON(current: Printer[], text: string): ImportResult {
   let parsed: unknown
   try {
     parsed = JSON.parse(text)
   } catch {
-    return { ok: false, error: 'The file is not valid JSON.' }
+    return { ok: false, error: { code: 'invalidJson' } }
   }
 
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-    return { ok: false, error: 'The file must contain a printer export object.' }
+    return { ok: false, error: { code: 'notExportObject' } }
   }
   const record = parsed as { version?: unknown; printers?: unknown }
   if (record.version !== EXPORT_VERSION) {
-    return { ok: false, error: `Unsupported file version. Expected version ${EXPORT_VERSION}.` }
+    return { ok: false, error: { code: 'unsupportedVersion', expected: EXPORT_VERSION } }
   }
   if (!Array.isArray(record.printers)) {
-    return { ok: false, error: 'The file must contain a list of printers.' }
+    return { ok: false, error: { code: 'printersList' } }
   }
 
   const imported: Printer[] = []
   for (const entry of record.printers) {
     if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) {
-      return { ok: false, error: 'Every printer entry must be an object.' }
+      return { ok: false, error: { code: 'entryNotObject' } }
     }
     const { name, extrapolationFactor } = entry as { name?: unknown; extrapolationFactor?: unknown }
     if (typeof name !== 'string' || !normalizeName(name)) {
-      return { ok: false, error: 'Every printer entry needs a non-empty name.' }
+      return { ok: false, error: { code: 'entryNameEmpty' } }
     }
     if (
       typeof extrapolationFactor !== 'number' ||
       !Number.isFinite(extrapolationFactor) ||
       extrapolationFactor <= 0
     ) {
-      return { ok: false, error: `“${normalizeName(name)}” has an invalid extrapolation factor.` }
+      return { ok: false, error: { code: 'entryFactorInvalid', name: normalizeName(name) } }
     }
     if (imported.some((printer) => namesMatch(printer.name, name))) {
-      return { ok: false, error: `The file contains duplicate printer name “${normalizeName(name)}”.` }
+      return { ok: false, error: { code: 'duplicateInFile', name: normalizeName(name) } }
     }
     imported.push({ name: normalizeName(name), extrapolationFactor })
   }

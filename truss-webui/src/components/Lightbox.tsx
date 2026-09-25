@@ -1,4 +1,6 @@
 import { createSignal, onCleanup, onMount } from 'solid-js'
+import { useLocale } from '../lib/locale-context.ts'
+import { messages } from '../lib/messages.ts'
 
 const MIN_SCALE = 1
 const MAX_SCALE = 8
@@ -16,6 +18,8 @@ export function Lightbox(props: {
 }) {
   const [scale, setScale] = createSignal(1)
   const [offset, setOffset] = createSignal({ x: 0, y: 0 })
+  const locale = useLocale()
+  const t = () => messages(locale())
   // Scale at which the image just fits inside the viewport. Small images are
   // upscaled to this so the viewer opens as large as possible without the
   // image spilling past the screen edges.
@@ -194,17 +198,17 @@ export function Lightbox(props: {
         />
       </div>
       <div class="truss-lightbox-controls">
-        <button type="button" onClick={() => zoomByButton(1.5)} aria-label="Zoom in">
+        <button type="button" onClick={() => zoomByButton(1.5)} aria-label={t().zoomIn}>
           +
         </button>
-        <button type="button" onClick={() => zoomByButton(1 / 1.5)} aria-label="Zoom out">
+        <button type="button" onClick={() => zoomByButton(1 / 1.5)} aria-label={t().zoomOut}>
           −
         </button>
-        <button type="button" onClick={reset} aria-label="Reset zoom">
-          Reset
+        <button type="button" onClick={reset} aria-label={t().resetZoom}>
+          {t().reset}
         </button>
-        <button type="button" onClick={close} aria-label="Close enlarged image">
-          Close
+        <button type="button" onClick={close} aria-label={t().closeEnlarged}>
+          {t().close}
         </button>
       </div>
       {props.caption && <p class="truss-lightbox-caption">{props.caption}</p>}

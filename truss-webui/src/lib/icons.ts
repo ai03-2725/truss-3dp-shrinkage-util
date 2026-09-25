@@ -5,6 +5,7 @@ import downloadSimple from '@phosphor-icons/core/assets/regular/download-simple.
 import house from '@phosphor-icons/core/assets/regular/house.svg?raw'
 import x from '@phosphor-icons/core/assets/regular/x.svg?raw'
 import githubLogo from '@phosphor-icons/core/assets/regular/github-logo.svg?raw'
+import globe from '@phosphor-icons/core/assets/regular/globe.svg?raw'
 import houseLine from '@phosphor-icons/core/assets/regular/house-line.svg?raw'
 
-export const icons = { copySimple, downloadSimple, house, githubLogo, houseLine, x }
+export const icons = { copySimple, downloadSimple, globe, house, githubLogo, houseLine, x }

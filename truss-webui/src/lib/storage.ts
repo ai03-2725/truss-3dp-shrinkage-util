@@ -8,8 +8,8 @@ import { normalizeName } from './calc.ts'
 
 export const STORAGE_KEY = 'truss-calibrator-v1'
 
-export const STORAGE_WARNING =
-  'Browser storage is unavailable. Your progress and printer profiles may not survive closing or refreshing the app. You can still calibrate and note the results down manually.'
+// Stable codes so an already-visible warning can change language on render.
+export type StorageIssue = 'unavailable' | 'unreadable' | 'malformed'
 
 export interface StorageApi {
   getItem(key: string): string | null
@@ -18,7 +18,7 @@ export interface StorageApi {
 
 export interface LoadOutcome {
   state: PersistedState
-  warning: string | null
+  warning: StorageIssue | null
 }
 
 export function defaultState(): PersistedState {
@@ -108,32 +108,32 @@ export function sanitizeState(value: unknown): PersistedState | null {
 }
 
 export function load(store: StorageApi | null): LoadOutcome {
-  if (!store) return { state: defaultState(), warning: STORAGE_WARNING }
+  if (!store) return { state: defaultState(), warning: 'unavailable' }
   let raw: string | null
   try {
     raw = store.getItem(STORAGE_KEY)
   } catch {
-    return { state: defaultState(), warning: STORAGE_WARNING }
+    return { state: defaultState(), warning: 'unavailable' }
   }
   if (raw === null) return { state: defaultState(), warning: null }
   let parsed: unknown
   try {
     parsed = JSON.parse(raw)
   } catch {
-    return { state: defaultState(), warning: 'Saved data could not be read and was reset.' }
+    return { state: defaultState(), warning: 'unreadable' }
   }
   const state = sanitizeState(parsed)
-  if (!state) return { state: defaultState(), warning: 'Saved data was malformed and was reset.' }
+  if (!state) return { state: defaultState(), warning: 'malformed' }
   return { state, warning: null }
 }
 
-export function save(store: StorageApi | null, state: PersistedState): string | null {
-  if (!store) return STORAGE_WARNING
+export function save(store: StorageApi | null, state: PersistedState): StorageIssue | null {
+  if (!store) return 'unavailable'
   try {
     store.setItem(STORAGE_KEY, JSON.stringify(state))
     return null
   } catch {
-    return STORAGE_WARNING
+    return 'unavailable'
   }
 }
 

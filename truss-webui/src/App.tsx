@@ -10,7 +10,16 @@ import type {
   TuningState,
 } from './lib/types.ts'
 import { emptyEquipment, emptyQuad, emptySingle, emptyTuning } from './lib/types.ts'
-import { browserStorage, load, save } from './lib/storage.ts'
+import { browserStorage, load, save, type StorageIssue } from './lib/storage.ts'
+import {
+  browserPreferredLanguages,
+  loadManualLocale,
+  resolveLocale,
+  saveManualLocale,
+  type LocaleId,
+} from './lib/locale.ts'
+import { LocaleContext } from './lib/locale-context.ts'
+import { storageMessage, messages } from './lib/messages.ts'
 import { previousStep } from './lib/flow.ts'
 import { upsertPrinter } from './lib/printers.ts'
 import { ConfirmDialog } from './components/ConfirmDialog.tsx'
@@ -41,12 +50,28 @@ function App() {
   // Load synchronously so the first render already shows the resumed screen.
   const store = browserStorage()
   const initial = load(store)
+  const [locale, setLocaleSignal] = createSignal<LocaleId>(
+    resolveLocale(loadManualLocale(store), browserPreferredLanguages()),
+  )
+  // Reflect the resolved locale before the first paint so assistive tech never
+  // sees a stale language.
+  document.documentElement.lang = locale()
   const [printers, setPrinters] = createSignal<Printer[]>(initial.state.printers)
   const [skipEquipment, setSkipEquipmentSignal] = createSignal(initial.state.skipEquipment)
   const [active, setActive] = createSignal<ActiveCalibration | null>(initial.state.active)
   const [view, setView] = createSignal<'home' | 'printers' | 'about'>('home')
-  const [storageWarning, setStorageWarning] = createSignal<string | null>(initial.warning)
+  const [storageWarning, setStorageWarning] = createSignal<StorageIssue | null>(initial.warning)
   const [exitConfirmOpen, setExitConfirmOpen] = createSignal(false)
+
+  createEffect(() => {
+    document.documentElement.lang = locale()
+  })
+
+  const setLocale = (next: LocaleId) => {
+    setLocaleSignal(next)
+    // Persist only an explicit manual choice; browser detection stays unset.
+    saveManualLocale(store, next)
+  }
 
   let firstSave = true
   createEffect(() => {
@@ -128,6 +153,8 @@ function App() {
     storageWarning,
     active,
     screen,
+    locale,
+    setLocale,
     startQuad,
     startSingle,
     openPrinters: () => setView('printers'),
@@ -158,11 +185,11 @@ function App() {
   }
 
   return (
-    <>
+    <LocaleContext.Provider value={locale}>
       <Show when={storageWarning()}>
-        {(message) => (
+        {(issue) => (
           <div class="truss-storage-warning" role="alert">
-            {message()}
+            {storageMessage(locale(), issue())}
           </div>
         )}
       </Show>
@@ -226,14 +253,14 @@ function App() {
 
       <Show when={exitConfirmOpen()}>
         <ConfirmDialog
-          title="Exit calibration?"
-          message="Leaving now clears this calibration's measurements, checkboxes, and progress. Saved printer profiles are kept."
-          confirmLabel="Exit and clear progress"
+          title={messages(locale()).exitTitle}
+          message={messages(locale()).exitMessage}
+          confirmLabel={messages(locale()).exitConfirm}
           onConfirm={confirmExit}
           onCancel={() => setExitConfirmOpen(false)}
         />
       </Show>
-    </>
+    </LocaleContext.Provider>
   )
 }
 

@@ -10,6 +10,7 @@ import {
   constants,
   existsSync,
   mkdirSync,
+  readdirSync,
   renameSync,
   rmSync,
 } from 'node:fs'
@@ -26,40 +27,17 @@ export const DEFAULT_OUTPUT_DIR = resolve(SCRIPT_DIR, '..', 'src', 'assets', 'im
 export const MAX_DIMENSION = 2560
 export const JPEG_QUALITY = 90
 
-// The 30 images imported by src/lib/assets.ts. `truss-dual.png` is deliberately
-// absent: the app does not use it.
-export const SOURCE_FILENAMES = [
-  'caliper-enter-top.jpg',
-  'calipers-incorrect-gap.jpg',
-  'calipers-incorrect-side.jpg',
-  'finished-print.jpg',
-  'inner-correct-1.jpg',
-  'inner-correct-2.jpg',
-  'inner-measurement-single.png',
-  'inner-measurement-walls.png',
-  'outer-measurement-single.png',
-  'outer-measurement-walls.png',
-  'outer-seam-example.png',
-  'print-prepared.png',
-  'printing-quad.png',
-  'printing-single.png',
-  'seam-tool.png',
-  'seam-visibility.png',
-  'shrinkage-adjust-1.png',
-  'shrinkage-adjust-2.png',
-  'single-measurement-inner.jpg',
-  'single-measurement-outer.jpg',
-  'single-printed.jpg',
-  'sliced-single.png',
-  'slicer-loaded.png',
-  'truss-quad.png',
-  'truss-single.png',
-  'x-beam.jpg',
-  'x-inner-diagram.png',
-  'x-inner-measurement.jpg',
-  'x-outer-diagram.png',
-  'x-outer-measurement.jpg',
-]
+// Sources under Documentation/Images are converted by default. `truss-dual.png`
+// is deliberately ignored: the app does not use it.
+export const IGNORE_FILENAMES = ['truss-dual.png']
+
+export function listSourceFiles(sourceDir: string): string[] {
+  return readdirSync(sourceDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && !entry.name.startsWith('.'))
+    .map((entry) => entry.name)
+    .filter((name) => !IGNORE_FILENAMES.includes(name))
+    .sort()
+}
 
 export function outputName(source: string): string {
   return basename(source, extname(source)) + '.jpg'
@@ -97,7 +75,7 @@ let tempCounter = 0
 export async function generateImages(options: GenerateOptions = {}): Promise<GenerateResult> {
   const sourceDir = options.sourceDir ?? DEFAULT_SOURCE_DIR
   const outputDir = options.outputDir ?? DEFAULT_OUTPUT_DIR
-  const files = options.files ?? SOURCE_FILENAMES
+  const files = options.files ?? listSourceFiles(sourceDir)
   const log = options.log ?? ((message: string) => console.log(message))
 
   assertUniqueOutputNames(files)

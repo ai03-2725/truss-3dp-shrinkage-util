@@ -14,13 +14,20 @@ import innerMeasurementWalls from '../assets/images/inner-measurement-walls.jpg'
 import outerMeasurementSingle from '../assets/images/outer-measurement-single.jpg'
 import outerMeasurementWalls from '../assets/images/outer-measurement-walls.jpg'
 import outerSeamExample from '../assets/images/outer-seam-example.jpg'
+import outerSeamExampleJa from '../assets/images/outer-seam-example-ja.jpg'
 import printPrepared from '../assets/images/print-prepared.jpg'
 import printingQuad from '../assets/images/printing-quad.jpg'
 import printingSingle from '../assets/images/printing-single.jpg'
 import seamTool from '../assets/images/seam-tool.jpg'
+import seamToolJa from '../assets/images/seam-tool-ja.jpg'
 import seamVisibility from '../assets/images/seam-visibility.jpg'
+import seamVisibilityJa from '../assets/images/seam-visibility-ja.jpg'
 import shrinkageAdjust1 from '../assets/images/shrinkage-adjust-1.jpg'
+import shrinkageAdjust1JaOrca from '../assets/images/shrinkage-adjust-1-ja-orca.jpg'
+import shrinkageAdjust1JaBambu from '../assets/images/shrinkage-adjust-1-ja-bambu.jpg'
 import shrinkageAdjust2 from '../assets/images/shrinkage-adjust-2.jpg'
+import shrinkageAdjust2JaOrca from '../assets/images/shrinkage-adjust-2-ja-orca.jpg'
+import shrinkageAdjust2JaBambu from '../assets/images/shrinkage-adjust-2-ja-bambu.jpg'
 import singleMeasurementInner from '../assets/images/single-measurement-inner.jpg'
 import singleMeasurementOuter from '../assets/images/single-measurement-outer.jpg'
 import singlePrinted from '../assets/images/single-printed.jpg'
@@ -48,13 +55,20 @@ export const img = {
   outerMeasurementSingle,
   outerMeasurementWalls,
   outerSeamExample,
+  outerSeamExampleJa,
   printPrepared,
   printingQuad,
   printingSingle,
   seamTool,
+  seamToolJa,
   seamVisibility,
+  seamVisibilityJa,
   shrinkageAdjust1,
+  shrinkageAdjust1JaOrca,
+  shrinkageAdjust1JaBambu,
   shrinkageAdjust2,
+  shrinkageAdjust2JaOrca,
+  shrinkageAdjust2JaBambu,
   singleMeasurementInner,
   singleMeasurementOuter,
   singlePrinted,
