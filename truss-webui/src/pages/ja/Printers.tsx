@@ -28,7 +28,7 @@ export function PrintersContent(props: PrintersContentProps) {
 
         <h1>プリンター管理</h1>
         <p>
-          プリンタープロファイルはこのブラウザーにのみ保存されます。移行やバックアップのためにエクスポートしてください。
+          プリンター情報は利用中のブラウザのみに保存されます。万が一のためにデータを出力して保存しておくことを強く推奨します。
         </p>
 
         <Show
@@ -100,19 +100,19 @@ export function PrintersContent(props: PrintersContentProps) {
         )}
         {props.importSkipped.length > 0 && (
           <p class="truss-warning" role="status">
-            インポートしましたが、すでに存在する{props.importSkipped.length}件の名前については保存済みプロファイルを保持しました：{props.importSkipped.join(', ')}。
+            インポートしましたが、すでに存在する{props.importSkipped.length}件の同名のプリンターについては上書きせず、ブラウザに保存されている情報を維持しました：{props.importSkipped.join(', ')}。
           </p>
         )}
 
         <section class="truss-preference" aria-labelledby="truss-preference-title">
-          <h2 id="truss-preference-title">校正の設定</h2>
+          <h2 id="truss-preference-title">その他の設定</h2>
           <label class="truss-checkbox">
             <input
               type="checkbox"
               checked={props.app.skipEquipment()}
               onChange={(event) => props.app.setSkipEquipment(event.currentTarget.checked)}
             />
-            今後のクアッド校正で機器の前提条件画面をスキップする
+            4軸補正にて「機材の確認」画面をスキップする
           </label>
         </section>
       </main>
@@ -140,7 +140,7 @@ export function PrintersContent(props: PrintersContentProps) {
       <Show when={props.deletingIndex !== null}>
         <ConfirmDialog
           title="プリンターを削除しますか？"
-          message={`“${props.app.printers()[props.deletingIndex!].name}”を削除しますか？この操作は元に戻せません。`}
+          message={`“${props.app.printers()[props.deletingIndex!].name}”を削除しますか？削除された情報は復元できません。`}
           confirmLabel="削除"
           onConfirm={props.onConfirmDelete}
           onCancel={props.onCloseDelete}
