@@ -1,0 +1,122 @@
+:root {
+
+  --form-input-padding: 0.875em;
+  --form-input-border: 1px solid #c3c3c3;
+  --form-background-color: #fafafa;
+  --form-placeholder-color: #a8a8a8;
+
+  --label-margin: 0.4375rem;
+
+  --font-headings: "Inter", Inter, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Apple SD Gothic Neo", Meiryo, "Noto Sans JP", "Noto Sans KR", "Malgun Gothic", Osaka, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --font-body: "Pretendard JP Variable", "Pretendard JP", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Hiragino Sans", "Apple SD Gothic Neo", Meiryo, "Noto Sans JP", "Noto Sans KR", "Malgun Gothic", Osaka, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --text-color-default: #414141;
+  --text-color-emphasis: #151515;
+  --text-color-deemphasized: #6a6a6a;
+
+  --button-padding: 0.6875rem 1.0625rem 0.6875rem 1.0625rem;
+  --button-border-width-secondary: 2px;
+
+  /* Warning / attention palette (shared by warning messages and callouts) */
+  --warning-background: #fff4d6;
+  --warning-border: #e6c35c;
+  --warning-accent: #e6a700;
+  --warning-text: #7a5200;
+  /* --button-bg-primary: #535353; */
+  --button-bg-primary: #414141;
+  --button-bg-disabled: #6a6a6a;
+  --button-text-primary: #fafafa;
+  --button-text-disabled: #a8a8a8;
+
+  /* Currently clip-path seems to yield rendering errors based on element size */
+  /* Especially noticeable on small elements - stick to regular radius for most */
+  --radius-small: 2.81px;
+  --radius-medium: 3.6875px;
+  --radius-large: 4.2625px;
+
+  /* Fillet round small - used as the standalone small fillet */
+  /* Tuning based on width 5 */
+  /* --scalar: 0.86375; -> Too sharp? */
+  /* --scalar: 0.91826;
+  --fillet-round-small: 0px calc(5px * var(--scalar)),
+    calc(0.002130375px * var(--scalar)) calc(4.558804px * var(--scalar)),
+    calc(0.007869328px * var(--scalar)) calc(4.117642px * var(--scalar)),
+    calc(0.02453877px * var(--scalar)) calc(3.676758px * var(--scalar)),
+    calc(0.06489249px * var(--scalar)) calc(3.237408px * var(--scalar)),
+    calc(0.1432836px * var(--scalar)) calc(2.803229px * var(--scalar)),
+    calc(0.2679518px * var(--scalar)) calc(2.38001px * var(--scalar)),
+    calc(0.4408858px * var(--scalar)) calc(1.974115px * var(--scalar)),
+    calc(0.6618039px * var(--scalar)) calc(1.592209px * var(--scalar)),
+    calc(0.9296148px * var(--scalar)) calc(1.24159px * var(--scalar)),
+    calc(1.24159px * var(--scalar)) calc(0.9296148px * var(--scalar)),
+    calc(1.592209px * var(--scalar)) calc(0.6618039px * var(--scalar)),
+    calc(1.974115px * var(--scalar)) calc(0.4408858px * var(--scalar)),
+    calc(2.38001px * var(--scalar)) calc(0.2679518px * var(--scalar)),
+    calc(2.803229px * var(--scalar)) calc(0.1432836px * var(--scalar)),
+    calc(3.237408px * var(--scalar)) calc(0.06489249px * var(--scalar)),
+    calc(3.676758px * var(--scalar)) calc(0.02453877px * var(--scalar)),
+    calc(4.117642px * var(--scalar)) calc(0.007869328px * var(--scalar)),
+    calc(4.558804px * var(--scalar)) calc(0.002130375px * var(--scalar)),
+    calc(5px * var(--scalar)) 0px,
+    calc(100% - (5px * var(--scalar))) 0px,
+    calc(100% - (4.558804px * var(--scalar))) calc(0.002130375px * var(--scalar)),
+    calc(100% - (4.117642px * var(--scalar))) calc(0.007869328px * var(--scalar)),
+    calc(100% - (3.676758px * var(--scalar))) calc(0.02453877px * var(--scalar)),
+    calc(100% - (3.237408px * var(--scalar))) calc(0.06489249px * var(--scalar)),
+    calc(100% - (2.803229px * var(--scalar))) calc(0.1432836px * var(--scalar)),
+    calc(100% - (2.38001px * var(--scalar))) calc(0.2679518px * var(--scalar)),
+    calc(100% - (1.974115px * var(--scalar))) calc(0.4408858px * var(--scalar)),
+    calc(100% - (1.592209px * var(--scalar))) calc(0.6618039px * var(--scalar)),
+    calc(100% - (1.24159px * var(--scalar))) calc(0.9296148px * var(--scalar)),
+    calc(100% - (0.9296148px * var(--scalar))) calc(1.24159px * var(--scalar)),
+    calc(100% - (0.6618039px * var(--scalar))) calc(1.592209px * var(--scalar)),
+    calc(100% - (0.4408858px * var(--scalar))) calc(1.974115px * var(--scalar)),
+    calc(100% - (0.2679518px * var(--scalar))) calc(2.38001px * var(--scalar)),
+    calc(100% - (0.1432836px * var(--scalar))) calc(2.803229px * var(--scalar)),
+    calc(100% - (0.06489249px * var(--scalar))) calc(3.237408px * var(--scalar)),
+    calc(100% - (0.02453877px * var(--scalar))) calc(3.676758px * var(--scalar)),
+    calc(100% - (0.007869328px * var(--scalar))) calc(4.117642px * var(--scalar)),
+    calc(100% - (0.002130375px * var(--scalar))) calc(4.558804px * var(--scalar)),
+    100% calc(5px * var(--scalar)),
+    100% calc(100% - (5px * var(--scalar))),
+    calc(100% - (0.002130375px * var(--scalar))) calc(100% - (4.558804px * var(--scalar))),
+    calc(100% - (0.007869328px * var(--scalar))) calc(100% - (4.117642px * var(--scalar))),
+    calc(100% - (0.02453877px * var(--scalar))) calc(100% - (3.676758px * var(--scalar))),
+    calc(100% - (0.06489249px * var(--scalar))) calc(100% - (3.237408px * var(--scalar))),
+    calc(100% - (0.1432836px * var(--scalar))) calc(100% - (2.803229px * var(--scalar))),
+    calc(100% - (0.2679518px * var(--scalar))) calc(100% - (2.38001px * var(--scalar))),
+    calc(100% - (0.4408858px * var(--scalar))) calc(100% - (1.974115px * var(--scalar))),
+    calc(100% - (0.6618039px * var(--scalar))) calc(100% - (1.592209px * var(--scalar))),
+    calc(100% - (0.9296148px * var(--scalar))) calc(100% - (1.24159px * var(--scalar))),
+    calc(100% - (1.24159px * var(--scalar))) calc(100% - (0.9296148px * var(--scalar))),
+    calc(100% - (1.592209px * var(--scalar))) calc(100% - (0.6618039px * var(--scalar))),
+    calc(100% - (1.974115px * var(--scalar))) calc(100% - (0.4408858px * var(--scalar))),
+    calc(100% - (2.38001px * var(--scalar))) calc(100% - (0.2679518px * var(--scalar))),
+    calc(100% - (2.803229px * var(--scalar))) calc(100% - (0.1432836px * var(--scalar))),
+    calc(100% - (3.237408px * var(--scalar))) calc(100% - (0.06489249px * var(--scalar))),
+    calc(100% - (3.676758px * var(--scalar))) calc(100% - (0.02453877px * var(--scalar))),
+    calc(100% - (4.117642px * var(--scalar))) calc(100% - (0.007869328px * var(--scalar))),
+    calc(100% - (4.558804px * var(--scalar))) calc(100% - (0.002130375px * var(--scalar))),
+    calc(100% - (5px * var(--scalar))) 100%,
+    calc(5px * var(--scalar)) 100%,
+    calc(4.558804px * var(--scalar)) calc(100% - (0.002130375px * var(--scalar))),
+    calc(4.117642px * var(--scalar)) calc(100% - (0.007869328px * var(--scalar))),
+    calc(3.676758px * var(--scalar)) calc(100% - (0.02453877px * var(--scalar))),
+    calc(3.237408px * var(--scalar)) calc(100% - (0.06489249px * var(--scalar))),
+    calc(2.803229px * var(--scalar)) calc(100% - (0.1432836px * var(--scalar))),
+    calc(2.38001px * var(--scalar)) calc(100% - (0.2679518px * var(--scalar))),
+    calc(1.974115px * var(--scalar)) calc(100% - (0.4408858px * var(--scalar))),
+    calc(1.592209px * var(--scalar)) calc(100% - (0.6618039px * var(--scalar))),
+    calc(1.24159px * var(--scalar)) calc(100% - (0.9296148px * var(--scalar))),
+    calc(0.9296148px * var(--scalar)) calc(100% - (1.24159px * var(--scalar))),
+    calc(0.6618039px * var(--scalar)) calc(100% - (1.592209px * var(--scalar))),
+    calc(0.4408858px * var(--scalar)) calc(100% - (1.974115px * var(--scalar))),
+    calc(0.2679518px * var(--scalar)) calc(100% - (2.38001px * var(--scalar))),
+    calc(0.1432836px * var(--scalar)) calc(100% - (2.803229px * var(--scalar))),
+    calc(0.06489249px * var(--scalar)) calc(100% - (3.237408px * var(--scalar))),
+    calc(0.02453877px * var(--scalar)) calc(100% - (3.676758px * var(--scalar))),
+    calc(0.007869328px * var(--scalar)) calc(100% - (4.117642px * var(--scalar))),
+    calc(0.002130375px * var(--scalar)) calc(100% - (4.558804px * var(--scalar))),
+    0px calc(100% - (5px * var(--scalar))); */
+  
+ 
+}

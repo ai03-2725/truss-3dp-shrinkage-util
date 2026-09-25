@@ -1,0 +1,61 @@
+/* Buttons */
+input[type="submit"], input[type="button"], input[type="reset"],
+button, .button {
+  display: block;
+  width: 100%;
+  max-width: fill-available;
+  max-width: stretch;
+  max-width: -webkit-fill-available;
+  max-width: -moz-available;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  padding: var(--button-padding);
+  /* border: var(--form-input-border); */
+  border-radius: var(--radius-large);
+  background-color: var(--button-bg-primary);
+  color: var(--button-text-primary);
+  border: none;
+  cursor: pointer;
+}
+
+/* Anchors styled as buttons must not inherit the dark link/visited colors */
+a.button:link,
+a.button:visited {
+  color: var(--button-text-primary);
+}
+
+input::file-selector-button {
+  display: block;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  padding: var(--button-padding);
+  /* border: var(--form-input-border); */
+  border-radius: var(--radius-large);
+  background-color: var(--button-bg-primary) !important;
+  color: var(--button-text-primary);
+  border: none;
+  cursor: pointer;
+}
+
+input[type="submit"]:disabled, input[type="button"]:disabled, input[type="reset"]:disabled,
+button:disabled, .button:disabled {
+  cursor: unset;
+  background-color: var(--button-bg-disabled) !important;
+  color: var(--button-text-disabled) !important;
+}
+
+/* Secondary (outline) buttons - reusable anywhere alongside the base button */
+.truss-button-secondary,
+.button-secondary {
+  background-color: transparent;
+  color: var(--text-color-emphasis);
+  border: var(--button-border-width-secondary) solid var(--button-bg-primary);
+  /* Inherits border-radius from the base button rule above */
+}
+
+.truss-button-secondary:hover:not(:disabled),
+.button-secondary:hover:not(:disabled) {
+  background-color: var(--button-bg-primary);
+  color: var(--button-text-primary);
+}
+

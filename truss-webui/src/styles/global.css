@@ -1,0 +1,106 @@
+/* @import "tailwindcss"; */
+
+/* Import Inter font */
+/* Currently handled by npm package */
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap'); */
+
+/* Import Pretendard font */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-jp-dynamic-subset.min.css");
+
+/* Import Chivo Mono font */
+@import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Import clothoid fillet defs */
+/* @import "./elements/clothoid-corners.css"; */
+
+/* Import individual element styling */
+@import "./elements/vars.css";
+@import "./elements/kbd.css";
+@import "./elements/code.css";
+@import "./elements/samp.css";
+@import "./elements/pre.css";
+@import "./elements/form.css";
+@import "./elements/text.css";
+@import "./elements/button.css";
+
+/* Import spacing utilities */
+@import "./utility/spacing.css";
+
+html {
+  font-size: 100%;
+  /* font-family: var(--font-headings); */
+  font-optical-sizing: auto;
+
+  /* Uses a similar idea to PicoCSS's rem scaling, but uses much more gradual values */
+  @media (min-width: 576px) {
+    /* font-size: 105%; */
+    font-size: 104%;
+  }
+  @media (min-width: 768px) {
+    font-size: 108%;
+  }
+  @media (min-width: 1024px) {
+    font-size: 112%;
+  }
+  @media (min-width: 1280px) {
+    font-size: 116%;
+  }
+  @media (min-width: 1536px) {
+    font-size: 120%;
+  }
+}
+
+
+
+/* Avoid styling the stock iframe element since some sites override styles on their own */
+.iframe-pretty {
+  border-style: none;
+}
+
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+
+  @media (min-width: 768px) {
+    max-width: 700px;
+  }
+
+}
+
+.spacer {
+  flex: 1;
+}
+
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+.center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.lock-scroll {
+  /* overflow: clip; */
+  /* touch-action: none; */
+  /* scrollbar-gutter: stable; */
+  /* position: fixed;
+  overflow-y: scroll; */
+}
+
+
+/* Colors */
+:root {
+  --color-secondary-base: #ede9e8;
+  --color-secondary-element: #392f2d;
+  --color-secondary-subheading: #87808e;
+  --color-secondary-dimmed: #ada1a8;
+}
