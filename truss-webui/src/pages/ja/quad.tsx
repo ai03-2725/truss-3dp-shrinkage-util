@@ -172,17 +172,16 @@ export function QuadPrintContent() {
   return (
     <>
       <p>スライスしたファイルを印刷します。</p>
-      <Figure src={img.printingQuad} alt="印刷中のクアッドビーム" />
+      <Figure src={img.printingQuad} alt="印刷中の4軸モデル" />
       <div class="truss-callout">
-        <h3>プリントの取り出し</h3>
+        <h3>造形物の取り外し</h3>
         <p>
-          <strong>プリントをビルドプレートから無理やり剥がさないでください</strong>。プリントが反ってしまい、
-          測定値が無効になるおそれがあります。 <br/>
-          プリントが完全に冷えるまで待ってから、ビルドプレートから慎重に取り外してください。 <br/>
+          <strong>造形物をビルドプレートから無理やり剥がさないでください</strong>。造形物が反ってしまい、測定値が無効になるおそれがあります。 <br/>
+          造形物が完全に冷えるまで待ってから、ビルドプレートから慎重に取り外してください。 <br/>
           <strong>ビルドプレートに付いた状態のまま測定を行わないでください。</strong>
         </p>
       </div>
-      <Figure src={img.finishedPrint} alt="取り外し前のプリント" caption="取り外し前のプリント" />
+      <Figure src={img.finishedPrint} alt="取り外し前の造形物" caption="取り外し前の造形物" />
     </>
   )
 }
@@ -209,10 +208,10 @@ export function QuadXContent(props: { app: AppApi; beam: BeamInput }) {
       <p>X梁の2つの計測点（外側と内側）を測定します。</p>
       <p>必要に応じて画像をタップ/クリックし、拡大してご確認ください。</p>
       <div class="truss-image-grid">
-        <Figure src={img.xOuterDiagram} alt="X外側測定の図" caption="外側測定。" />
-        <Figure src={img.xOuterMeasurement} alt="ノギスによるX外側測定の写真" />
-        <Figure src={img.xInnerDiagram} alt="X内側測定の図" caption="内側測定。" />
-        <Figure src={img.xInnerMeasurement} alt="ノギスによるX内側測定の写真" />
+        <Figure src={img.xOuterDiagram} alt="X外側測定の図" caption="外側の測定用の面" />
+        <Figure src={img.xOuterMeasurement} alt="ノギスによる外側の面の測定" />
+        <Figure src={img.xInnerDiagram} alt="X内側測定の図" caption="内側の測定用の面" />
+        <Figure src={img.xInnerMeasurement} alt="ノギスによる内側の面の測定" />
       </div>
 
       <InnerJawGuidance />
